@@ -70,7 +70,7 @@ class MyHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Duration seconds = const Duration(seconds: 10);
+    Duration seconds = const Duration(seconds: 5);
     Timer timer = Timer(seconds, handleTimeout);
 
     return GestureDetector(
