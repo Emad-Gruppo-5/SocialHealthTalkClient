@@ -15,13 +15,6 @@ class Profile extends StatefulWidget {
 
   const Profile({required this.cod_fiscale, required this.nome, required this.cognome, required this.email, required this.num_cellulare, required this.tipologia_chat });
 
-  // String getnome(){ return this.nome; }
-  // String getcognome(){ return this.cognome; }
-  // String getemail(){ return this.email; }
-  // String getcod_fiscale(){ return this.cod_fiscale; }
-  // int getnum_cellulare(){ return this.num_cellulare; }
-  // int gettipologia_chat(){ return this.tipologia_chat; }
-
   @override
   _Profile createState() => _Profile();
 

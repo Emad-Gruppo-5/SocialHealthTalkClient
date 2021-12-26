@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'profile.dart';
 import 'dart:developer';
-
+import 'package:intl/intl.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -117,7 +117,10 @@ class Patient_Home extends StatelessWidget {
 
   void handleTimeout(){
     print("TIMEOUT\nCod_fiscale: " + cod_fiscale);
+    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
+    String ultimo_accesso = dateFormat.format(DateTime.now());
     FirebaseFirestore.instance.collection('patients').doc(cod_fiscale).update({'status': 'offline'});
+    FirebaseFirestore.instance.collection('patients').doc(cod_fiscale).update({'ultimo_accesso': ultimo_accesso});
   }
   
 
