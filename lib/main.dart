@@ -1,244 +1,46 @@
-import 'package:flutter/material.dart' hide Key;
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:encrypt/encrypt.dart';
-import 'package:crypt/crypt.dart';
-import 'package:project/familiare.dart';
+import 'package:flutter/material.dart';
+import 'patient/popup.dart';
+import 'patient/home.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp());
+}
 
-
-
-void main() => runApp(MyApp());
-
+/// This is the main application widget.
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-    // String token;
-    @override
-    Widget build(BuildContext context) {
-        return MaterialApp(
-            title: "Social Health Talk",
-            debugShowCheckedModeBanner: false,
-            home: LoginPage(),
-        );
-    }
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+        home: Scaffold(
+      body: MyStatelessWidget(),
+    ));
+  }
 }
 
+/// This is the stateless widget that the main application instantiates.
+class MyStatelessWidget extends StatelessWidget {
+  const MyStatelessWidget({Key? key}) : super(key: key);
 
-
-class LoginPage extends StatelessWidget {
-
-
-    TextEditingController _cod_fiscaleC = TextEditingController();
-    TextEditingController _passwordC = TextEditingController();
-
-    Future<String> login(cod_fiscale, password) async {
-      
-      final digest = Crypt.sha256(password).toString();
-      var uri = Uri.parse('http://127.0.0.1:5000/login');
-      uri = uri.replace(queryParameters: <String, String>{'cod_fiscale': cod_fiscale, 'password': digest});
-      print(uri);
-
-      int role;
-      print("\nECCOMI IN getUser. COD_FISCALE: "+ cod_fiscale +" PASSWORD: "  + digest);
-
-      Map<String, String> message = {"cod_fiscale": cod_fiscale, "password":digest};
-      var body = json.encode(message);
-      print("\nBODY:: " + body);
-      final data = await http.get(uri, headers: <String, String>{ 'Content-Type':'application/json; charset=UTF-8'});
-      print('Response status: ${data.statusCode}');
-      print('Response body: ${data.body}');
-      return data.body;
-    }
-
-    @override
-    Widget build(BuildContext context) {
-        return Scaffold(
-            body: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        colors: [
-                            Colors.lightBlue.shade200,
-                            Colors.lightBlue.shade100,
-                            Colors.lightBlue.shade200
-                        ]
-                    )
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: < Widget > [
-                        SizedBox(height: 40, ),
-                        Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: < Widget > [
-                                    // Text("Login", style: TextStyle(color: Colors.white, fontSize: 40),),
-                                    // SizedBox(height: 10,)
-                                    Center(child: Image.asset('assets/images/SHT.png'))
-                                ],
-                            ),
-                        ),
-                        SizedBox(height: 20),
-                        Expanded(
-                            child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(topLeft: Radius.circular(60), topRight: Radius.circular(60))
-                                ),
-                                child: SingleChildScrollView(
-                                    child: Padding(
-                                        padding: EdgeInsets.all(30),
-                                        child: Column(
-                                            children: < Widget > [
-                                                SizedBox(height: 30, ),
-                                                Container(
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius: BorderRadius.circular(10),
-                                                        boxShadow: [BoxShadow(
-                                                            color: Color.fromRGBO(109, 193, 255, .3),
-                                                            blurRadius: 20,
-                                                            offset: Offset(0, 10)
-                                                        )]
-                                                    ),
-                                                    child: Column(
-                                                        children: < Widget > [
-                                                            Container(
-                                                                padding: EdgeInsets.all(10),
-                                                                decoration: BoxDecoration(
-                                                                    border: Border(bottom: BorderSide(color: Colors.grey.shade200))
-                                                                ),
-                                                                child: TextField(
-                                                                    controller: _cod_fiscaleC,
-                                                                    decoration: InputDecoration(
-                                                                        hintText: "Codice fiscale",
-                                                                        hintStyle: TextStyle(color: Colors.grey),
-                                                                        border: InputBorder.none
-                                                                    ),
-                                                                ),
-                                                            ),
-                                                            Container(
-                                                                padding: EdgeInsets.all(10),
-                                                                decoration: BoxDecoration(
-                                                                    border: Border(bottom: BorderSide(color: Colors.grey.shade200))
-                                                                ),
-                                                                child: TextField(
-                                                                    controller: _passwordC,
-                                                                    obscureText: true,
-                                                                    decoration: InputDecoration(
-                                                                        hintText: "Password",
-                                                                        hintStyle: TextStyle(color: Colors.grey),
-                                                                        border: InputBorder.none
-                                                                    ),
-                                                                ),
-                                                            ),
-                                                        ],
-                                                    ),
-                                                ),
-                                                SizedBox(height: 40, ),
-                                                Container(
-                                                    height: 50,
-                                                    margin: EdgeInsets.symmetric(horizontal: 50),
-                                                    decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(90),
-                                                        color: Colors.lightBlue.shade700
-                                                    ),
-                                                    child: ElevatedButton(onPressed: () {
-                                                            var cod_fiscale = _cod_fiscaleC.text;
-                                                            var password = _passwordC.text;
-                                                            
-                                                            login(cod_fiscale, password).then((data) {
-                                                              int role = json.decode(data)['role'];
-                                                              String token = json.decode(data)['token'];
-                                                              switch (role) {
-                                                                case 0: //ADMIN
-                                                                  Navigator.push(context,
-                                                                         MaterialPageRoute(
-                                                                            builder: (context) => Familiare(token: token)));
-                                                                  break;
-                                                                case 1: //PAZIENTE
-                                                                  Navigator.push(context,
-                                                                         MaterialPageRoute(
-                                                                            builder: (context) => Familiare(token: token)));
-                                                                  break;
-                                                                case 2: //FAMILIARE
-                                                                  Navigator.push(context,
-                                                                         MaterialPageRoute(
-                                                                            builder: (context) => Familiare(token: token)));
-                                                                  break;
-                                                                case 3: //VOLONTARIO
-                                                                  Navigator.push(context,
-                                                                         MaterialPageRoute(
-                                                                            builder: (context) => Familiare(token: token)));
-                                                                  break;
-                                                                default:
-                                                              }
-                                                            });
-                                                            
-                                                            
-                                                            // Navigator.of(context).pushNamed("familiarePage");
-
-                                                        }, child: Center(
-                                                            child: Text("Accedi", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), )
-
-                                                        ),
-                                                        style: ElevatedButton.styleFrom(
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.circular(90)
-                                                            ),
-                                                            primary: Colors.lightBlue.shade900
-                                                        ),
-
-                                                    )
-                                                ),
-                                                SizedBox(height: 20, ),
-                                                const Divider(
-                                                        height: 20,
-                                                        thickness: 1,
-                                                        indent: 10,
-                                                        endIndent: 30
-                                                    ),
-                                                    SizedBox(height: 20, ),
-                                                    Text("Non sei ancora registrato? ", style: TextStyle(color: Colors.black87), ),
-                                                    SizedBox(height: 20, ),
-                                                    Container(
-                                                        height: 50,
-                                                        margin: EdgeInsets.symmetric(horizontal: 50),
-                                                        decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(50),
-                                                            color: Colors.lightBlue.shade900
-                                                        ),
-                                                        child: Center(
-                                                            child: Text("Registrati", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), ),
-                                                        )
-                                                    )
-                                            ],
-                                        ),
-                                    ),
-                                ),
-                            ),
-                        )
-                    ],
-                ),
-            ),
-        );
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Home()),
+          );
+        },
+        child: const Text('Home'),
+      ),
+    );
+  }
 }
-
-// class AdminHome extends StatelessWidget {
-
-//     final String data;
-
-//     AdminHome({
-//         required this.data
-//     });
-
-//     @override
-//     Widget build(BuildContext context) {
-//         return Scaffold(
-//             appBar: AppBar(title: Text('Routing App'), ),
-//         );
-//     }
-// }
