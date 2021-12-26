@@ -1,44 +1,54 @@
 import 'dart:async';
-//import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:html';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'profile.dart';
+import 'dart:developer';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
+Duration seconds = const Duration(seconds: 7);
+
 /// This is the main application widget.
-// ignore: must_be_immutable
-class Home extends StatelessWidget {
-  Home({Key? key}) : super(key: key);
+class Patient_Home extends StatelessWidget {
+  
+  // final String cod_fiscale;
+  final String nome;
+  final String cognome;
+  final String email;
+  final int num_cellulare;
+  final int tipologia_chat;
+  final String token;
+  final String cod_fiscale;
+  
+  Patient_Home({required this.cod_fiscale, required this.nome, required this.cognome, required this.email, required this.num_cellulare, required this.tipologia_chat, required this.token});
 
-  final String patientId = "patient1"; // patientId
-  Duration seconds = const Duration(seconds: 5);
-  late Timer timer;
-
-  handleTimeout() {
-    FirebaseFirestore.instance
-        .collection('patients')
-        .doc(patientId) // patientId
-        .update({'status': 'offline', 'last_seen': Timestamp.now()})
-        .then((value) => print("patient status updated"))
-        .catchError(
-            (error) => print("Failed to update patient status: $error"));
-    //await http.get("http://127.0.0.1:5000/timeout");
-  }
-
-  Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip,
-      StatelessWidget statelessWidget) {
+  Timer timer = Timer(seconds, callback);
+  String timerText = "Start";
+  Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
+    print("cod_fiscale: " + cod_fiscale);
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
       iconSize: 40,
       onPressed: () {
-        timer.cancel();
-
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => statelessWidget),
-        ).then((value) {
-          timer = Timer(seconds, handleTimeout);
-        });
+          MaterialPageRoute(
+            builder: (context) => Profile(
+              cod_fiscale: cod_fiscale,
+              nome: nome,
+              cognome: cognome,
+              email: email,
+              num_cellulare: num_cellulare,
+              tipologia_chat: tipologia_chat
+            )
+            ),
+          
+          );
       },
     );
   }
@@ -49,8 +59,6 @@ class Home extends StatelessWidget {
       tooltip: tooltip,
       iconSize: 40,
       onPressed: () {
-        timer.cancel();
-
         Navigator.pop(context);
       },
     );
@@ -58,61 +66,64 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    timer = Timer(seconds, handleTimeout);
-
     return MaterialApp(
-      home: GestureDetector(
-        child: Scaffold(
-          appBar: AppBar(
-            leading: _iconButtonPush(
-                context, Icons.account_circle, 'Profilo', const Profile()),
-            title: const Text("Promemoria giornalieri"),
-            actions: [
-              _iconButtonPop(context, Icons.logout, 'Logout'),
-            ],
-          ),
-          body: const Center(
-            child: MyHome(),
-          ),
+      home: Scaffold(
+        appBar: AppBar(
+          leading: _iconButtonPush(
+              context, Icons.account_circle, 'Profilo', ),
+          title: const Text("Promemoria giornalieri"),
+          actions: [
+            _iconButtonPop(context, Icons.logout, 'Logout'),
+          ],
         ),
-        onTap: () {
-          timer.cancel();
-          FirebaseFirestore.instance
-              .collection('patients')
-              .doc(patientId)
-              .update({'status': 'online'})
-              .then((value) => print("patient status updated"))
-              .catchError(
-                  (error) => print("Failed to update patient status: $error"));
-          timer = Timer(seconds, handleTimeout);
-        },
+        body: Center(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              child: ListView(
+            children: [
+              _card('Hai preso la pillola?', 'Dott. Bianchi\nOre: 9:30'),
+              _card('Videochiamata con Gianni Valeri', '(Parente)\nOre: 17:30'),
+              _card(cod_fiscale.toString(), 'prova prova prova'),
+        ],
       ),
+      onTap: () {
+        
+        timer.cancel();
+        timer = Timer(seconds, handleTimeout);
+      },
+    ),
+      ),
+    ),
+    
     );
   }
-}
-
-/// This is the stateless widget that the main application instantiates.
-class MyHome extends StatelessWidget {
-  const MyHome({Key? key}) : super(key: key);
 
   Widget _card(String title, String subtitle) {
-    return Card(
-      child: ListTile(
+    return GestureDetector(
+      child: Card(
+        child: ListTile(
         title: Text(title),
         subtitle: Text(subtitle),
       ),
+    ),
+    onTap: () {
+        print("UPDATE FIRESTORE");
+        FirebaseFirestore.instance.collection('patients').doc(cod_fiscale).update({'status': 'online'});
+        timer.cancel();
+        timer = Timer(seconds, handleTimeout);
+      },
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        _card('Hai preso la pillola?', 'Dott. Bianchi\nOre: 9:30'),
-        _card('Videochiamata con Gianni Valeri', '(Parente)\nOre: 17:30'),
-        _card(
-            'Qual è il tuo livello di pressione?', 'Dott. Bianchi\nOre: 18:00'),
-      ],
-    );
+  void handleTimeout(){
+    print("TIMEOUT\nCod_fiscale: " + cod_fiscale);
+    FirebaseFirestore.instance.collection('patients').doc(cod_fiscale).update({'status': 'offline'});
   }
+  
+
 }
+
+void callback(){}
+
+
+

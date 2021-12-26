@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../main.dart';
 
+void main() => runApp(const ModifyProfile());
+
 /// This is the main application widget.
 class ModifyProfile extends StatelessWidget {
   const ModifyProfile({Key? key}) : super(key: key);
@@ -41,7 +43,7 @@ class ModifyProfile extends StatelessWidget {
             child: Text("Modifica dati"),
           ),
           actions: [
-            _iconButtonPush(context, Icons.logout, 'Logout', const MyApp()),
+            _iconButtonPush(context, Icons.logout, 'Logout', MyApp()),
           ],
         ),
         body: const Center(child: MyModifyProfile()),
