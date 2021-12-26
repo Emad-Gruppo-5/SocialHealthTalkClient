@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 import 'modify_profile.dart';
 
-void main() => runApp(const Profile());
-
 /// This is the main application widget.
 class Profile extends StatelessWidget {
   const Profile({Key? key}) : super(key: key);
@@ -46,7 +44,7 @@ class Profile extends StatelessWidget {
           actions: [
             _iconButtonPush(
                 context, Icons.edit, 'Modifica', const ModifyProfile()),
-            _iconButtonPush(context, Icons.logout, 'Logout', MyApp()),
+            _iconButtonPush(context, Icons.logout, 'Logout', const MyApp()),
           ],
         ),
         body: const Center(

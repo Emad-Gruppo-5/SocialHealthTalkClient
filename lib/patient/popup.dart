@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'profile.dart';
 
-void main() => runApp(const Popup());
-
 /// This is the main application widget.
 class Popup extends StatelessWidget {
   const Popup({Key? key}) : super(key: key);
