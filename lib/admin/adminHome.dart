@@ -11,7 +11,9 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() => runApp(AdminHome());
+void main() {
+  runApp(AdminHome());
+}
 
 class AdminHome extends StatefulWidget {
   @override
@@ -19,9 +21,17 @@ class AdminHome extends StatefulWidget {
 }
 
 class _AdminHome extends State<AdminHome> {
+  static int online = FirebaseFirestore.instance
+      .collection('patients')
+      .where('status', isEqualTo: 'online')
+      .get() as int;
+  static int offline = FirebaseFirestore.instance
+      .collection('patients')
+      .where('status', isEqualTo: 'offline')
+      .get() as int;
   final List<ChartData> chartData = [
-    ChartData('Online', 60, Color(0xff0984e3)),
-    ChartData('Offline', 40, Color(0xfffdcb6e)),
+    ChartData('Online', online, const Color(0xff0984e3)),
+    ChartData('Offline', offline, const Color(0xfffdcb6e)),
   ];
 
   int key = 0;
@@ -116,7 +126,7 @@ class _AdminHome extends State<AdminHome> {
                                 pointColorMapper: (ChartData data, _) =>
                                     data.color,
                                 dataLabelSettings:
-                                    DataLabelSettings(isVisible: true),
+                                    const DataLabelSettings(isVisible: true),
                                 // Radius of pie
                                 radius: '118%')
                           ]),
@@ -125,8 +135,8 @@ class _AdminHome extends State<AdminHome> {
                       padding: const EdgeInsets.all(8.0),
                       child: Card(
                         child: ListTile(
-                          title: Text("Numero pazienti offline: " + "40"),
-                          subtitle: Text("Premi per controllare"),
+                          title: const Text("Numero pazienti offline: " + "40"),
+                          subtitle: const Text("Premi per controllare"),
                           trailing: new Icon(Icons.arrow_forward_ios),
                           onTap: () {
                             Navigator.push(
@@ -154,7 +164,8 @@ class _AdminHome extends State<AdminHome> {
               child: BottomNavigationBar(
                 type: BottomNavigationBarType.fixed,
                 selectedItemColor: Colors.white,
-                selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+                selectedLabelStyle:
+                    const TextStyle(fontWeight: FontWeight.bold),
                 items: const <BottomNavigationBarItem>[
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home_outlined),
@@ -190,6 +201,6 @@ class ChartData {
   ChartData(this.x, this.y, this.color);
 
   final String x;
-  final double y;
+  final int y;
   final Color? color;
 }
