@@ -28,7 +28,6 @@ class _AdminHome extends State<AdminHome> {
 
   int _selectedIndex = 0;
 
-
   void _onItemTapped(int index) {
     switch (index) {
       case 1:
@@ -96,56 +95,55 @@ class _AdminHome extends State<AdminHome> {
             //                     );
             //                   }).toList(),
             //                 );
-            //               }),                     
+            //               }),
             //            ),
             body: SingleChildScrollView(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SfCircularChart(
-                            title: ChartTitle(text: "Stato Attività pazienti"),
-                            legend: Legend(
-                                isVisible: true,
-                                overflowMode: LegendItemOverflowMode.wrap),
-                            series: <CircularSeries>[
-                              PieSeries<ChartData, String>(
-                                  dataSource: chartData,
-                                  xValueMapper: (ChartData data, _) => data.x,
-                                  yValueMapper: (ChartData data, _) => data.y,
-                                  pointColorMapper: (ChartData data, _) =>
-                                  data.color,
-                                  dataLabelSettings:
-                                  DataLabelSettings(isVisible: true),
-                                  // Radius of pie
-                                  radius: '118%')
-                            ]),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Card(
-                            child: ListTile(
-                              title: Text("Numero pazienti offline: " + "40"),
-                              subtitle: Text("Premi per controllare"),
-                              trailing: new Icon(Icons.arrow_forward_ios),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => StatoAttivitaPazienti(),
-                                  ),
-                                );
-                              },
-                            ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SfCircularChart(
+                          title: ChartTitle(text: "Stato Attività pazienti"),
+                          legend: Legend(
+                              isVisible: true,
+                              overflowMode: LegendItemOverflowMode.wrap),
+                          series: <CircularSeries>[
+                            PieSeries<ChartData, String>(
+                                dataSource: chartData,
+                                xValueMapper: (ChartData data, _) => data.x,
+                                yValueMapper: (ChartData data, _) => data.y,
+                                pointColorMapper: (ChartData data, _) =>
+                                    data.color,
+                                dataLabelSettings:
+                                    DataLabelSettings(isVisible: true),
+                                // Radius of pie
+                                radius: '118%')
+                          ]),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        child: ListTile(
+                          title: Text("Numero pazienti offline: " + "40"),
+                          subtitle: Text("Premi per controllare"),
+                          trailing: new Icon(Icons.arrow_forward_ios),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => StatoAttivitaPazienti(),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    ]),
                     ),
-
+                  ]),
+            ),
             bottomNavigationBar: Theme(
               data: Theme.of(context).copyWith(
-                // sets the background color of the `BottomNavigationBar`
+                  // sets the background color of the `BottomNavigationBar`
                   canvasColor: Colors.blue,
                   // sets the active color of the `BottomNavigationBar` if `Brightness` is light
                   primaryColor: Colors.white,
@@ -186,7 +184,6 @@ class _AdminHome extends State<AdminHome> {
               ),
             )));
   }
-  
 }
 
 class ChartData {
