@@ -117,7 +117,7 @@ class Patient_Home extends StatelessWidget {
 
   void handleTimeout(){
     print("TIMEOUT\nCod_fiscale: " + cod_fiscale);
-    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
+    DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
     String ultimo_accesso = dateFormat.format(DateTime.now());
     FirebaseFirestore.instance.collection('patients').doc(cod_fiscale).update({'status': 'offline'});
     FirebaseFirestore.instance.collection('patients').doc(cod_fiscale).update({'ultimo_accesso': ultimo_accesso});
