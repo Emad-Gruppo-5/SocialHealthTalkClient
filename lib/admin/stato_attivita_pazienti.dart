@@ -60,7 +60,13 @@ class BodyLayout extends State<StatoAttivitaPazienti> {
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Text("Loading");
+                  return Center(
+                      child: Image.asset(
+                    'assets/images/loading.gif',
+                    // height: 125.0,
+                    // width: 125.0,
+                  )
+                  );
                 }
 
                 return ListView(
