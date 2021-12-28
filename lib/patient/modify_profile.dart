@@ -1,23 +1,65 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../main.dart';
 
-void main() => runApp(const ModifyProfile());
+class ModifyProfile extends StatefulWidget {
+  final String nome;
+  final String cognome;
+  final String email;
+  final int num_cellulare;
+  final int tipologia_chat;
+  final String cod_fiscale;
+
+  const ModifyProfile(
+      {required this.cod_fiscale,
+      required this.nome,
+      required this.cognome,
+      required this.email,
+      required this.num_cellulare,
+      required this.tipologia_chat});
+
+  @override
+  _ModifyProfile createState() => _ModifyProfile();
+}
 
 /// This is the main application widget.
-class ModifyProfile extends StatelessWidget {
-  const ModifyProfile({Key? key}) : super(key: key);
+class _ModifyProfile extends State<ModifyProfile> {
+  late String nome;
+  late String cognome;
+  late String email;
+  late int num_cellulare;
+  late int tipologia_chat;
+  late String cod_fiscale;
 
-  Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip,
-      StatelessWidget statelessWidget) {
+  @override
+  void initState() {
+    nome = widget.nome;
+    cognome = widget.cognome;
+    email = widget.email;
+    num_cellulare = widget.num_cellulare;
+    tipologia_chat = widget.tipologia_chat;
+    cod_fiscale = widget.cod_fiscale;
+    super.initState();
+  }
+
+  Duration seconds = const Duration(seconds: 7);
+  late Timer timer;
+  String timerText = "Start";
+
+  Widget _iconButtonPush(
+      BuildContext context, IconData icon, String tooltip, MyApp myApp) {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
       iconSize: 40,
       onPressed: () {
+        timer.cancel();
+
         Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => statelessWidget),
-        );
+            context, MaterialPageRoute(builder: (context) => MyApp()));
       },
     );
   }
@@ -28,6 +70,8 @@ class ModifyProfile extends StatelessWidget {
       tooltip: tooltip,
       iconSize: 40,
       onPressed: () {
+        timer.cancel();
+
         Navigator.pop(context);
       },
     );
@@ -35,20 +79,47 @@ class ModifyProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    timer = Timer(seconds, handleTimeout);
+
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          leading: _iconButtonPop(context, Icons.arrow_back, 'Indietro'),
-          title: const Center(
-            child: Text("Modifica dati"),
+      home: GestureDetector(
+        child: Scaffold(
+          appBar: AppBar(
+            leading: _iconButtonPop(context, Icons.arrow_back, 'Indietro'),
+            title: const Center(
+              child: Text("Modifica dati"),
+            ),
+            actions: [
+              _iconButtonPush(context, Icons.logout, 'Logout', MyApp()),
+            ],
           ),
-          actions: [
-            _iconButtonPush(context, Icons.logout, 'Logout', MyApp()),
-          ],
+          body: const Center(child: MyModifyProfile()),
         ),
-        body: const Center(child: MyModifyProfile()),
+        onTap: () {
+          print("UPDATE FIRESTORE");
+          FirebaseFirestore.instance
+              .collection('patients')
+              .doc(cod_fiscale)
+              .update({'status': 'online'});
+          timer.cancel();
+          timer = Timer(seconds, handleTimeout);
+        },
       ),
     );
+  }
+
+  void handleTimeout() {
+    print("TIMEOUT\nCod_fiscale: " + cod_fiscale);
+    DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
+    String ultimo_accesso = dateFormat.format(DateTime.now());
+    FirebaseFirestore.instance
+        .collection('patients')
+        .doc(cod_fiscale)
+        .update({'status': 'offline'});
+    FirebaseFirestore.instance
+        .collection('patients')
+        .doc(cod_fiscale)
+        .update({'ultimo_accesso': ultimo_accesso});
   }
 }
 
