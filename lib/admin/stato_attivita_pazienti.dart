@@ -32,26 +32,6 @@ class BodyLayout extends State<StatoAttivitaPazienti> {
             },
           ),
         ),
-        //       body: ListView(
-        //   children: <Widget>[
-        //     ListTile(
-        //       title: Text('Paziente 1'),
-        //       subtitle: Text('offline da x minuti'),
-        //       trailing: new Icon(Icons.circle, color: Colors.redAccent,),
-        //     ),
-        //     ListTile(
-        //       title: Text('Paziente 2'),
-        //       subtitle: Text('offline da x minuti'),
-        //       trailing: new Icon(Icons.circle, color: Colors.redAccent,),
-        //     ),
-        //     ListTile(
-        //       title: Text('Paziente 3'),
-        //       subtitle: Text('offline da x minuti'),
-        //       trailing: new Icon(Icons.circle, color: Colors.redAccent,),
-        //     ),
-
-        //   ],
-        // ),
         body: Center(
           child: StreamBuilder(
               stream: FirebaseFirestore.instance
@@ -63,8 +43,6 @@ class BodyLayout extends State<StatoAttivitaPazienti> {
                   return Center(
                       child: Image.asset(
                     'assets/images/loading.gif',
-                    // height: 125.0,
-                    // width: 125.0,
                   )
                   );
                 }
