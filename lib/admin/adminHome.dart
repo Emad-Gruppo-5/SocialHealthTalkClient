@@ -88,6 +88,8 @@ class _AdminHome extends State<AdminHome> {
 
   @override
   Widget build(BuildContext context) {
+    int users = FirebaseFirestore.instance.collection('patients').get() as int;
+
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Stato attività pazienti',
@@ -135,7 +137,7 @@ class _AdminHome extends State<AdminHome> {
                       padding: const EdgeInsets.all(8.0),
                       child: Card(
                         child: ListTile(
-                          title: const Text("Numero pazienti offline: " + "40"),
+                          title: Text("Numero pazienti: " + users.toString()),
                           subtitle: const Text("Premi per controllare"),
                           trailing: new Icon(Icons.arrow_forward_ios),
                           onTap: () {
