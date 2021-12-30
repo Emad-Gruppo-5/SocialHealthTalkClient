@@ -54,7 +54,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   TextEditingController _cont5 = TextEditingController();
   int val = -1;
 
-  Future<String> creaPazienteServer() async {
+  Future<void> creaPazienteServer() async {
     var uri = Uri.parse('http://127.0.0.1:5000/crea_utente');
     print(uri);
     CollectionReference patients = FirebaseFirestore.instance.collection('patients');
@@ -78,42 +78,35 @@ class _MyModifyProfile extends State<MyModifyProfile> {
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8'
     },
-    body: body)
-    .then((value) {
-        print(value);
-        patients.doc(message['cod_fiscale']).set({
+    body: body);
+
+    if(data.statusCode == 200){
+      patients.doc(message['cod_fiscale']).set({
           'nome': message['nome'],
           'cognome': message['cognome'],
           'status': 'offline',
           'ultimo_accesso': 'Nessun accesso'
         })
         .catchError((error) => {
-          print("ERRORE LATO FIRESTORE")
+          print("ERRORE LATO FIRESTORE: err: " + error)
         });
-    })
-    .catchError((error) => {
-      print("ERRORE LATO POSTGRESQL")
-    });
-    
-    print('Response status: ${data.statusCode}');
-    print('Response body: ' + data.body);
 
-    if (data.statusCode == 200){
-      creaPazienteServer();
-      final snackBar = SnackBar(
-        content: const Text('Utente inserito con successo'),
-      );
-      // Find the ScaffoldMessenger in the widget tree
-      // and use it to show a SnackBar.
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    } else {
+          // creaPazienteServer();
+          final snackBar = SnackBar(
+            content: const Text('Utente inserito con successo'),
+          );
+          // Find the ScaffoldMessenger in the widget tree
+          // and use it to show a SnackBar.
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         
+    }else{
+      print("ERRORE LATO POSTGRESQL: err: ");
       const snackBar = const SnackBar(
-        content: Text('Utente non inserito'),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            content: Text('Utente non inserito'),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
-
-    return data.body;
+    
   }
 
   Widget _textFormField(

@@ -57,8 +57,8 @@ class ListSearchState extends State<ListSearch> {
     print(uri);
 
     int role = 1;
-    Map<String, String> message = {
-      "role": role.toString(),
+    Map<String, int> message = {
+      "role": role,
     };
     var body = json.encode(message);
     print("\nBODY:: " + body);
