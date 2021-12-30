@@ -45,9 +45,10 @@ class _ModifyProfile extends State<ModifyProfile> {
     super.initState();
   }
 
-  Duration seconds = const Duration(seconds: 7);
+  Duration duration = const Duration(seconds: 7);
   late Timer timer;
   String timerText = "Start";
+  bool _visible = false;
 
   Widget _iconButtonPush(
       BuildContext context, IconData icon, String tooltip, MyApp myApp) {
@@ -57,6 +58,13 @@ class _ModifyProfile extends State<ModifyProfile> {
       iconSize: 40,
       onPressed: () {
         timer.cancel();
+
+        DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
+        String ultimo_accesso = dateFormat.format(DateTime.now());
+        FirebaseFirestore.instance
+            .collection('patients')
+            .doc(cod_fiscale)
+            .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
 
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => MyApp()));
@@ -72,6 +80,12 @@ class _ModifyProfile extends State<ModifyProfile> {
       onPressed: () {
         timer.cancel();
 
+        print("UPDATE FIRESTORE");
+        FirebaseFirestore.instance
+            .collection('patients')
+            .doc(cod_fiscale)
+            .update({'status': 'online'});
+
         Navigator.pop(context);
       },
     );
@@ -79,7 +93,7 @@ class _ModifyProfile extends State<ModifyProfile> {
 
   @override
   Widget build(BuildContext context) {
-    timer = Timer(seconds, handleTimeout);
+    timer = Timer(duration, handleTimeout);
 
     return MaterialApp(
       home: GestureDetector(
@@ -93,7 +107,26 @@ class _ModifyProfile extends State<ModifyProfile> {
               _iconButtonPush(context, Icons.logout, 'Logout', MyApp()),
             ],
           ),
-          body: const Center(child: MyModifyProfile()),
+          body: Center(
+            child: Column(
+              children: [
+                const Text(
+                  "Mario Esposito",
+                  style: TextStyle(fontSize: 30),
+                ),
+                _form(),
+                const Text("\nTipologia chat"),
+                _checkboxListTile("Solo testo", 0),
+                _checkboxListTile("Videochiamata", 1),
+                _checkboxListTile("Chiamata vocale", 2),
+                Visibility(
+                    child: const Text("Seleziona almeno una chat",
+                        style: TextStyle(color: Colors.red)),
+                    visible: _visible),
+                _submitButton(),
+              ],
+            ),
+          ),
         ),
         onTap: () {
           print("UPDATE FIRESTORE");
@@ -102,7 +135,7 @@ class _ModifyProfile extends State<ModifyProfile> {
               .doc(cod_fiscale)
               .update({'status': 'online'});
           timer.cancel();
-          timer = Timer(seconds, handleTimeout);
+          timer = Timer(duration, handleTimeout);
         },
       ),
     );
@@ -115,25 +148,42 @@ class _ModifyProfile extends State<ModifyProfile> {
     FirebaseFirestore.instance
         .collection('patients')
         .doc(cod_fiscale)
-        .update({'status': 'offline'});
-    FirebaseFirestore.instance
-        .collection('patients')
-        .doc(cod_fiscale)
-        .update({'ultimo_accesso': ultimo_accesso});
+        .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
-}
 
-/// This is the stateful widget that the main application instantiates.
-class MyModifyProfile extends StatefulWidget {
-  const MyModifyProfile({Key? key}) : super(key: key);
+  Widget _submitButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: ElevatedButton(
+        onPressed: () {
+          print("UPDATE FIRESTORE");
+          FirebaseFirestore.instance
+              .collection('patients')
+              .doc(cod_fiscale)
+              .update({'status': 'online'});
+          timer.cancel();
+          timer = Timer(duration, handleTimeout);
 
-  @override
-  State<MyModifyProfile> createState() => _MyModifyProfile();
-}
+          if (!isChecked.contains(true)) {
+            setState(() {
+              _visible = true;
+            });
+          } else {
+            _visible = false;
+          }
 
-// This is the stateless widget that the main application instantiates.
-class _MyModifyProfile extends State<MyModifyProfile> {
+          // Validate returns true if the form is valid, or false otherwise.
+          if (_formKey.currentState!.validate()) {
+            // If the form is valid
+          }
+        },
+        child: const Text('Salva'),
+      ),
+    );
+  }
+
   List<bool> isChecked = [false, true, false];
+  final _formKey = GlobalKey<FormState>();
 
   Widget _textFormField(
       IconData icon, String labelText, String initialValue, String validator) {
@@ -150,12 +200,28 @@ class _MyModifyProfile extends State<MyModifyProfile> {
         }
         return null;
       },
+      onTap: () {
+        print("UPDATE FIRESTORE");
+        FirebaseFirestore.instance
+            .collection('patients')
+            .doc(cod_fiscale)
+            .update({'status': 'online'});
+        timer.cancel();
+        timer = Timer(duration, handleTimeout);
+      },
+      onChanged: (value) {
+        print("UPDATE FIRESTORE");
+        FirebaseFirestore.instance
+            .collection('patients')
+            .doc(cod_fiscale)
+            .update({'status': 'online'});
+        timer.cancel();
+        timer = Timer(duration, handleTimeout);
+      },
     );
   }
 
   Widget _form() {
-    final _formKey = GlobalKey<FormState>();
-
     return Form(
       key: _formKey,
       child: Column(
@@ -171,20 +237,6 @@ class _MyModifyProfile extends State<MyModifyProfile> {
             child: _textFormField(Icons.email, "E-mail", "mariorossi@gmail.com",
                 "Inserisci e-mail"),
           ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Validate returns true if the form is valid, or false otherwise.
-                  if (_formKey.currentState!.validate()) {
-                    // If the form is valid
-                  }
-                },
-                child: const Text('Salva'),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -199,24 +251,14 @@ class _MyModifyProfile extends State<MyModifyProfile> {
         setState(() {
           isChecked[index] = value!;
         });
-      },
-    );
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text(
-          "Mario Rossi",
-          style: TextStyle(fontSize: 50),
-        ),
-        _form(),
-        const Text("\nTipologia chat"),
-        _checkboxListTile("Solo testo", 0),
-        _checkboxListTile("Videochiamata", 1),
-        _checkboxListTile("Chiamata vocale", 2),
-      ],
+        timer.cancel();
+        print("UPDATE FIRESTORE");
+        FirebaseFirestore.instance
+            .collection('patients')
+            .doc(cod_fiscale)
+            .update({'status': 'online'});
+      },
     );
   }
 }

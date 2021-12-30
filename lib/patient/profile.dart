@@ -59,6 +59,12 @@ class _Profile extends State<Profile> {
         onPressed: () {
           timer.cancel();
 
+          print("UPDATE FIRESTORE");
+          FirebaseFirestore.instance
+              .collection('patients')
+              .doc(cod_fiscale)
+              .update({'status': 'online'});
+
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -82,6 +88,13 @@ class _Profile extends State<Profile> {
         onPressed: () {
           timer.cancel();
 
+          DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
+          String ultimo_accesso = dateFormat.format(DateTime.now());
+          FirebaseFirestore.instance
+              .collection('patients')
+              .doc(cod_fiscale)
+              .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
+
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => MyApp()));
         },
@@ -96,6 +109,12 @@ class _Profile extends State<Profile> {
       iconSize: 40,
       onPressed: () {
         timer.cancel();
+
+        print("UPDATE FIRESTORE");
+        FirebaseFirestore.instance
+            .collection('patients')
+            .doc(cod_fiscale)
+            .update({'status': 'online'});
 
         Navigator.pop(context);
       },
@@ -123,7 +142,7 @@ class _Profile extends State<Profile> {
             children: [
               Text(
                 "$nome $cognome",
-                style: TextStyle(fontSize: 50),
+                style: TextStyle(fontSize: 30),
               ),
               _card("$cod_fiscale", Icons.person),
               _card("$num_cellulare", Icons.smartphone),
@@ -176,11 +195,7 @@ class _Profile extends State<Profile> {
     FirebaseFirestore.instance
         .collection('patients')
         .doc(cod_fiscale)
-        .update({'status': 'offline'});
-    FirebaseFirestore.instance
-        .collection('patients')
-        .doc(cod_fiscale)
-        .update({'ultimo_accesso': ultimo_accesso});
+        .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
 }
 

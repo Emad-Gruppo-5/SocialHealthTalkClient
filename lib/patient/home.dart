@@ -32,6 +32,7 @@ class Patient_Home extends StatelessWidget {
   Duration seconds = const Duration(seconds: 7);
   late Timer timer;
   String timerText = "Start";
+
   Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
     print("cod_fiscale: " + cod_fiscale);
     return IconButton(
@@ -40,6 +41,12 @@ class Patient_Home extends StatelessWidget {
       iconSize: 40,
       onPressed: () {
         timer.cancel();
+
+        print("UPDATE FIRESTORE");
+        FirebaseFirestore.instance
+            .collection('patients')
+            .doc(cod_fiscale)
+            .update({'status': 'online'});
 
         Navigator.push(
           context,
@@ -66,6 +73,13 @@ class Patient_Home extends StatelessWidget {
       onPressed: () {
         timer.cancel();
 
+        DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
+        String ultimo_accesso = dateFormat.format(DateTime.now());
+        FirebaseFirestore.instance
+            .collection('patients')
+            .doc(cod_fiscale)
+            .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
+
         Navigator.pop(context);
       },
     );
@@ -74,6 +88,12 @@ class Patient_Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     timer = Timer(seconds, handleTimeout);
+
+    print("UPDATE FIRESTORE");
+    FirebaseFirestore.instance
+        .collection('patients')
+        .doc(cod_fiscale)
+        .update({'status': 'online'});
 
     return MaterialApp(
       home: GestureDetector(
@@ -129,11 +149,7 @@ class Patient_Home extends StatelessWidget {
     FirebaseFirestore.instance
         .collection('patients')
         .doc(cod_fiscale)
-        .update({'status': 'offline'});
-    FirebaseFirestore.instance
-        .collection('patients')
-        .doc(cod_fiscale)
-        .update({'ultimo_accesso': ultimo_accesso});
+        .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
 }
 
