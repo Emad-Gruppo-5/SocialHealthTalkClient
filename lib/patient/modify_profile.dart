@@ -9,7 +9,7 @@ class ModifyProfile extends StatefulWidget {
   final String nome;
   final String cognome;
   final String email;
-  final int num_cellulare;
+  final String num_cellulare;
   final int tipologia_chat;
   final String cod_fiscale;
 
@@ -30,7 +30,7 @@ class _ModifyProfile extends State<ModifyProfile> {
   late String nome;
   late String cognome;
   late String email;
-  late int num_cellulare;
+  late String num_cellulare;
   late int tipologia_chat;
   late String cod_fiscale;
 
@@ -234,8 +234,8 @@ class _ModifyProfile extends State<ModifyProfile> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(Icons.email, "E-mail", "$email",
-                "Inserisci e-mail"),
+            child: _textFormField(
+                Icons.email, "E-mail", "$email", "Inserisci e-mail"),
           ),
         ],
       ),

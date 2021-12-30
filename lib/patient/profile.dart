@@ -11,7 +11,7 @@ class Profile extends StatefulWidget {
   final String nome;
   final String cognome;
   final String email;
-  final int num_cellulare;
+  final String num_cellulare;
   final int tipologia_chat;
   final String cod_fiscale;
 
@@ -31,7 +31,7 @@ class _Profile extends State<Profile> {
   late String nome;
   late String cognome;
   late String email;
-  late int num_cellulare;
+  late String num_cellulare;
   late int tipologia_chat;
   late String cod_fiscale;
 

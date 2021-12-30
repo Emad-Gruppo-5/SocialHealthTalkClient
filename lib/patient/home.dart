@@ -15,7 +15,7 @@ class Patient_Home extends StatelessWidget {
   final String nome;
   final String cognome;
   final String email;
-  final int num_cellulare;
+  final String num_cellulare;
   final int tipologia_chat;
   final String token;
   final String cod_fiscale;
