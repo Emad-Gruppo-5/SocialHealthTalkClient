@@ -77,7 +77,11 @@ class _AdminHome extends State<AdminHome> {
         debugShowCheckedModeBanner: false,
         title: 'Stato attività pazienti',
         home: Scaffold(
-            appBar: new AppBar(),
+            appBar: AppBar(
+                title: const Center(
+                  child: Text("Admin Home"),
+                )
+            ),
             body: SingleChildScrollView(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

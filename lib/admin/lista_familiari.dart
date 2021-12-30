@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sht/admin/crea_nuovo_familiare.dart';
 import 'package:sht/admin/profilo_dottore.dart';
 import 'package:sht/admin/profilo_familiari.dart';
 import 'package:sht/admin/profilo_paziente_modifica.dart';
+import 'package:http/http.dart' as http;
 
 import 'profilo_paziente.dart';
 
@@ -13,20 +16,22 @@ class ListaFamiliari extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
             appBar: AppBar(
-              title: Text('Lista Familiari'),
-              leading: new IconButton(
-                icon: Icon(Icons.arrow_back_ios_sharp),
+              title: const Text('Lista Familiari'),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_sharp),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               actions: [
-                new IconButton(
-                  icon: Icon(Icons.add, color: Colors.white, size: 40),
+                IconButton(
+                  icon: const Icon(Icons.add, color: Colors.white),
                   onPressed: () {
-                    MaterialPageRoute(
-                      builder: (context) => CreaNuovoFamiliare(),
-                    );
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CreaNuovoFamiliare(),
+                        ));
                   },
                 ),
               ],
@@ -42,16 +47,47 @@ class ListSearch extends StatefulWidget {
 class ListSearchState extends State<ListSearch> {
   TextEditingController _textController = TextEditingController();
 
-  static List<String> mainDataList = [
-    "Familiare 1",
-    "Familiare 2",
-    "Familiare 3",
-    "Familiare 4",
-    "Familiare 5",
-    "Familiare 6",
-    "Familiare 7",
-    "Familiare 8",
-  ];
+  @protected
+  @mustCallSuper
+  void initState() {
+    getFamiliari();
+  }
+
+  static List<String> mainDataList = [];
+
+  Future<String> getFamiliari() async {
+
+    mainDataList.clear();
+    var uri = Uri.parse('http://127.0.0.1:5000/admin/lista_attori');
+    print(uri);
+
+    int role = 4;
+    Map<String, String> message = {
+      "role": role.toString(),
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+
+    var i = 0;
+    while (i < json.decode(data.body).length) {
+      mainDataList.add(json.decode(data.body)[i]['cognome'] + ' ' + json.decode(data.body)[i]['nome'] + ' ' + json.decode(data.body)[i]['cod_fiscale']);
+      i=i+1;
+    }
+
+    print(mainDataList);
+    setState(() {
+      newDataList = List.from(mainDataList);
+    });
+
+    return data.body;
+  }
 
   // Copy Main List into New List.
   List<String> newDataList = List.from(mainDataList);
@@ -72,12 +108,12 @@ class ListSearchState extends State<ListSearch> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(12.0),
-            child: new Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new TextField(
+                TextField(
                   controller: _textController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Cerca',
                   ),
                   onChanged: onItemChanged,

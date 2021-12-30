@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sht/admin/crea_nuovo_volontario.dart';
 import 'package:sht/admin/profilo_dottore.dart';
 import 'package:sht/admin/profilo_familiari.dart';
 import 'package:sht/admin/profilo_paziente_modifica.dart';
 import 'package:sht/admin/profilo_volontari.dart';
+import 'package:http/http.dart' as http;
 
 import 'profilo_paziente.dart';
 
@@ -15,19 +18,21 @@ class ListaVolontari extends StatelessWidget {
         home: Scaffold(
             appBar: AppBar(
               title: Text('Lista Volontari'),
-              leading: new IconButton(
+              leading: IconButton(
                 icon: Icon(Icons.arrow_back_ios_sharp),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               actions: [
-                new IconButton(
+                IconButton(
                   icon: Icon(Icons.add, color: Colors.white, size: 40),
                   onPressed: () {
-                    MaterialPageRoute(
-                      builder: (context) => CreaNuovoVolontario(),
-                    );
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CreaNuovoVolontario(),
+                        ));
                   },
                 ),
               ],
@@ -43,16 +48,48 @@ class ListSearch extends StatefulWidget {
 class ListSearchState extends State<ListSearch> {
   TextEditingController _textController = TextEditingController();
 
-  static List<String> mainDataList = [
-    "Volontario 1",
-    "Volontario 2",
-    "Volontario 3",
-    "Volontario 4",
-    "Volontario 5",
-    "Volontario 6",
-    "Volontario 7",
-    "Volontario 8",
-  ];
+  @protected
+  @mustCallSuper
+  void initState() {
+    getDoctors();
+  }
+
+  static List<String> mainDataList = [];
+
+  Future<String> getDoctors() async {
+
+    mainDataList.clear();
+    var uri = Uri.parse('http://127.0.0.1:5000/admin/lista_attori');
+    print(uri);
+
+    int role = 2;
+    Map<String, String> message = {
+      "role": role.toString(),
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+
+    var i = 0;
+    while (i < json.decode(data.body).length) {
+      mainDataList.add(json.decode(data.body)[i]['cognome'] + ' ' + json.decode(data.body)[i]['nome'] + ' ' + json.decode(data.body)[i]['cod_fiscale']);
+      i=i+1;
+    }
+
+    print(mainDataList);
+
+    setState(() {
+      newDataList = List.from(mainDataList);
+    });
+
+    return data.body;
+  }
 
   // Copy Main List into New List.
   List<String> newDataList = List.from(mainDataList);
@@ -73,12 +110,12 @@ class ListSearchState extends State<ListSearch> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(12.0),
-            child: new Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new TextField(
+                TextField(
                   controller: _textController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Cerca',
                   ),
                   onChanged: onItemChanged,

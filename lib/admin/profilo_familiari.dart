@@ -14,7 +14,7 @@ class ProfiloFamiliare extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
+          leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_sharp),
             onPressed: () {
               Navigator.pop(context);
@@ -24,9 +24,8 @@ class ProfiloFamiliare extends StatelessWidget {
             child: Text("Profilo"),
           ),
           actions: [
-            new IconButton(
+            IconButton(
               icon: Icon(Icons.edit),
-              iconSize: 40,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -36,9 +35,8 @@ class ProfiloFamiliare extends StatelessWidget {
                 );
               },
             ),
-            new IconButton(
+            IconButton(
               icon: Icon(Icons.delete_forever),
-              iconSize: 40,
               onPressed: () {
                 Navigator.push(
                   context,

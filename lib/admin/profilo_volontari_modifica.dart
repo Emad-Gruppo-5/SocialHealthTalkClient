@@ -13,8 +13,8 @@ class ProfiloVolontarioModifica extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
-            icon: Icon(Icons.arrow_back_ios_sharp),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_sharp),
             onPressed: (){
               Navigator.pop(context);
             },

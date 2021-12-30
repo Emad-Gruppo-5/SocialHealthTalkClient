@@ -29,8 +29,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
-  
+
+
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -40,10 +40,9 @@ dependencies:
   encrypt: ^5.0.1
   crypt: ^4.0.1
   syncfusion_flutter_charts: ^19.3.57
-  path: ^1.6.2
-  path_provider: ^1.6.27
-  firebase_core: ^0.7.0
-  cloud_firestore: ^0.16.0+1
+  flutter_session: ^0.1.1
+  flutter_isolate: ^2.0.0
+  date_time_picker: "^2.1.0"
 
 dev_dependencies:
   flutter_test:
@@ -64,7 +63,7 @@ dev_dependencies:
 flutter:
 
   assets:
-      - assets/images/SHT.png
+    - assets/images/SHT.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

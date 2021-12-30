@@ -14,7 +14,7 @@ class ProfiloPazienteModifica extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
+          leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_sharp),
             onPressed: (){
               Navigator.pop(context);
@@ -96,9 +96,9 @@ class _MyModifyProfile extends State<MyModifyProfile> {
             child: _textFormField(Icons.email, "E-mail", "mariorossi@gmail.com",
                 "Inserisci e-mail"),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: const Text(
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
               "Dottori associati",
               style: TextStyle(fontSize: 15),
             ),

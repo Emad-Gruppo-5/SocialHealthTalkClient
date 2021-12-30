@@ -89,9 +89,9 @@ class _MyModifyProfile extends State<MyModifyProfile> {
                 "Inserisci e-mail"),
           ),
 
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: const Text(
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
               "Pazienti associati",
               style: TextStyle(fontSize: 15),
             ),

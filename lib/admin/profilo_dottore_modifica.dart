@@ -13,7 +13,7 @@ class ProfiloDottoreModifica extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
+          leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_sharp),
             onPressed: (){
               Navigator.pop(context);
@@ -94,9 +94,9 @@ class _MyModifyProfile extends State<MyModifyProfile> {
                 "Inserisci specializzazione"),
           ),
 
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: const Text(
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
               "Pazienti associati",
               style: TextStyle(fontSize: 15),
             ),

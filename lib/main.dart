@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart' hide Key;
+import 'package:flutter_session/flutter_session.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:encrypt/encrypt.dart';
 import 'package:crypt/crypt.dart';
 import 'package:sht/familiare.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(MyApp());
-}
+import 'admin/adminHome.dart';
+import 'dottore/main_dottore.dart';
+
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // String token;
@@ -31,16 +27,18 @@ class LoginPage extends StatelessWidget {
   TextEditingController _cod_fiscaleC = TextEditingController();
   TextEditingController _passwordC = TextEditingController();
 
+  Future<void> saveData(String data) async {
+
+    var session = FlutterSession();
+    await session.set('cf', data.toString());
+  }
+
   Future<String> login(cod_fiscale, password) async {
     final digest = Crypt.sha256(password).toString();
     var uri = Uri.parse('http://127.0.0.1:5000/login');
-    uri = uri.replace(queryParameters: <String, String>{
-      'cod_fiscale': cod_fiscale,
-      'password': digest
-    });
+    // uri = uri.replace(queryParameters: <String, String>{'cod_fiscale': cod_fiscale, 'password': password});
     print(uri);
 
-    int role;
     print("\nECCOMI IN getUser. COD_FISCALE: " +
         cod_fiscale +
         " PASSWORD: " +
@@ -48,13 +46,15 @@ class LoginPage extends StatelessWidget {
 
     Map<String, String> message = {
       "cod_fiscale": cod_fiscale,
-      "password": digest
+      "password": password
     };
     var body = json.encode(message);
     print("\nBODY:: " + body);
-    final data = await http.get(uri, headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8'
-    });
+    final data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
     print('Response status: ${data.statusCode}');
     print('Response body: ${data.body}');
     return data.body;
@@ -163,31 +163,40 @@ class LoginPage extends StatelessWidget {
                                 var password = _passwordC.text;
 
                                 login(cod_fiscale, password).then((data) {
+                                  saveData(cod_fiscale);
                                   int role = json.decode(data)['role'];
                                   String token = json.decode(data)['token'];
                                   switch (role) {
-                                    case 0: //ADMIN
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  Familiare(token: token)));
-                                      break;
                                     case 1: //PAZIENTE
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  Familiare(token: token)));
+                                                  AdminHome()));
                                       break;
-                                    case 2: //FAMILIARE
+                                    case 2: //DOTTORE
+                                      if (json.decode(data)['cod_fiscale'] == 'admin') {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AdminHome()));
+                                      } else {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    MainDottore()));
+                                      }
+                                      break;
+                                    case 3: //VOLONTARIO
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   Familiare(token: token)));
                                       break;
-                                    case 3: //VOLONTARIO
+                                    case 4: //FAMILIARE
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(

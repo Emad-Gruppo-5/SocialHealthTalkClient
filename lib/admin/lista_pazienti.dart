@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sht/admin/crea_nuovo_paziente.dart';
 import 'package:sht/admin/profilo_paziente_modifica.dart';
+import 'package:http/http.dart' as http;
 
 import 'profilo_paziente.dart';
 
@@ -8,26 +11,28 @@ class ListaPazienti extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-            appBar: AppBar(
-              title: Text('Lista pazienti'),
-              leading: new IconButton(
-                icon: Icon(Icons.arrow_back_ios_sharp),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              actions: [
-                new IconButton(
-                  icon: Icon(Icons.add, color: Colors.white, size: 36),
-                  onPressed: () {
+        appBar: AppBar(
+          title: const Text('Lista pazienti'),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_sharp),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                    context,
                     MaterialPageRoute(
-                      builder: (context) => CreaNuovoPaziente(),
-                    );
-                  },
-                ),
-              ],
+                      builder: (context) => const CreaPaziente(),
+                    ));
+              },
             ),
-            body: Center(child: ListSearch()));
+          ],
+        ),
+        body: Center(child: ListSearch()));
   }
 }
 
@@ -38,16 +43,51 @@ class ListSearch extends StatefulWidget {
 class ListSearchState extends State<ListSearch> {
   TextEditingController _textController = TextEditingController();
 
-  static List<String> mainDataList = [
-    "Paziente 1",
-    "Paziente 2",
-    "Paziente 3",
-    "Paziente 4",
-    "Paziente 5",
-    "Paziente 6",
-    "Paziente 7",
-    "Paziente 8",
-  ];
+  @protected
+  @mustCallSuper
+  void initState() {
+    getPatient();
+  }
+
+  static List<String> mainDataList = [];
+
+  Future<String> getPatient() async {
+    mainDataList.clear();
+    var uri = Uri.parse('http://127.0.0.1:5000/admin/lista_attori');
+    print(uri);
+
+    int role = 1;
+    Map<String, String> message = {
+      "role": role.toString(),
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+
+    var i = 0;
+    while (i < json.decode(data.body).length) {
+      mainDataList.add(json.decode(data.body)[i]['cognome'] +
+          ' ' +
+          json.decode(data.body)[i]['nome'] +
+          ' ' +
+          json.decode(data.body)[i]['cod_fiscale']);
+      i = i + 1;
+    }
+
+    print(mainDataList);
+
+    setState(() {
+      newDataList = List.from(mainDataList);
+    });
+
+    return data.body;
+  }
 
   // Copy Main List into New List.
   List<String> newDataList = List.from(mainDataList);
@@ -68,12 +108,12 @@ class ListSearchState extends State<ListSearch> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(12.0),
-            child: new Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new TextField(
+                TextField(
                   controller: _textController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Cerca',
                   ),
                   onChanged: onItemChanged,

@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sht/admin/profilo_dottore_modifica.dart';
-import 'package:sht/admin/profilo_paziente_modifica.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_session/flutter_session.dart';
 
 void main() => runApp(const ProfiloDottore());
 
@@ -13,8 +16,8 @@ class ProfiloDottore extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
-            icon: Icon(Icons.arrow_back_ios_sharp),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_sharp),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -23,9 +26,8 @@ class ProfiloDottore extends StatelessWidget {
             child: Text("Profilo"),
           ),
           actions: [
-            new IconButton(
-              icon: Icon(Icons.edit),
-              iconSize: 40,
+            IconButton(
+              icon: const Icon(Icons.edit),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -35,9 +37,8 @@ class ProfiloDottore extends StatelessWidget {
                 );
               },
             ),
-            new IconButton(
-              icon: Icon(Icons.delete_forever),
-              iconSize: 40,
+            IconButton(
+              icon: const Icon(Icons.delete_forever),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -49,17 +50,93 @@ class ProfiloDottore extends StatelessWidget {
             ),
           ],
         ),
+
         body: const SingleChildScrollView(
-          child: MyProfile(),
+          child: MyProf(),
         ),
       ),
     );
   }
 }
 
+
+class MyProf extends StatefulWidget {
+  const MyProf({Key? key}) : super(key: key);
+
+  MyProfile createState() => MyProfile();
+}
+
 // This is the stateless widget that the main application instantiates.
-class MyProfile extends StatelessWidget {
-  const MyProfile({Key? key}) : super(key: key);
+class MyProfile extends State<MyProf> {
+
+  var data;
+  var patient;
+  Map<String, dynamic> p = <String, dynamic>{};
+
+  @override
+  @protected
+  @mustCallSuper
+  void initState() {
+    getDoctor();
+    getPatient();
+  }
+
+  Future<String> getDoctor() async {
+
+    String data2 = await FlutterSession().get("cf");
+
+    print(data2);
+    var uri = Uri.parse('http://127.0.0.1:5000/admin/dati_profilo');
+    print(uri);
+
+    Map<String, String> message = {
+      "cod_fiscale": data2.toString().lastChars(6),
+      "role": 2.toString(),
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+
+    setState(() {
+      data = data;
+    });
+    return data.body;
+  }
+
+  Future<String> getPatient() async {
+
+    String data2 = await FlutterSession().get("cf");
+
+    var uri = Uri.parse('http://127.0.0.1:5000/admin/attori_associati');
+    print(uri);
+
+    Map<String, String> message = {
+      "cod_fiscale": data2.toString().lastChars(6),
+      "role": 2.toString(),
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    patient = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${patient.statusCode}');
+    print('Response body: ' + patient.body);
+
+    setState(() {
+      patient=patient;
+    });
+    print(2);
+
+    return patient.body;
+  }
 
   Widget _card(String title, IconData icon) {
     return Card(
@@ -83,20 +160,30 @@ class MyProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text(
-          "Mario Rossi",
+        Text(
+          json.decode(data.body)['cognome'] + " " + json.decode(data.body)['nome'],
           style: TextStyle(fontSize: 30),
         ),
-        _card("SMLLNEXIXISI", Icons.person),
-        _card("+39 331 313 3141", Icons.smartphone),
-        _card("mariorossi@gmail.com", Icons.email),
+        _card(json.decode(data.body)['cod_fiscale'], Icons.person),
+        _card(json.decode(data.body)['num_cellulare'], Icons.smartphone),
+        _card(json.decode(data.body)['email'], Icons.email),
         _card("Cardiologo", Icons.description),
         const Text(
           "Paziente associati",
           style: TextStyle(fontSize: 20),
         ),
-        _card("Paziente 1", Icons.medical_services_outlined),
+        _card(json.decode(patient.body)[0], Icons.medical_services_outlined),
       ],
     );
   }
+}
+
+class ScreenArguments {
+final String data;
+
+ScreenArguments(this.data);
+}
+
+extension E on String {
+  String lastChars(int n) => substring(length - n);
 }

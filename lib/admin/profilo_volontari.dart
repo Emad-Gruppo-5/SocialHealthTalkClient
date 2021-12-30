@@ -25,9 +25,8 @@ class ProfiloVolontario extends StatelessWidget {
             child: Text("Profilo"),
           ),
           actions: [
-            new IconButton(
+            IconButton(
               icon: Icon(Icons.edit),
-              iconSize: 40,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -37,9 +36,8 @@ class ProfiloVolontario extends StatelessWidget {
                 );
               },
             ),
-            new IconButton(
+            IconButton(
               icon: Icon(Icons.delete_forever),
-              iconSize: 40,
               onPressed: () {
                 Navigator.push(
                   context,
