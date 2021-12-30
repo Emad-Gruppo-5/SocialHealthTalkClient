@@ -110,8 +110,8 @@ class _ModifyProfile extends State<ModifyProfile> {
           body: Center(
             child: Column(
               children: [
-                const Text(
-                  "Mario Esposito",
+                Text(
+                  "$nome $cognome",
                   style: TextStyle(fontSize: 30),
                 ),
                 _form(),
@@ -230,11 +230,11 @@ class _ModifyProfile extends State<ModifyProfile> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: _textFormField(Icons.smartphone, "Numero di cellulare",
-                "+39 331 313 3141", "Inserisci numero di cellulare"),
+                "$num_cellulare", "Inserisci numero di cellulare"),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(Icons.email, "E-mail", "mariorossi@gmail.com",
+            child: _textFormField(Icons.email, "E-mail", "$email",
                 "Inserisci e-mail"),
           ),
         ],
