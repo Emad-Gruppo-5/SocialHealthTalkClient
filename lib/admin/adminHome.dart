@@ -89,7 +89,7 @@ class _AdminHome extends State<AdminHome> {
     return Scaffold(
             appBar: AppBar(
               // QUI CI VA IL BOTTONE DI LOGOUT, nell'onPressed ci va il seguente codice:
-              // Navigator.push(
+              // Navigator.pushReplacement(
               //       context,
               //       MaterialPageRoute(
               //         builder: (context) => LoginPage(),
@@ -160,6 +160,7 @@ class _AdminHome extends State<AdminHome> {
                                         radius: '100%')
                                   ]
                                   )
+                                  
                                   ,
                             ),
                             Padding(
