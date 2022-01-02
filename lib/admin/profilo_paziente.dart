@@ -1,16 +1,84 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:test_emad/admin/lista_pazienti.dart';
 import 'package:test_emad/admin/profilo_paziente_modifica.dart';
+import 'package:test_emad/familiare.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() => runApp(const ProfiloPaziente());
 
 /// This is the main application widget.
-class ProfiloPaziente extends StatelessWidget {
-  const ProfiloPaziente({Key? key}) : super(key: key);
+class ProfiloPaziente extends StatefulWidget {
+
+  final String cod_fiscale;
+
+  ProfiloPaziente(
+    this.cod_fiscale, {Key? key}
+  ) : super(key: key);
 
   
+  @override
+  _ProfiloPaziente createState() => _ProfiloPaziente();
+  
+}
+
+// This is the stateless widget that the main application instantiates.
+class _ProfiloPaziente extends State<ProfiloPaziente> {
+  
+
+  late String cod_fiscale;
+
+  //late Future<Map<String, dynamic>> datiprofilo;
+
+  @override
+  void initState() {
+    print("initState");
+    
+    cod_fiscale = widget.cod_fiscale;
+    super.initState();
+  }
+
+  Future<Map<String, dynamic>> getprofiledata() async {
+    print("Inizio funzione");
+    var uri = Uri.parse('http://127.0.0.1:5000/dati_profilo');
+    print(uri);
+    var message = {
+      "role": 1,
+      "cod_fiscale": cod_fiscale
+    };
+    
+    var body = json.encode(message);
+    
+    var dati_profilo = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+
+    
+
+    uri = Uri.parse('http://127.0.0.1:5000/attori_associati');
+
+    var attori_associati = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+
+    
+
+    Map<String, dynamic> resp = { 'paziente' : json.decode(dati_profilo.body)};
+    resp['familiari'] = json.decode(attori_associati.body)["familiari"]; 
+    resp['dottori'] = json.decode(attori_associati.body)["dottori"];
+    
+    return resp;
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    // var datiprofilo = getprofiledata();
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -40,27 +108,106 @@ class ProfiloPaziente extends StatelessWidget {
               icon: Icon(Icons.delete_forever),
               iconSize: 40,
               onPressed: () {
-                Navigator.push(
-                  context,
+              CollectionReference patients = FirebaseFirestore.instance.collection('patients');
+              var uri = Uri.parse('http://127.0.0.1:5000/elimina_utente');
+              print(uri);
+              var message = {
+                "role": 1,
+                "cod_fiscale": cod_fiscale
+              };
+              
+              var body = json.encode(message);
+              
+                http.post(uri,
+                  headers: <String, String>{
+                    'Content-Type': 'application/json; charset=UTF-8'
+                  },
+                  body: body).then((value) {
+                    if(value.statusCode == 200){
+                      patients
+                              .doc(cod_fiscale)
+                              .delete()
+                              .then((value) => print("Patient Deleted"))
+                              .catchError((error) => print("Failed to delete patient: $error"));
+                    }
+                    else{
+                      print("Errore lato Server: " + value.body);
+                    }
+                  });
+                Navigator.pushReplacement(
+                  context, 
                   MaterialPageRoute(
-                    builder: (context) => ProfiloPazienteModifica(),
+                    builder: (context) => ListaPazienti(),
                   ),
                 );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => ListaPazienti(),
+                //   ),
+                // );
               },
             ),
           ],
         ),
-        body: const SingleChildScrollView(
-          child: MyProfile(),
+        body: Center(
+          child: FutureBuilder(
+            future: getprofiledata(),
+            builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot){
+              if (snapshot.hasData){
+                print(snapshot.data);
+                
+                Map<String, dynamic> data = Map.from( snapshot.data! );
+                var profilo = json.decode(json.encode(data["paziente"]).toString());
+                List<dynamic> familiari = json.decode(json.encode(data["familiari"]).toString());
+                List<dynamic> dottori = json.decode(json.encode(data["dottori"]).toString());                
+                
+                print("DOTTORI\n" + dottori.toString());
+                print("FAMILIARI\n" + familiari.toString());
+                return SingleChildScrollView(
+                  child: Column(
+                  children: [
+                    Text(
+                      profilo["nome"] + " " + profilo["cognome"],
+                      style: TextStyle(fontSize: 30),
+                    ),
+                    _card(profilo["cod_fiscale"], Icons.person),
+                    _card(profilo["num_cellulare"].toString(), Icons.smartphone),
+                    _card(profilo["email"], Icons.email),
+                    const Text("\nTipologia chat"),
+                    _checkboxListTile("Solo testo", profilo["tipologia_chat"] == 0 ? true : false),
+                    _checkboxListTile("Videochiamata", profilo["tipologia_chat"] == 1 ? true : false),
+                    _checkboxListTile("Chiamata vocale", profilo["tipologia_chat"] == 2 ? true : false),
+                    const Text(
+                      "Dottori associati",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    
+                    for(int i=0; i< dottori.length; i++)
+                      _card(dottori[i]["cognome"] + " " + dottori[i]["nome"], Icons.medical_services_outlined),
+                    
+                    const Text(
+                      "Familiari associati",
+                      style: TextStyle(fontSize: 20),
+                    ),
+
+                    for(int i=0; i< familiari.length; i++)
+                      _card(familiari[i]["cognome"] + " " + familiari[i]["nome"], Icons.people_alt),
+                    
+                  ],
+                  ),
+                );
+                // return Center(child: Text("NON FUNZIONA"));
+              } else {
+                 return Center(child: CircularProgressIndicator());
+              }
+            },
+          
+          ),
         ),
       ),
     );
   }
-}
-
-// This is the stateless widget that the main application instantiates.
-class MyProfile extends StatelessWidget {
-  const MyProfile({Key? key}) : super(key: key);
 
   Widget _card(String title, IconData icon) {
     return Card(
@@ -80,32 +227,5 @@ class MyProfile extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text(
-          "Mario Rossi",
-          style: TextStyle(fontSize: 30),
-        ),
-        _card("SMLLNEXIXISI", Icons.person),
-        _card("+39 331 313 3141", Icons.smartphone),
-        _card("mariorossi@gmail.com", Icons.email),
-        const Text("\nTipologia chat"),
-        _checkboxListTile("Solo testo", false),
-        _checkboxListTile("Videochiamata", true),
-        _checkboxListTile("Chiamata vocale", false),
-        const Text(
-          "Dottori associati",
-          style: TextStyle(fontSize: 20),
-        ),
-        _card("Dottore 1", Icons.medical_services_outlined),
-        const Text(
-          "Familiari associati associati",
-          style: TextStyle(fontSize: 20),
-        ),
-        _card("Familiare 1", Icons.people_alt),
-      ],
-    );
-  }
+  
 }

@@ -9,6 +9,7 @@ import 'package:test_emad/admin/stato_attivita_pazienti.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:test_emad/main.dart';
 
 void main() {
   runApp(AdminHome());
@@ -86,7 +87,14 @@ class _AdminHome extends State<AdminHome> {
 
 
     return Scaffold(
-            appBar: new AppBar(),
+            appBar: AppBar(
+              // QUI CI VA IL BOTTONE DI LOGOUT, nell'onPressed ci va il seguente codice:
+              // Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => LoginPage(),
+              //       ));
+            ),
             body: Center(
             child: StreamBuilder(
                 stream: FirebaseFirestore.instance
@@ -96,12 +104,12 @@ class _AdminHome extends State<AdminHome> {
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    
-                    return Center(
-                        child: Image.asset(
-                      'assets/images/loading.gif',
-                    )
-                    );
+                    return Center(child: CircularProgressIndicator());
+                    // return Center(
+                    //     child: Image.asset(
+                    //   'assets/images/loading.gif',
+                    // )
+                    // );
                   }
                   online = snapshot.data!.docs.length;
 
@@ -113,31 +121,11 @@ class _AdminHome extends State<AdminHome> {
                     builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        
-                        return Center(
-                            child: Image.asset(
-                          'assets/images/loading.gif',
-                        )
-                        );
+                        return Center(child: CircularProgressIndicator());
                       }
 
                       offline = snapshot.data!.docs.length;
 
-
-            // FutureBuilder(future: getstatus().then((status) => {
-            //     print(status['online'].toString() + " " + status['offline'].toString()),
-
-            //     online = int.tryParse(status['online'] ?? '0'),
-            //     offline = int.tryParse(status['offline'] ?? '0'),
-            //     print(status['online'].toString() + " " + status['offline'].toString()),
-            //   }), builder: (context, snap){
-            //   if(!snap.hasData) {
-            //     return Center(
-            //           child: Image.asset(
-            //         'assets/images/loading.gif',
-            //       )
-            //       );
-            //   }
               return MaterialApp(
 
                 debugShowCheckedModeBanner: false,

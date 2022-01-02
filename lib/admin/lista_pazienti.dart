@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:test_emad/admin/adminHome.dart';
 import 'package:test_emad/admin/crea_nuovo_paziente.dart';
 import 'package:test_emad/admin/profilo_paziente_modifica.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +17,12 @@ class ListaPazienti extends StatelessWidget {
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_sharp),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                  context, 
+                  MaterialPageRoute(
+                    builder: (context) => AdminHome(),
+                  ),
+                );
             },
           ),
           actions: [
@@ -49,7 +55,7 @@ class ListSearchState extends State<ListSearch> {
     getPatient();
   }
 
-  static List<String> mainDataList = [];
+  static List<Map<String, String>> mainDataList = [];
 
   Future<String> getPatient() async {
     mainDataList.clear();
@@ -72,12 +78,11 @@ class ListSearchState extends State<ListSearch> {
 
     var i = 0;
     while (i < json.decode(data.body).length) {
-      mainDataList.add(json.decode(data.body)[i]['cognome'] +
-          ' ' +
-          json.decode(data.body)[i]['nome'] +
-          ' ' +
-          json.decode(data.body)[i]['cod_fiscale']);
-      i = i + 1;
+      mainDataList.add(
+          {'cognome' : json.decode(data.body)[i]['cognome'],
+           'nome' : json.decode(data.body)[i]['nome'],
+           'cod_fiscale' : json.decode(data.body)[i]['cod_fiscale']});
+      i++;
     }
 
     print(mainDataList);
@@ -90,13 +95,13 @@ class ListSearchState extends State<ListSearch> {
   }
 
   // Copy Main List into New List.
-  List<String> newDataList = List.from(mainDataList);
+  List<Map<String, String>> newDataList = List.from(mainDataList);
 
   onItemChanged(String value) {
     setState(() {
-      newDataList = mainDataList
-          .where((string) => string.toLowerCase().contains(value.toLowerCase()))
-          .toList();
+      // newDataList = mainDataList
+      //     .where((map) => map[""].toLowerCase().contains(value.toLowerCase()))
+      //     .toList();
     });
   }
 
@@ -125,14 +130,17 @@ class ListSearchState extends State<ListSearch> {
             child: ListView(
               padding: EdgeInsets.all(12.0),
               children: newDataList.map((data) {
+                print("STAMPA: " + data["cognome"]!);
                 return ListTile(
-                  title: Text(data),
-                  onTap: () => Navigator.push(
+                  title: Text(data["cognome"]! + ' ' + data["nome"]!),
+                  onTap: () => {
+                    Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProfiloPaziente(),
+                      builder: (context) => ProfiloPaziente(data["cod_fiscale"]!),
                     ),
                   ),
+                  }
                 );
               }).toList(),
             ),

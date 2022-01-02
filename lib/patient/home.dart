@@ -71,15 +71,6 @@ class Patient_Home extends StatelessWidget {
       tooltip: tooltip,
       iconSize: 40,
       onPressed: () {
-        timer.cancel();
-
-        DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
-        String ultimo_accesso = dateFormat.format(DateTime.now());
-        FirebaseFirestore.instance
-            .collection('patients')
-            .doc(cod_fiscale)
-            .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
-
         Navigator.pop(context);
       },
     );
