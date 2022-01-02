@@ -60,8 +60,9 @@ class _MyModifyProfile extends State<MyModifyProfile> {
     CollectionReference patients = FirebaseFirestore.instance.collection('patients');
     int role = 1;
     print(senddata);
-    Map<String, String> message = {
-      "role": role.toString(),
+
+    Map<String, dynamic> message = {
+      "role": role,
       "cod_fiscale": senddata["cod_fiscale"],
       "nome": senddata["nome"],
       "cognome": senddata["cognome"],
