@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:test_emad/admin/lista_pazienti.dart';
 import 'package:test_emad/admin/lista_dottori.dart';
 import 'package:test_emad/admin/lista_familiari.dart';
 import 'package:test_emad/admin/lista_volontari.dart';
+import 'package:test_emad/admin/notifications.dart';
 import 'package:test_emad/admin/stato_attivita_pazienti.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -71,8 +73,10 @@ class _AdminHome extends State<AdminHome> {
 
   @override
   Widget build(BuildContext context) {
-    int online;
-    int offline;
+    int online, offline, _notificationsLength;
+
+    final Stream<QuerySnapshot> _notifications =
+        FirebaseFirestore.instance.collection('notifications').snapshots();
 
     return Scaffold(
       appBar: AppBar(
@@ -93,6 +97,43 @@ class _AdminHome extends State<AdminHome> {
           },
         ),
         title: const Text("Admin"),
+        actions: [
+          StreamBuilder<QuerySnapshot>(
+              stream: _notifications,
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  return const Text('Something went wrong');
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Text("Loading");
+                }
+
+                _notificationsLength = snapshot.data!.docs.length;
+
+                bool showBadge = true;
+                if (_notificationsLength == 0) showBadge = false;
+
+                return Badge(
+                  badgeContent: Text('$_notificationsLength'),
+                  child: IconButton(
+                    icon: const Icon(Icons.doorbell),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => Notifications(),
+                        ),
+                      );
+                    },
+                    tooltip: "Notifiche",
+                  ),
+                  position: BadgePosition.topEnd(top: 0, end: 0),
+                  showBadge: showBadge,
+                );
+              }),
+        ],
       ),
       body: Center(
         child: StreamBuilder(
@@ -172,28 +213,6 @@ class _AdminHome extends State<AdminHome> {
                                           );
                                         }),
                                   ),
-                                  /*Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Card(
-                                      child: ListTile(
-                                        title: const Text(
-                                            "Numero pazienti offline: " + "40"),
-                                        subtitle:
-                                            const Text("Premi per controllare"),
-                                        trailing:
-                                            new Icon(Icons.arrow_forward_ios),
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  StatoAttivitaPazienti(),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),*/
                                 ])),
                             bottomNavigationBar: Theme(
                               data: Theme.of(context).copyWith(
