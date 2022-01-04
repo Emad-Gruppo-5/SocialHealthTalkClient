@@ -1,8 +1,10 @@
 import 'dart:async';
-
+import 'dart:io';
+import 'package:flash/flash.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:test_emad/patient/profile.dart';
 import '../main.dart';
 
 class ModifyProfile extends StatefulWidget {
@@ -12,6 +14,7 @@ class ModifyProfile extends StatefulWidget {
   final String num_cellulare;
   final int tipologia_chat;
   final String cod_fiscale;
+  final String token;
 
   const ModifyProfile(
       {required this.cod_fiscale,
@@ -19,11 +22,14 @@ class ModifyProfile extends StatefulWidget {
       required this.cognome,
       required this.email,
       required this.num_cellulare,
-      required this.tipologia_chat});
+      required this.tipologia_chat,
+      required this.token});
 
   @override
   _ModifyProfile createState() => _ModifyProfile();
 }
+
+enum SingingCharacter { testo, videochiamata, chiamata }
 
 /// This is the main application widget.
 class _ModifyProfile extends State<ModifyProfile> {
@@ -33,7 +39,12 @@ class _ModifyProfile extends State<ModifyProfile> {
   late String num_cellulare;
   late int tipologia_chat;
   late String cod_fiscale;
-
+  late String token;
+  late String ultimo_accesso;
+  SingingCharacter? _character;
+  late TextEditingController _email;
+  late TextEditingController _num_cell;
+  CollectionReference notifications = FirebaseFirestore.instance.collection('notifications');
   @override
   void initState() {
     nome = widget.nome;
@@ -42,13 +53,26 @@ class _ModifyProfile extends State<ModifyProfile> {
     num_cellulare = widget.num_cellulare;
     tipologia_chat = widget.tipologia_chat;
     cod_fiscale = widget.cod_fiscale;
+    token = widget.token;
+    switch (tipologia_chat) {
+      case 0: _character = SingingCharacter.testo;
+        break;
+      case 1: _character = SingingCharacter.videochiamata;
+        break;
+      case 2: _character = SingingCharacter.chiamata;
+        break;
+    }
+    _num_cell = TextEditingController(text: num_cellulare);
+    _email = TextEditingController(text: email);
     super.initState();
   }
-
-  Duration duration = const Duration(seconds: 7);
+  
+  Duration alert_duration = const Duration(seconds: 20);
+  Duration online_duration = const Duration(seconds: 7);
   late Timer timer;
+  late Timer timer_alert;
   String timerText = "Start";
-  bool _visible = false;
+  // bool _visible = false;
 
   Widget _iconButtonPush(
       BuildContext context, IconData icon, String tooltip, MyApp myApp) {
@@ -58,7 +82,7 @@ class _ModifyProfile extends State<ModifyProfile> {
       iconSize: 40,
       onPressed: () {
         timer.cancel();
-
+        timer_alert.cancel();
         DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
         String ultimo_accesso = dateFormat.format(DateTime.now());
         FirebaseFirestore.instance
@@ -66,7 +90,7 @@ class _ModifyProfile extends State<ModifyProfile> {
             .doc(cod_fiscale)
             .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
 
-        Navigator.push(
+        Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => MyApp()));
       },
     );
@@ -79,22 +103,34 @@ class _ModifyProfile extends State<ModifyProfile> {
       iconSize: 40,
       onPressed: () {
         timer.cancel();
-
+        timer_alert.cancel();
         print("UPDATE FIRESTORE");
         FirebaseFirestore.instance
             .collection('patients')
             .doc(cod_fiscale)
             .update({'status': 'online'});
 
-        Navigator.pop(context);
+        Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => Profile(
+                      cod_fiscale: cod_fiscale,
+                      nome: nome,
+                      cognome: cognome,
+                      email: email,
+                      num_cellulare: num_cellulare,
+                      tipologia_chat: tipologia_chat,
+                      token: token),
+                  ),
+                );
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    timer = Timer(duration, handleTimeout);
-
+    timer = Timer(online_duration, handleTimeout);
+    timer_alert = Timer(alert_duration, callback);
     return MaterialApp(
       home: GestureDetector(
         child: Scaffold(
@@ -116,13 +152,63 @@ class _ModifyProfile extends State<ModifyProfile> {
                 ),
                 _form(),
                 const Text("\nTipologia chat"),
-                _checkboxListTile("Solo testo", 0),
-                _checkboxListTile("Videochiamata", 1),
-                _checkboxListTile("Chiamata vocale", 2),
-                Visibility(
-                    child: const Text("Seleziona almeno una chat",
-                        style: TextStyle(color: Colors.red)),
-                    visible: _visible),
+                  ListTile(
+                    title: const Text('Solo testo'),
+                    leading: Radio<SingingCharacter>(
+                      value: SingingCharacter.testo,
+                      groupValue: _character,
+                      onChanged: (SingingCharacter? value) {
+                        setState(() {
+                          _character = value;
+                        });
+                        timer.cancel();
+                        timer_alert.cancel();
+                        print("UPDATE FIRESTORE");
+                        FirebaseFirestore.instance
+                            .collection('patients')
+                            .doc(cod_fiscale)
+                            .update({'status': 'online'});
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Videochiamata'),
+                    leading: Radio<SingingCharacter>(
+                      value: SingingCharacter.videochiamata,
+                      groupValue: _character,
+                      onChanged: (SingingCharacter? value) {
+                        setState(() {
+                          _character = value;
+                        });
+                        timer.cancel();
+                        timer_alert.cancel();
+                        print("UPDATE FIRESTORE");
+                        FirebaseFirestore.instance
+                            .collection('patients')
+                            .doc(cod_fiscale)
+                            .update({'status': 'online'});
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Chiamata vocale'),
+                    leading: Radio<SingingCharacter>(
+                      value: SingingCharacter.chiamata,
+                      groupValue: _character,
+                      onChanged: (SingingCharacter? value) {
+                        setState(() {
+                          _character = value;
+                        });
+                        timer.cancel();
+                        timer_alert.cancel();
+                        print("UPDATE FIRESTORE");
+                        FirebaseFirestore.instance
+                            .collection('patients')
+                            .doc(cod_fiscale)
+                            .update({'status': 'online'});
+                      },
+                    ),
+                  ),
                 _submitButton(),
               ],
             ),
@@ -135,7 +221,9 @@ class _ModifyProfile extends State<ModifyProfile> {
               .doc(cod_fiscale)
               .update({'status': 'online'});
           timer.cancel();
-          timer = Timer(duration, handleTimeout);
+          timer_alert.cancel();
+          timer = Timer(online_duration, handleTimeout);
+          timer_alert = Timer(alert_duration, callback);
         },
       ),
     );
@@ -143,83 +231,82 @@ class _ModifyProfile extends State<ModifyProfile> {
 
   void handleTimeout() {
     print("TIMEOUT\nCod_fiscale: " + cod_fiscale);
-    DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
-    String ultimo_accesso = dateFormat.format(DateTime.now());
+    DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+    ultimo_accesso = dateFormat.format(DateTime.now());
     FirebaseFirestore.instance
         .collection('patients')
         .doc(cod_fiscale)
         .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
 
+  void callback() {
+    print("ALERT\nCod_fiscale: " + cod_fiscale);
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .add({
+              'alert': true,
+              'letto': false,
+              'cod_fiscale': cod_fiscale,
+              'nome': nome,
+              'cognome': cognome,
+              'data': ultimo_accesso
+        });
+  }
+
   Widget _submitButton() {
-    return Padding(
+     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
         onPressed: () {
+         bool flag;
+         Duration flash_duration = const Duration(seconds: 3);
           print("UPDATE FIRESTORE");
           FirebaseFirestore.instance
               .collection('patients')
               .doc(cod_fiscale)
               .update({'status': 'online'});
           timer.cancel();
-          timer = Timer(duration, handleTimeout);
-
-          if (!isChecked.contains(true)) {
-            setState(() {
-              _visible = true;
-            });
-          } else {
-            _visible = false;
-          }
+          timer_alert.cancel();
+          timer = Timer(online_duration, handleTimeout);
+          timer_alert = Timer(alert_duration, callback);
 
           // Validate returns true if the form is valid, or false otherwise.
           if (_formKey.currentState!.validate()) {
-            // If the form is valid
+            DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
+            String data_notifica = dateFormat.format(DateTime.now());
+            notifications.add({
+              'alert': false,
+              'cod_fiscale': cod_fiscale,
+              'letto': false,
+              'nome': nome,
+              'cognome': cognome,
+              'data': data_notifica,
+              'email': _email.text,
+              'num_cellulare': _num_cell.text,
+              'tipologia_chat': _character!.index
+            })
+            .then((value) {
+                  print("Notifica aggiunta\ncod_fiscale: $cod_fiscale, email: " 
+                                  + _email.text + ", num_cellulare: " + _num_cell.text 
+                                  + ", tipologia_chat: " + _character!.index.toString());
+                  flag = true;
+                  _showBasicsFlash(flag ,flash_duration);
+            })
+            .catchError((error) {
+                print("Errore nell'aggiunta della notifica: $error");
+                flag = false;
+                _showBasicsFlash(flag ,flash_duration);
+            });
+            
           }
+          
         },
         child: const Text('Salva'),
       ),
     );
   }
 
-  List<bool> isChecked = [false, true, false];
   final _formKey = GlobalKey<FormState>();
-
-  Widget _textFormField(
-      IconData icon, String labelText, String initialValue, String validator) {
-    return TextFormField(
-      decoration: InputDecoration(
-        icon: Icon(icon),
-        labelText: labelText,
-      ),
-      initialValue: initialValue,
-      // The validator receives the text that the user has entered.
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return validator;
-        }
-        return null;
-      },
-      onTap: () {
-        print("UPDATE FIRESTORE");
-        FirebaseFirestore.instance
-            .collection('patients')
-            .doc(cod_fiscale)
-            .update({'status': 'online'});
-        timer.cancel();
-        timer = Timer(duration, handleTimeout);
-      },
-      onChanged: (value) {
-        print("UPDATE FIRESTORE");
-        FirebaseFirestore.instance
-            .collection('patients')
-            .doc(cod_fiscale)
-            .update({'status': 'online'});
-        timer.cancel();
-        timer = Timer(duration, handleTimeout);
-      },
-    );
-  }
 
   Widget _form() {
     return Form(
@@ -229,36 +316,110 @@ class _ModifyProfile extends State<ModifyProfile> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(Icons.smartphone, "Numero di cellulare",
-                "$num_cellulare", "Inserisci numero di cellulare"),
+            child: TextFormField(
+              controller: _num_cell,
+              decoration: InputDecoration(
+                icon: Icon(Icons.smartphone),
+                labelText: "Numero di cellulare",
+              ),
+              // initialValue: "$num_cellulare",
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Inserisci numero di cellulare";
+                }
+
+                return null;
+              },
+              onTap: () {
+                print("UPDATE FIRESTORE");
+                FirebaseFirestore.instance
+                    .collection('patients')
+                    .doc(cod_fiscale)
+                    .update({'status': 'online'});
+                timer.cancel();
+                timer_alert.cancel();
+                timer = Timer(online_duration, handleTimeout);
+                timer_alert = Timer(alert_duration, callback);
+              },
+              onChanged: (value) {
+                print("UPDATE FIRESTORE");
+                FirebaseFirestore.instance
+                    .collection('patients')
+                    .doc(cod_fiscale)
+                    .update({'status': 'online'});
+                timer.cancel();
+                timer_alert.cancel();
+                timer = Timer(online_duration, handleTimeout);
+                timer_alert = Timer(alert_duration, callback);
+                
+              },
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(
-                Icons.email, "E-mail", "$email", "Inserisci e-mail"),
+            child: TextFormField(
+                controller: _email,
+                decoration: InputDecoration(
+                  icon: Icon(Icons.email),
+                  labelText: "E-mail",
+                ),
+                // initialValue: "$email",
+                // The validator receives the text that the user has entered.
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Inserisci e-mail";
+                  }
+                  return null;
+                },
+                onTap: () {
+                  print("UPDATE FIRESTORE");
+                  FirebaseFirestore.instance
+                      .collection('patients')
+                      .doc(cod_fiscale)
+                      .update({'status': 'online'});
+                  timer.cancel();
+                  timer_alert.cancel();
+                  timer = Timer(online_duration, handleTimeout);
+                  timer_alert = Timer(alert_duration, callback);
+                },
+                onChanged: (value) {
+                  print("UPDATE FIRESTORE");
+                  FirebaseFirestore.instance
+                      .collection('patients')
+                      .doc(cod_fiscale)
+                      .update({'status': 'online'});
+                  timer.cancel();
+                  timer_alert.cancel();
+                  timer = Timer(online_duration, handleTimeout);
+                  timer_alert = Timer(alert_duration, callback);
+                },
+              ),
           ),
         ],
       ),
     );
   }
 
-  Widget _checkboxListTile(String text, int index) {
-    return CheckboxListTile(
-      title: Text(text),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 100),
-      value: isChecked[index],
-      onChanged: (bool? value) {
-        setState(() {
-          isChecked[index] = value!;
-        });
-
-        timer.cancel();
-        print("UPDATE FIRESTORE");
-        FirebaseFirestore.instance
-            .collection('patients')
-            .doc(cod_fiscale)
-            .update({'status': 'online'});
+  void _showBasicsFlash(bool flag, Duration duration ) {
+    showFlash(
+      context: context,
+      duration: duration,
+      builder: (context, controller) {
+        String text = flag ? "Richiesta inviata con successo" : "Errore, richiesta non inviata";
+        var flashStyle = FlashBehavior.floating;
+        return Flash(
+          controller: controller,
+          behavior: flashStyle,
+          position: FlashPosition.bottom,
+          boxShadows: kElevationToShadow[4],
+          horizontalDismissDirection: HorizontalDismissDirection.horizontal,
+          child: FlashBar(
+            content: Text(text),
+          ),
+        );
       },
     );
   }
+
 }

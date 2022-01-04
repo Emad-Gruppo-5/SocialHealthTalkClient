@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:test_emad/patient/home.dart';
 import '../main.dart';
 import 'modify_profile.dart';
 
@@ -14,6 +15,7 @@ class Profile extends StatefulWidget {
   final String num_cellulare;
   final int tipologia_chat;
   final String cod_fiscale;
+  final String token;
 
   const Profile(
       {required this.cod_fiscale,
@@ -21,7 +23,8 @@ class Profile extends StatefulWidget {
       required this.cognome,
       required this.email,
       required this.num_cellulare,
-      required this.tipologia_chat});
+      required this.tipologia_chat,
+      required this.token});
 
   @override
   _Profile createState() => _Profile();
@@ -34,7 +37,8 @@ class _Profile extends State<Profile> {
   late String num_cellulare;
   late int tipologia_chat;
   late String cod_fiscale;
-
+  late String token;
+  late String ultimo_accesso;
   @override
   void initState() {
     nome = widget.nome;
@@ -43,11 +47,13 @@ class _Profile extends State<Profile> {
     num_cellulare = widget.num_cellulare;
     tipologia_chat = widget.tipologia_chat;
     cod_fiscale = widget.cod_fiscale;
+    token = widget.token;
     super.initState();
   }
-
-  Duration seconds = const Duration(seconds: 7);
+  Duration alert_duration = const Duration(seconds: 20);
+  Duration online_duration = const Duration(seconds: 7);
   late Timer timer;
+  late Timer timer_alert;
   String timerText = "Start";
 
   Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
@@ -58,7 +64,7 @@ class _Profile extends State<Profile> {
         iconSize: 40,
         onPressed: () {
           timer.cancel();
-
+          timer_alert.cancel();
           print("UPDATE FIRESTORE");
           FirebaseFirestore.instance
               .collection('patients')
@@ -74,10 +80,9 @@ class _Profile extends State<Profile> {
                     cognome: cognome,
                     email: email,
                     num_cellulare: num_cellulare,
-                    tipologia_chat: tipologia_chat)),
-          ).then((value) {
-            timer = Timer(seconds, handleTimeout);
-          });
+                    tipologia_chat: tipologia_chat,
+                    token: token)),
+          );
         },
       );
     } else {
@@ -87,7 +92,7 @@ class _Profile extends State<Profile> {
         iconSize: 40,
         onPressed: () {
           timer.cancel();
-
+          timer_alert.cancel();
           DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
           String ultimo_accesso = dateFormat.format(DateTime.now());
           FirebaseFirestore.instance
@@ -109,22 +114,35 @@ class _Profile extends State<Profile> {
       iconSize: 40,
       onPressed: () {
         timer.cancel();
-
+        timer_alert.cancel();
         print("UPDATE FIRESTORE");
         FirebaseFirestore.instance
             .collection('patients')
             .doc(cod_fiscale)
             .update({'status': 'online'});
 
-        Navigator.pop(context);
+        Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => Patient_Home(
+                      cod_fiscale: cod_fiscale,
+                      nome: nome,
+                      cognome: cognome,
+                      email: email,
+                      num_cellulare: num_cellulare,
+                      tipologia_chat: tipologia_chat,
+                      token: token
+                      ),
+                  ),
+                );
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    timer = Timer(seconds, handleTimeout);
-
+    timer = Timer(online_duration, handleTimeout);
+    timer_alert = Timer(alert_duration, callback);
     return MaterialApp(
       home: GestureDetector(
         child: Scaffold(
@@ -158,13 +176,15 @@ class _Profile extends State<Profile> {
           ),
         ),
         onTap: () {
-          print("UPDATE FIRESTORE");
+          print("TAP UTENTE");
           FirebaseFirestore.instance
               .collection('patients')
               .doc(cod_fiscale)
               .update({'status': 'online'});
           timer.cancel();
-          timer = Timer(seconds, handleTimeout);
+          timer_alert.cancel();
+          timer = Timer(online_duration, handleTimeout);
+          timer_alert = Timer(alert_duration, callback);
         },
       ),
     );
@@ -190,31 +210,27 @@ class _Profile extends State<Profile> {
 
   void handleTimeout() {
     print("TIMEOUT\nCod_fiscale: " + cod_fiscale);
-    DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
-    String ultimo_accesso = dateFormat.format(DateTime.now());
+    DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+    ultimo_accesso = dateFormat.format(DateTime.now());
     FirebaseFirestore.instance
         .collection('patients')
         .doc(cod_fiscale)
         .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
+
+  void callback() {
+    print("ALERT\nCod_fiscale: " + cod_fiscale);
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .add({
+              'alert': true,
+              'letto': false,
+              'cod_fiscale': cod_fiscale,
+              'nome': nome,
+              'cognome': cognome,
+              'data': ultimo_accesso
+        });
+  }
 }
 
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Column(
-  //     children: [
-  //       const Text(
-  //         " ",
-  //         style: TextStyle(fontSize: 50),
-  //       ),
-  //       _card("SMLLNEXIXISI", Icons.person),
-  //       _card("+39 331 313 3141", Icons.smartphone),
-  //       _card("mariorossi@gmail.com", Icons.email),
-  //       const Text("\nTipologia chat"),
-  //       _checkboxListTile("Solo testo", false),
-  //       _checkboxListTile("Videochiamata", true),
-  //       _checkboxListTile("Chiamata vocale", false),
-  //     ],
-  //   );
-  // }

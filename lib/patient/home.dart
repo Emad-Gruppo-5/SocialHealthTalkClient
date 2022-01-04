@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:html';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import '../main.dart';
 import 'profile.dart';
 import 'dart:developer';
 import 'package:intl/intl.dart';
@@ -29,10 +30,12 @@ class Patient_Home extends StatelessWidget {
       required this.tipologia_chat,
       required this.token});
 
-  Duration seconds = const Duration(seconds: 7);
+  Duration online_duration = const Duration(seconds: 7);
+  Duration alert_duration = const Duration(seconds: 20);
   late Timer timer;
+  late Timer timer_alert;
   String timerText = "Start";
-
+  late String ultimo_accesso;
   Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
     print("cod_fiscale: " + cod_fiscale);
     return IconButton(
@@ -41,8 +44,8 @@ class Patient_Home extends StatelessWidget {
       iconSize: 40,
       onPressed: () {
         timer.cancel();
-
-        print("UPDATE FIRESTORE");
+        timer_alert.cancel();
+        print("TAP UTENTE");
         FirebaseFirestore.instance
             .collection('patients')
             .doc(cod_fiscale)
@@ -57,10 +60,9 @@ class Patient_Home extends StatelessWidget {
                   cognome: cognome,
                   email: email,
                   num_cellulare: num_cellulare,
-                  tipologia_chat: tipologia_chat)),
-        ).then((value) {
-          timer = Timer(seconds, handleTimeout);
-        });
+                  tipologia_chat: tipologia_chat,
+                  token: token)),
+        );
       },
     );
   }
@@ -71,16 +73,18 @@ class Patient_Home extends StatelessWidget {
       tooltip: tooltip,
       iconSize: 40,
       onPressed: () {
-        Navigator.pop(context);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => MyApp()));
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    timer = Timer(seconds, handleTimeout);
+    timer = Timer(online_duration, handleTimeout);
+    timer_alert = Timer(alert_duration, callback);
 
-    print("UPDATE FIRESTORE");
+    // print("UPDATE FIRESTORE");
     FirebaseFirestore.instance
         .collection('patients')
         .doc(cod_fiscale)
@@ -112,13 +116,15 @@ class Patient_Home extends StatelessWidget {
           ),
         ),
         onTap: () {
-          print("UPDATE FIRESTORE");
+          print("TAP UTENTE");
           FirebaseFirestore.instance
               .collection('patients')
               .doc(cod_fiscale)
               .update({'status': 'online'});
           timer.cancel();
-          timer = Timer(seconds, handleTimeout);
+          timer_alert.cancel();
+          timer = Timer(online_duration, handleTimeout);
+          timer_alert = Timer(alert_duration, callback);
         },
       ),
     );
@@ -135,13 +141,27 @@ class Patient_Home extends StatelessWidget {
 
   void handleTimeout() {
     print("TIMEOUT\nCod_fiscale: " + cod_fiscale);
-    DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
-    String ultimo_accesso = dateFormat.format(DateTime.now());
+    DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+    ultimo_accesso = dateFormat.format(DateTime.now());
     FirebaseFirestore.instance
         .collection('patients')
         .doc(cod_fiscale)
         .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
+  
+  void callback() {
+    print("ALERT\nCod_fiscale: " + cod_fiscale);
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .add({
+              'alert': true,
+              'letto': false,
+              'cod_fiscale': cod_fiscale,
+              'nome': nome,
+              'cognome': cognome,
+              'data': ultimo_accesso
+        });
+  }
 }
 
-void callback() {}
+
