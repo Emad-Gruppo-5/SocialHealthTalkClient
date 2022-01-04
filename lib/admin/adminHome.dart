@@ -118,7 +118,7 @@ class _AdminHome extends State<AdminHome> {
                 return Badge(
                   badgeContent: Text('$_notificationsLength'),
                   child: IconButton(
-                    icon: const Icon(Icons.doorbell),
+                    icon: const Icon(Icons.notifications),
                     onPressed: () {
                       Navigator.push(
                         context,

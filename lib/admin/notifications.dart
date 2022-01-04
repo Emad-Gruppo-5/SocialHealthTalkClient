@@ -69,13 +69,16 @@ class MyNotifications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Stream<QuerySnapshot> _patients = FirebaseFirestore.instance
+    final Stream<QuerySnapshot> _notificationsStream = FirebaseFirestore
+        .instance
         .collection('notifications')
         .orderBy('data', descending: true)
         .snapshots();
+    CollectionReference _notificationsReference =
+        FirebaseFirestore.instance.collection('notifications');
 
     return StreamBuilder<QuerySnapshot>(
-      stream: _patients,
+      stream: _notificationsStream,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return const Text('Something went wrong');
@@ -90,12 +93,12 @@ class MyNotifications extends StatelessWidget {
             Map<String, dynamic> data =
                 document.data()! as Map<String, dynamic>;
 
-            Icon leading;
             String subtitle = "";
+            Icon trailing;
             Row row;
             if (data['alert']) {
-              leading = const Icon(Icons.warning);
               subtitle = "Risulta offline da più di 2 ore";
+              trailing = const Icon(Icons.warning, color: Colors.red);
               row = Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -117,8 +120,8 @@ class MyNotifications extends StatelessWidget {
                 ],
               );
             } else {
-              leading = const Icon(Icons.edit);
               subtitle = "Vuole aggiornare il suo profilo";
+              trailing = const Icon(Icons.edit);
               row = Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -141,12 +144,20 @@ class MyNotifications extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   ListTile(
-                    leading: leading,
+                    leading: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Visibility(
+                          child: const Icon(Icons.circle,
+                              color: Colors.blue, size: 15),
+                          visible: data['letto'],
+                        ),
+                      ],
+                    ),
                     title: Text(data['nome'] + " " + data['cognome']),
                     subtitle: Text(subtitle),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => showDialog<String>(
+                    trailing: trailing,
+                    /*onPressed: () => showDialog<String>(
                         context: context,
                         builder: (BuildContext context) => AlertDialog(
                           title: const Text('ATTENZIONE!'),
@@ -157,8 +168,7 @@ class MyNotifications extends StatelessWidget {
                               onPressed: () {
                                 Navigator.pop(context, 'Si');
 
-                                FirebaseFirestore.instance
-                                    .collection('notifications')
+                                _notificationsReference
                                     .doc(document.id)
                                     .delete()
                                     .then(
@@ -177,10 +187,13 @@ class MyNotifications extends StatelessWidget {
                             ),
                           ],
                         ),
-                      ),
-                      tooltip: "Rimuovi",
-                      color: Colors.red,
-                    ),
+                      ),*/
+                    onTap: () => _notificationsReference
+                        .doc(document.id)
+                        .update({'letto': !data['letto']})
+                        .then((value) => print("Notification Updated"))
+                        .catchError((error) =>
+                            print("Failed to update notifications: $error")),
                   ),
                   row,
                 ],
