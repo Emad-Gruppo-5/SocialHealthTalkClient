@@ -81,8 +81,10 @@ class MyNotifications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Stream<QuerySnapshot> _patients =
-        FirebaseFirestore.instance.collection('notifications').snapshots();
+    final Stream<QuerySnapshot> _patients = FirebaseFirestore.instance
+        .collection('notifications')
+        .orderBy('data', descending: true)
+        .snapshots();
 
     return StreamBuilder<QuerySnapshot>(
       stream: _patients,
@@ -103,7 +105,7 @@ class MyNotifications extends StatelessWidget {
             Icon leading;
             String subtitle = "";
             Row row;
-            if (data['type'] == 'status') {
+            if (data['alert']) {
               leading = const Icon(Icons.warning);
               subtitle = "Risulta offline da più di 2 ore";
               row = Row(
