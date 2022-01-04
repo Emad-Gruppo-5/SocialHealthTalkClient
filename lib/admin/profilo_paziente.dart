@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -7,26 +8,18 @@ import 'package:test_emad/familiare.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 /// This is the main application widget.
 class ProfiloPaziente extends StatefulWidget {
-
   final String cod_fiscale;
 
-  ProfiloPaziente(
-    this.cod_fiscale, {Key? key}
-  ) : super(key: key);
+  ProfiloPaziente(this.cod_fiscale, {Key? key}) : super(key: key);
 
-  
   @override
   _ProfiloPaziente createState() => _ProfiloPaziente();
-  
 }
 
 // This is the stateless widget that the main application instantiates.
 class _ProfiloPaziente extends State<ProfiloPaziente> {
-  
-
   late String cod_fiscale;
 
   //late Future<Map<String, dynamic>> datiprofilo;
@@ -34,7 +27,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
   @override
   void initState() {
     print("initState");
-    
+
     cod_fiscale = widget.cod_fiscale;
     super.initState();
   }
@@ -43,20 +36,15 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
     print("Inizio funzione");
     var uri = Uri.parse('http://127.0.0.1:5000/dati_profilo');
     print(uri);
-    var message = {
-      "role": 1,
-      "cod_fiscale": cod_fiscale
-    };
-    
+    var message = {"role": 1, "cod_fiscale": cod_fiscale};
+
     var body = json.encode(message);
-    
+
     var dati_profilo = await http.post(uri,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
         body: body);
-
-    
 
     uri = Uri.parse('http://127.0.0.1:5000/attori_associati');
 
@@ -66,19 +54,17 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
         },
         body: body);
 
-    
-
-    Map<String, dynamic> resp = { 'paziente' : json.decode(dati_profilo.body)};
-    resp['familiari'] = json.decode(attori_associati.body)["familiari"]; 
+    Map<String, dynamic> resp = {'paziente': json.decode(dati_profilo.body)};
+    resp['familiari'] = json.decode(attori_associati.body)["familiari"];
     resp['dottori'] = json.decode(attori_associati.body)["dottori"];
-    
+
     return resp;
   }
-
 
   @override
   Widget build(BuildContext context) {
     // var datiprofilo = getprofiledata();
+
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -108,36 +94,68 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
               icon: Icon(Icons.delete_forever),
               iconSize: 40,
               onPressed: () {
-              CollectionReference patients = FirebaseFirestore.instance.collection('patients');
-              var uri = Uri.parse('http://127.0.0.1:5000/elimina_utente');
-              print(uri);
-              var message = {
-                "role": 1,
-                "cod_fiscale": cod_fiscale
-              };
-              
-              var body = json.encode(message);
-              
-                http.post(uri,
-                  headers: <String, String>{
-                    'Content-Type': 'application/json; charset=UTF-8'
-                  },
-                  body: body).then((value) {
-                    if(value.statusCode == 200){
-                      patients
-                              .doc(cod_fiscale)
-                              .delete()
-                              .then((value) => print("Patient Deleted"))
-                              .catchError((error) => print("Failed to delete patient: $error"));
-                    }
-                    else{
-                      print("Errore lato Server: " + value.body);
-                    }
-                  });
-                Navigator.pushReplacement(
-                  context, 
-                  MaterialPageRoute(
-                    builder: (context) => ListaPazienti(),
+                showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text('ATTENZIONE!'),
+                    content: const Text('Rimuovere il paziente?'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, 'Si');
+
+                          CollectionReference patients =
+                              FirebaseFirestore.instance.collection('patients');
+                          var uri =
+                              Uri.parse('http://127.0.0.1:5000/elimina_utente');
+                          print(uri);
+                          var message = {"role": 1, "cod_fiscale": cod_fiscale};
+
+                          var body = json.encode(message);
+
+                          http
+                              .post(uri,
+                                  headers: <String, String>{
+                                    'Content-Type':
+                                        'application/json; charset=UTF-8'
+                                  },
+                                  body: body)
+                              .then((value) {
+                            if (value.statusCode == 200) {
+                              patients.doc(cod_fiscale).delete().then((value) {
+                                print("Patient Deleted");
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ListaPazienti(),
+                                  ),
+                                );
+                              }).catchError((error) {
+                                print("Failed to delete patient: $error");
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: Text(
+                                        "Errore nella rimozione del paziente")));
+                              });
+                            } else {
+                              print("Errore lato Server: " + value.body);
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      "Errore nella rimozione del paziente")));
+                            }
+                          });
+                        },
+                        child: const Text('Si'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, 'No');
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Paziente non rimosso")));
+                        },
+                        child: const Text('No'),
+                      ),
+                    ],
                   ),
                 );
                 // Navigator.push(
@@ -153,56 +171,63 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
         body: Center(
           child: FutureBuilder(
             future: getprofiledata(),
-            builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot){
-              if (snapshot.hasData){
+            builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+              if (snapshot.hasData) {
                 print(snapshot.data);
-                
-                Map<String, dynamic> data = Map.from( snapshot.data! );
-                var profilo = json.decode(json.encode(data["paziente"]).toString());
-                List<dynamic> familiari = json.decode(json.encode(data["familiari"]).toString());
-                List<dynamic> dottori = json.decode(json.encode(data["dottori"]).toString());                
-                
+
+                Map<String, dynamic> data = Map.from(snapshot.data!);
+                var profilo =
+                    json.decode(json.encode(data["paziente"]).toString());
+                List<dynamic> familiari =
+                    json.decode(json.encode(data["familiari"]).toString());
+                List<dynamic> dottori =
+                    json.decode(json.encode(data["dottori"]).toString());
+
                 print("DOTTORI\n" + dottori.toString());
                 print("FAMILIARI\n" + familiari.toString());
                 return SingleChildScrollView(
                   child: Column(
-                  children: [
-                    Text(
-                      profilo["nome"] + " " + profilo["cognome"],
-                      style: TextStyle(fontSize: 30),
-                    ),
-                    _card(profilo["cod_fiscale"], Icons.person),
-                    _card(profilo["num_cellulare"].toString(), Icons.smartphone),
-                    _card(profilo["email"], Icons.email),
-                    const Text("\nTipologia chat"),
-                    _checkboxListTile("Solo testo", profilo["tipologia_chat"] == 0 ? true : false),
-                    _checkboxListTile("Videochiamata", profilo["tipologia_chat"] == 1 ? true : false),
-                    _checkboxListTile("Chiamata vocale", profilo["tipologia_chat"] == 2 ? true : false),
-                    const Text(
-                      "Dottori associati",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    
-                    for(int i=0; i< dottori.length; i++)
-                      _card(dottori[i]["cognome"] + " " + dottori[i]["nome"], Icons.medical_services_outlined),
-                    
-                    const Text(
-                      "Familiari associati",
-                      style: TextStyle(fontSize: 20),
-                    ),
-
-                    for(int i=0; i< familiari.length; i++)
-                      _card(familiari[i]["cognome"] + " " + familiari[i]["nome"], Icons.people_alt),
-                    
-                  ],
+                    children: [
+                      Text(
+                        profilo["nome"] + " " + profilo["cognome"],
+                        style: TextStyle(fontSize: 30),
+                      ),
+                      _card(profilo["cod_fiscale"], Icons.person),
+                      _card(profilo["num_cellulare"].toString(),
+                          Icons.smartphone),
+                      _card(profilo["email"], Icons.email),
+                      const Text("\nTipologia chat"),
+                      _checkboxListTile("Solo testo",
+                          profilo["tipologia_chat"] == 0 ? true : false),
+                      _checkboxListTile("Videochiamata",
+                          profilo["tipologia_chat"] == 1 ? true : false),
+                      _checkboxListTile("Chiamata vocale",
+                          profilo["tipologia_chat"] == 2 ? true : false),
+                      const Text(
+                        "Dottori associati",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      for (int i = 0; i < dottori.length; i++)
+                        _card(dottori[i]["cognome"] + " " + dottori[i]["nome"],
+                            Icons.medical_services_outlined),
+                      const Text(
+                        "Familiari associati",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      for (int i = 0; i < familiari.length; i++)
+                        _card(
+                            familiari[i]["cognome"] +
+                                " " +
+                                familiari[i]["nome"],
+                            Icons.people_alt),
+                    ],
                   ),
                 );
                 // return Center(child: Text("NON FUNZIONA"));
               } else {
-                 return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator());
               }
             },
-          
           ),
         ),
       ),
@@ -226,6 +251,4 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
       onChanged: null,
     );
   }
-
-  
 }
