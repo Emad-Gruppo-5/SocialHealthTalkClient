@@ -178,7 +178,7 @@ class LoginPage extends StatelessWidget {
                                   String cognome = json.decode(data)['cognome'];
                                   String email = json.decode(data)['email'];
                                   String num_cellulare =
-                                      json.decode(data)['num_cellulare'];
+                                      json.decode(data)['num_cellulare'].toString();
                                   int tipologia_chat =
                                       json.decode(data)['tipologia_chat'];
                                   switch (role) {

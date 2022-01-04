@@ -8,10 +8,6 @@ class Notifications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const snackBar = SnackBar(
-      content: Text('Notifica rimossa'),
-    );
-
     return MaterialApp(
       title: _title,
       home: Scaffold(
@@ -58,14 +54,6 @@ class Notifications extends StatelessWidget {
                   ],
                 ),
               ),
-              /*FirebaseFirestore.instance
-                    .collection('users')
-                    .get()
-                    .then((QuerySnapshot querySnapshot) {
-                  querySnapshot.docs.forEach((doc) {
-                    doc.reference.delete();
-                  });
-                });*/
               tooltip: "Rimuovi tutto",
             ),
           ],
