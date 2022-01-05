@@ -132,7 +132,7 @@ class MyProfileState extends State<MyProfile> {
           _card(json.decode(data.body)['cod_fiscale'], Icons.person),
           _card(json.decode(data.body)['num_cellulare'], Icons.smartphone),
           _card(json.decode(data.body)['email'], Icons.email),
-          _card("Cardiologo", Icons.medical_services),
+          _card("Cardiologo", Icons.medical_services), //TODO
         ],
       );
     }else {

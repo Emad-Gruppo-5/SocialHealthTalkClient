@@ -1,9 +1,9 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_session/flutter_session.dart';
 import 'package:http/http.dart' as http;
-
 
 void main() => runApp(TimePickerVisita(date: "2121"));
 
@@ -17,24 +17,73 @@ class TimePickerVisita extends StatelessWidget {
     return MaterialApp(
       title: 'Seleziona orario',
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(date: date),
+      home: CreateVisita2(date: date),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class CreateVisita2 extends StatefulWidget {
   final String date;
 
-  const MyHomePage({Key? key, required this.date}) : super(key: key);
+  const CreateVisita2({Key? key, required this.date}) : super(key: key);
+
   @override
-  _MyHomePageState createState() => _MyHomePageState(date: date);
+  _CreateVisita2State createState() => _CreateVisita2State(date: date);
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  TimeOfDay _time = TimeOfDay(hour: 7, minute: 15);
+class _CreateVisita2State extends State<CreateVisita2> {
+  TimeOfDay _time = TimeOfDay(hour: 10, minute: 15);
   final String date;
 
-  _MyHomePageState({required this.date});
+  _CreateVisita2State({required this.date});
+
+  @protected
+  @mustCallSuper
+  void initState() {
+    getPatient();
+    newDataList.clear();
+    newDataList.add('Aggiungi Paziente');
+  }
+
+  static List<String> mainDataList = [];
+
+  Future<String> getPatient() async {
+    mainDataList.clear();
+    var uri = Uri.parse('http://127.0.0.1:5000/admin/attori_associati');
+    print(uri);
+
+    String cfd = await FlutterSession().get("cf");
+    print(cfd + "ukff");
+
+    int role = 1;
+    Map<String, String> message = {
+      "cod_fiscale": cfd,
+      "role": role.toString(),
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+
+    var i = 0;
+    while (i < json.decode(data.body).length) {
+      mainDataList.add(json.decode(data.body)[i]['cod_fiscale']);
+      i = i + 1;
+    }
+
+    print(mainDataList);
+
+    setState(() {
+      newDataList.addAll(mainDataList);
+    });
+
+    return data.body;
+  }
 
   void _selectTime() async {
     final TimeOfDay? newTime = await showTimePicker(
@@ -49,15 +98,17 @@ class _MyHomePageState extends State<MyHomePage> {
     print(date);
   }
 
-  Future<String> creaPazienteServer() async {
+  Future<String> creaVisitaServer() async {
     var uri = Uri.parse('http://127.0.0.1:5000/dottore/crea_visita');
     print(uri);
 
     String cfd = await FlutterSession().get("cf");
     print(cfd + "ukff");
 
-    int role = 1;
+    Random random = new Random();
+    int id = random.nextInt(1000000);
     Map<String, String> message = {
+      "id": id.toString(),
       "cfdottore": cfd,
       "ora": _time.format(context),
       "data": date,
@@ -74,8 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print('Response status: ${data.statusCode}');
     print('Response body: ' + data.body);
 
-    if (data.statusCode == 200){
-      creaPazienteServer();
+    if (data.statusCode == 200) {
       final snackBar = SnackBar(
         content: const Text('Visita inserita con successo'),
       );
@@ -94,6 +144,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String dropdownValue = 'Aggiungi notifica';
 
+  String dropdownValue2 = 'Aggiungi Paziente';
+
+  List<String> newDataList = List.from(mainDataList);
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
@@ -102,9 +156,9 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             ElevatedButton(
               onPressed: _selectTime,
-              child: Text('SELECT TIME'),
+              child: Text('Seleziona Ora'),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Ora selezionata: ${_time.format(context)}',
             ),
@@ -133,6 +187,40 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text(value),
                 );
               }).toList(),
+            ),
+            DropdownButton<String>(
+              value: dropdownValue2,
+              icon: const Icon(Icons.arrow_downward),
+              elevation: 16,
+              style: const TextStyle(color: Colors.blue),
+              underline: Container(
+                height: 2,
+                color: Colors.blue,
+              ),
+              onChanged: (String? newValue) {
+                setState(() {
+                  dropdownValue2 = newValue!;
+                });
+              },
+              items: newDataList.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (dropdownValue2 != 'Aggiungi Paziente') {
+                  creaVisitaServer();
+                } else {
+                  final snackBar = SnackBar(
+                    content: const Text('Seleziona orario della notifica'),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+              },
+              child: const Text('Salva'),
             )
           ],
         ),
