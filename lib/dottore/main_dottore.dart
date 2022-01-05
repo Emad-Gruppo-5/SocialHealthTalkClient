@@ -11,10 +11,21 @@ class MainDottore extends StatelessWidget {
   
   final String token;
   final String cod_fiscale;
+  final String nome;
+  final String cognome;
+  final String email;
+  final String num_cellulare;
+  final String specializzazione;
 
   MainDottore({
     required this.cod_fiscale,
-    required this.token
+    required this.token,
+    required this.nome,
+    required this.cognome, 
+    required this.email, 
+    required this.num_cellulare,
+    required this.specializzazione,
+
   });
 
 
@@ -24,7 +35,7 @@ class MainDottore extends StatelessWidget {
   Widget build(BuildContext context) {
     return  MaterialApp(
       title: _title,
-      home: MyStatefulWidget(token: token, cod_fiscale: cod_fiscale),
+      home: MyStatefulWidget(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,token: token, cod_fiscale: cod_fiscale),
     );
   }
 
@@ -37,10 +48,20 @@ class MyStatefulWidget extends StatefulWidget {
 
   final String token;
   final String cod_fiscale;
+  final String nome;
+  final String cognome;
+  final String email;
+  final String num_cellulare;
+  final String specializzazione;
 
   MyStatefulWidget({
     required this.cod_fiscale,
-    required this.token
+    required this.token,
+    required this.nome,
+    required this.cognome, 
+    required this.email, 
+    required this.num_cellulare,
+    required this.specializzazione,
   });
 
   @override
@@ -52,6 +73,11 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   int _selectedIndex = 0;
   late String token;
   late String cod_fiscale;
+  late String nome;
+  late String cognome;
+  late String email;
+  late String num_cellulare;
+  late String specializzazione;
   late List<Widget> _widgetOptions;
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
@@ -60,10 +86,15 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   void initState() {
     cod_fiscale = widget.cod_fiscale;
     token = widget.token;
+    nome = widget.nome;
+    cognome = widget.cognome;
+    email = widget.email;
+    num_cellulare = widget.num_cellulare;
+    specializzazione = widget.specializzazione;
     _widgetOptions = <Widget>[
-    List_page(cod_fiscale: cod_fiscale , token: token),
+    List_page(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,cod_fiscale: cod_fiscale , token: token),
     createVisita(cod_fiscale: cod_fiscale , token: token),
-    Profile( cod_fiscale: cod_fiscale , token: token),
+    Profile(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione , cod_fiscale: cod_fiscale , token: token),
     ];
     super.initState();
   }

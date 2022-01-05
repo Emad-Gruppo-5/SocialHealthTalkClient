@@ -205,12 +205,19 @@ class LoginPage extends StatelessWidget {
                                                     builder: (context) =>
                                                         AdminHome()));
                                           } else {
-                                            
+                                            String specializzazione = json.decode(data)['specializzazione'];
                                             Navigator.pushReplacement(
                                                 context, 
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        MainDottore(token: token, cod_fiscale: cod_fiscale)));
+                                                        MainDottore(
+                                                          token: token, 
+                                                          cod_fiscale: cod_fiscale,
+                                                          nome: nome,
+                                                          cognome: cognome,
+                                                          email: email,
+                                                          num_cellulare: num_cellulare,
+                                                          specializzazione: specializzazione )));
                                           }
 
                                           break;

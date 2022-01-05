@@ -41,11 +41,6 @@ class BodyLayout extends State<StatoAttivitaPazienti> {
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
-                  // return Center(
-                  //     child: Image.asset(
-                  //   'assets/images/loading.gif',
-                  // )
-                  // );
                 }
 
                 return ListView(
