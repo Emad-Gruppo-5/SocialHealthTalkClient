@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:crypt/crypt.dart';
+import 'package:test_emad/dottore/main_dottore.dart';
 import 'package:test_emad/patient/home.dart';
 import 'package:test_emad/admin/adminHome.dart';
 
@@ -179,10 +180,10 @@ class LoginPage extends StatelessWidget {
                                       String email = json.decode(data)['email'];
                                       String num_cellulare =
                                           json.decode(data)['num_cellulare'].toString();
-                                      int tipologia_chat =
-                                          json.decode(data)['tipologia_chat'];
+                                      
                                       switch (role) {
                                         case 1: //PAZIENTE
+                                          int tipologia_chat = json.decode(data)['tipologia_chat'];
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -204,9 +205,12 @@ class LoginPage extends StatelessWidget {
                                                     builder: (context) =>
                                                         AdminHome()));
                                           } else {
-                                            // Navigator.push(context,
-                                            //      MaterialPageRoute(
-                                            //         builder: (context) => Familiare(token: token)));
+                                            
+                                            Navigator.pushReplacement(
+                                                context, 
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        MainDottore(token: token, cod_fiscale: cod_fiscale)));
                                           }
 
                                           break;
@@ -228,8 +232,6 @@ class LoginPage extends StatelessWidget {
                                           .showSnackBar(SnackBar(content: Text('Utente non esistente'))),
                                           print(error)
                                 });
-
-                                // Navigator.of(context).pushNamed("familiarePage");
                               },
                               child: Center(
                                   child: Text(

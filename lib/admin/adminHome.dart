@@ -27,7 +27,7 @@ class _AdminHome extends State<AdminHome> {
     switch (index) {
       case 1:
         {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => ListaPazienti(),
@@ -38,7 +38,7 @@ class _AdminHome extends State<AdminHome> {
 
       case 2:
         {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => ListaDottori(),
@@ -107,7 +107,7 @@ class _AdminHome extends State<AdminHome> {
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Text("Loading");
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 _notificationsLength = snapshot.data!.docs.length;
@@ -214,52 +214,88 @@ class _AdminHome extends State<AdminHome> {
                                         }),
                                   ),
                                 ])),
-                            bottomNavigationBar: Theme(
-                              data: Theme.of(context).copyWith(
-                                  // sets the background color of the `BottomNavigationBar`
-                                  canvasColor: Colors.blue,
-                                  // sets the active color of the `BottomNavigationBar` if `Brightness` is light
-                                  primaryColor: Colors.white,
-                                  textTheme: Theme.of(context)
-                                      .textTheme
-                                      .copyWith(
-                                          caption: new TextStyle(
-                                              color: Colors.white))),
-                              // sets the inactive color of the `BottomNavigationBar`
-                              child: BottomNavigationBar(
-                                type: BottomNavigationBarType.fixed,
-                                selectedItemColor: Colors.white,
-                                selectedLabelStyle: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                                items: const <BottomNavigationBarItem>[
-                                  BottomNavigationBarItem(
-                                    icon: Icon(Icons.home_outlined),
-                                    label: 'Home',
+                            bottomNavigationBar: BottomNavigationBar(
+                                    items: const <BottomNavigationBarItem>[
+                                      BottomNavigationBarItem(
+                                        icon: Icon(Icons.home),
+                                        label: 'Home',
+                                      ),
+                                      BottomNavigationBarItem(
+                                        icon: Icon(Icons.supervised_user_circle_outlined),
+                                        label: 'Pazienti',
+                                      ),
+                                      BottomNavigationBarItem(
+                                        icon: Icon(Icons.local_hospital),
+                                        label: 'Dottori',
+                                      ),
+                                      BottomNavigationBarItem(
+                                        icon: Icon(Icons.wc_outlined),
+                                        label: 'Familiari',
+                                      ),
+                                      BottomNavigationBarItem(
+                                        icon: Icon(Icons.attribution_outlined),
+                                        label: 'Volontari',
+                                      ),
+                                    ],
+                                    currentIndex: _selectedIndex,
+                                    selectedItemColor: Colors.amber[800],
+                                    onTap: _onItemTapped,
+                                    unselectedItemColor: Colors.black87,
                                   ),
-                                  BottomNavigationBarItem(
-                                    icon: Icon(
-                                        Icons.supervised_user_circle_outlined),
-                                    label: 'Pazienti',
-                                  ),
-                                  BottomNavigationBarItem(
-                                    icon: Icon(Icons.local_hospital),
-                                    label: 'Dottori',
-                                  ),
-                                  BottomNavigationBarItem(
-                                    icon: Icon(Icons.wc_outlined),
-                                    label: 'Familiari',
-                                  ),
-                                  BottomNavigationBarItem(
-                                    icon: Icon(Icons.attribution_outlined),
-                                    label: 'Volontari',
-                                  ),
-                                ],
-                                currentIndex: _selectedIndex,
-                                //New
-                                onTap: _onItemTapped,
-                                //selectedItemColor: Colors.blue,
-                              ),
-                            )));
+
+
+
+
+
+
+                            // Theme(
+                            //   data: Theme.of(context).copyWith(
+                            //       // sets the background color of the `BottomNavigationBar`
+                            //       canvasColor: Colors.blue,
+                            //       // sets the active color of the `BottomNavigationBar` if `Brightness` is light
+                            //       primaryColor: Colors.white,
+                            //       textTheme: Theme.of(context)
+                            //           .textTheme
+                            //           .copyWith(
+                            //               caption: new TextStyle(
+                            //                   color: Colors.white))),
+                            //   // sets the inactive color of the `BottomNavigationBar`
+                            //   child: BottomNavigationBar(
+                            //     type: BottomNavigationBarType.fixed,
+                            //     selectedItemColor: Colors.white,
+                            //     selectedLabelStyle: const TextStyle(
+                            //         fontWeight: FontWeight.bold),
+                            //     items: const <BottomNavigationBarItem>[
+                            //       BottomNavigationBarItem(
+                            //         icon: Icon(Icons.home_outlined),
+                            //         label: 'Home',
+                            //       ),
+                            //       BottomNavigationBarItem(
+                            //         icon: Icon(
+                            //             Icons.supervised_user_circle_outlined),
+                            //         label: 'Pazienti',
+                            //       ),
+                            //       BottomNavigationBarItem(
+                            //         icon: Icon(Icons.local_hospital),
+                            //         label: 'Dottori',
+                            //       ),
+                            //       BottomNavigationBarItem(
+                            //         icon: Icon(Icons.wc_outlined),
+                            //         label: 'Familiari',
+                            //       ),
+                            //       BottomNavigationBarItem(
+                            //         icon: Icon(Icons.attribution_outlined),
+                            //         label: 'Volontari',
+                            //       ),
+                            //     ],
+                            //     currentIndex: _selectedIndex,
+                            //     //New
+                            //     onTap: _onItemTapped,
+                            //     //selectedItemColor: Colors.blue,
+                            //   ),
+                            // )
+                            )
+                            );
                   });
             }),
       ),

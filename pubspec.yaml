@@ -44,8 +44,9 @@ dependencies:
   intl: ^0.17.0
   badges: ^2.0.2 
   flash: ^2.0.3
-  #path_provider: ^1.6.27
-
+  syncfusion_flutter_datepicker: ^19.4.40
+  date_time_picker: "^2.1.0"
+ 
 dev_dependencies:
   flutter_test:
     sdk: flutter
