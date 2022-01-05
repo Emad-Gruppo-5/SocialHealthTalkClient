@@ -11,11 +11,20 @@ class DetailPatient extends StatelessWidget {
   
   final String token;
   final String cod_fiscale;
-
+  final String nome;
+  final String cognome;
+  final String email;
+  final String num_cellulare;
+  final String specializzazione;
 
   DetailPatient({
     required this.cod_fiscale,
-    required this.token
+    required this.token,
+    required this.nome,
+    required this.cognome, 
+    required this.email, 
+    required this.num_cellulare,
+    required this.specializzazione,
   } );
   
 
@@ -42,12 +51,12 @@ class DetailPatient extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           leading:
-              _iconButton(context, Icons.arrow_back, 'Indietro', MainDottore(cod_fiscale: cod_fiscale, token: token)),
+              _iconButton(context, Icons.arrow_back, 'Indietro', MainDottore(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione , cod_fiscale: cod_fiscale, token: token)),
           title: const Center(
             child: Text("Profilo"),
           ),     
           actions: [
-            _iconButton(context, Icons.logout, 'Logout', MainDottore(cod_fiscale: cod_fiscale, token: token)),
+            _iconButton(context, Icons.logout, 'Logout', MainDottore(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,cod_fiscale: cod_fiscale, token: token)),
           ],
         ),
         body: Center(
@@ -58,7 +67,7 @@ class DetailPatient extends StatelessWidget {
           Navigator.of(context).push(
             CupertinoPageRoute(
               fullscreenDialog: true,
-              builder: (context) => NewQuestion(cod_fiscale: cod_fiscale, token: token)
+              builder: (context) => NewQuestion(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,cod_fiscale: cod_fiscale, token: token)
             ),
           );
         },
