@@ -228,7 +228,7 @@ class _Profile extends State<Profile> {
               'cod_fiscale': cod_fiscale,
               'nome': nome,
               'cognome': cognome,
-              'data': ultimo_accesso
+              'ultimo_accesso': ultimo_accesso
         });
   }
 }

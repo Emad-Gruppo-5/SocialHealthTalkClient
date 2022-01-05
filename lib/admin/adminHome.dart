@@ -77,7 +77,7 @@ class _AdminHome extends State<AdminHome> {
 
     final Stream<QuerySnapshot> _notifications =
         FirebaseFirestore.instance.collection('notifications').snapshots();
-
+    
     return Scaffold(
       appBar: AppBar(
         leading: Builder(
