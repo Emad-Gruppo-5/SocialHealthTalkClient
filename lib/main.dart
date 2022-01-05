@@ -47,7 +47,6 @@ class LoginPage extends StatelessWidget {
     var uri = Uri.parse('http://127.0.0.1:5000/login');
     print(uri);
 
-    int role;
     print("\nECCOMI IN getUser. COD_FISCALE: " +
         cod_fiscale +
         " PASSWORD: " +
@@ -66,6 +65,7 @@ class LoginPage extends StatelessWidget {
         body: body);
     print('Response status: ${data.statusCode}');
     print('Response body: ${data.body}');
+
     return data.body;
   }
 
@@ -172,56 +172,61 @@ class LoginPage extends StatelessWidget {
                                 var password = _passwordC.text;
 
                                 login(cod_fiscale, password).then((data) {
-                                  int role = json.decode(data)['role'];
-                                  String token = json.decode(data)['token'];
-                                  String nome = json.decode(data)['nome'];
-                                  String cognome = json.decode(data)['cognome'];
-                                  String email = json.decode(data)['email'];
-                                  String num_cellulare =
-                                      json.decode(data)['num_cellulare'].toString();
-                                  int tipologia_chat =
-                                      json.decode(data)['tipologia_chat'];
-                                  switch (role) {
-                                    case 1: //PAZIENTE
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => Patient_Home(
-                                                cod_fiscale: cod_fiscale,
-                                                nome: nome,
-                                                cognome: cognome,
-                                                email: email,
-                                                num_cellulare: num_cellulare,
-                                                tipologia_chat: tipologia_chat,
-                                                token: token)),
-                                      );
-                                      break;
-                                    case 2: //DOTTORE
-                                      if (cod_fiscale == 'admin') {
-                                        Navigator.push(
+                                      int role = json.decode(data)['role'];
+                                      String token = json.decode(data)['token'];
+                                      String nome = json.decode(data)['nome'];
+                                      String cognome = json.decode(data)['cognome'];
+                                      String email = json.decode(data)['email'];
+                                      String num_cellulare =
+                                          json.decode(data)['num_cellulare'].toString();
+                                      int tipologia_chat =
+                                          json.decode(data)['tipologia_chat'];
+                                      switch (role) {
+                                        case 1: //PAZIENTE
+                                          Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) =>
-                                                    AdminHome()));
-                                      } else {
-                                        // Navigator.push(context,
-                                        //      MaterialPageRoute(
-                                        //         builder: (context) => Familiare(token: token)));
-                                      }
+                                                builder: (context) => Patient_Home(
+                                                    cod_fiscale: cod_fiscale,
+                                                    nome: nome,
+                                                    cognome: cognome,
+                                                    email: email,
+                                                    num_cellulare: num_cellulare,
+                                                    tipologia_chat: tipologia_chat,
+                                                    token: token)),
+                                          );
+                                          break;
+                                        case 2: //DOTTORE
+                                          if (cod_fiscale == 'admin') {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AdminHome()));
+                                          } else {
+                                            // Navigator.push(context,
+                                            //      MaterialPageRoute(
+                                            //         builder: (context) => Familiare(token: token)));
+                                          }
 
-                                      break;
-                                    case 3: //VOLONTARIO
-                                      // Navigator.push(context,
-                                      //        MaterialPageRoute(
-                                      //           builder: (context) => Familiare(token: token)));
-                                      break;
-                                    case 4: //FAMILIARE
-                                      // Navigator.push(context,
-                                      //        MaterialPageRoute(
-                                      //           builder: (context) => Familiare(token: token)));
-                                      break;
-                                    default:
-                                  }
+                                          break;
+                                        case 3: //VOLONTARIO
+                                          // Navigator.push(context,
+                                          //        MaterialPageRoute(
+                                          //           builder: (context) => Familiare(token: token)));
+                                          break;
+                                        case 4: //FAMILIARE
+                                          // Navigator.push(context,
+                                          //        MaterialPageRoute(
+                                          //           builder: (context) => Familiare(token: token)));
+                                          break;
+                                        default:
+                                      }
+                                })
+                                .catchError((error) => {
+                                  ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(content: Text('Utente non esistente'))),
+                                          print(error)
                                 });
 
                                 // Navigator.of(context).pushNamed("familiarePage");
