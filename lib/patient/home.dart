@@ -41,7 +41,6 @@ class Patient_Home extends StatelessWidget {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         timer.cancel();
         timer_alert.cancel();
@@ -71,7 +70,6 @@ class Patient_Home extends StatelessWidget {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => MyApp()));
@@ -148,20 +146,16 @@ class Patient_Home extends StatelessWidget {
         .doc(cod_fiscale)
         .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
-  
+
   void callback() {
     print("ALERT\nCod_fiscale: " + cod_fiscale);
-    FirebaseFirestore.instance
-        .collection('notifications')
-        .add({
-              'alert': true,
-              'letto': false,
-              'cod_fiscale': cod_fiscale,
-              'nome': nome,
-              'cognome': cognome,
-              'ultimo_accesso': ultimo_accesso
-        });
+    FirebaseFirestore.instance.collection('notifications').add({
+      'alert': true,
+      'letto': false,
+      'cod_fiscale': cod_fiscale,
+      'nome': nome,
+      'cognome': cognome,
+      'ultimo_accesso': ultimo_accesso
+    });
   }
 }
-
-

@@ -44,7 +44,8 @@ class _ModifyProfile extends State<ModifyProfile> {
   SingingCharacter? _character;
   late TextEditingController _email;
   late TextEditingController _num_cell;
-  CollectionReference notifications = FirebaseFirestore.instance.collection('notifications');
+  CollectionReference notifications =
+      FirebaseFirestore.instance.collection('notifications');
   @override
   void initState() {
     nome = widget.nome;
@@ -55,18 +56,21 @@ class _ModifyProfile extends State<ModifyProfile> {
     cod_fiscale = widget.cod_fiscale;
     token = widget.token;
     switch (tipologia_chat) {
-      case 0: _character = SingingCharacter.testo;
+      case 0:
+        _character = SingingCharacter.testo;
         break;
-      case 1: _character = SingingCharacter.videochiamata;
+      case 1:
+        _character = SingingCharacter.videochiamata;
         break;
-      case 2: _character = SingingCharacter.chiamata;
+      case 2:
+        _character = SingingCharacter.chiamata;
         break;
     }
     _num_cell = TextEditingController(text: num_cellulare);
     _email = TextEditingController(text: email);
     super.initState();
   }
-  
+
   Duration alert_duration = const Duration(seconds: 20);
   Duration online_duration = const Duration(seconds: 7);
   late Timer timer;
@@ -79,7 +83,6 @@ class _ModifyProfile extends State<ModifyProfile> {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         timer.cancel();
         timer_alert.cancel();
@@ -100,7 +103,6 @@ class _ModifyProfile extends State<ModifyProfile> {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         timer.cancel();
         timer_alert.cancel();
@@ -111,18 +113,18 @@ class _ModifyProfile extends State<ModifyProfile> {
             .update({'status': 'online'});
 
         Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => Profile(
-                      cod_fiscale: cod_fiscale,
-                      nome: nome,
-                      cognome: cognome,
-                      email: email,
-                      num_cellulare: num_cellulare,
-                      tipologia_chat: tipologia_chat,
-                      token: token),
-                  ),
-                );
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => Profile(
+                cod_fiscale: cod_fiscale,
+                nome: nome,
+                cognome: cognome,
+                email: email,
+                num_cellulare: num_cellulare,
+                tipologia_chat: tipologia_chat,
+                token: token),
+          ),
+        );
       },
     );
   }
@@ -136,82 +138,80 @@ class _ModifyProfile extends State<ModifyProfile> {
         child: Scaffold(
           appBar: AppBar(
             leading: _iconButtonPop(context, Icons.arrow_back, 'Indietro'),
-            title: const Center(
-              child: Text("Modifica dati"),
-            ),
+            title: Text("Modifica dati"),
             actions: [
               _iconButtonPush(context, Icons.logout, 'Logout', MyApp()),
             ],
           ),
-          body: Center(
-            child: Column(
-              children: [
-                Text(
-                  "$nome $cognome",
-                  style: TextStyle(fontSize: 30),
-                ),
-                _form(),
-                const Text("\nTipologia chat"),
-                  ListTile(
-                    title: const Text('Solo testo'),
-                    leading: Radio<SingingCharacter>(
-                      value: SingingCharacter.testo,
-                      groupValue: _character,
-                      onChanged: (SingingCharacter? value) {
-                        setState(() {
-                          _character = value;
-                        });
-                        timer.cancel();
-                        timer_alert.cancel();
-                        print("UPDATE FIRESTORE");
-                        FirebaseFirestore.instance
-                            .collection('patients')
-                            .doc(cod_fiscale)
-                            .update({'status': 'online'});
-                      },
-                    ),
-                  ),
-                  ListTile(
-                    title: const Text('Videochiamata'),
-                    leading: Radio<SingingCharacter>(
-                      value: SingingCharacter.videochiamata,
-                      groupValue: _character,
-                      onChanged: (SingingCharacter? value) {
-                        setState(() {
-                          _character = value;
-                        });
-                        timer.cancel();
-                        timer_alert.cancel();
-                        print("UPDATE FIRESTORE");
-                        FirebaseFirestore.instance
-                            .collection('patients')
-                            .doc(cod_fiscale)
-                            .update({'status': 'online'});
-                      },
-                    ),
-                  ),
-                  ListTile(
-                    title: const Text('Chiamata vocale'),
-                    leading: Radio<SingingCharacter>(
-                      value: SingingCharacter.chiamata,
-                      groupValue: _character,
-                      onChanged: (SingingCharacter? value) {
-                        setState(() {
-                          _character = value;
-                        });
-                        timer.cancel();
-                        timer_alert.cancel();
-                        print("UPDATE FIRESTORE");
-                        FirebaseFirestore.instance
-                            .collection('patients')
-                            .doc(cod_fiscale)
-                            .update({'status': 'online'});
-                      },
-                    ),
-                  ),
-                _submitButton(),
-              ],
-            ),
+          body: Column(
+            children: [
+              Text(
+                "$nome $cognome",
+                style: TextStyle(fontSize: 30),
+              ),
+              _form(),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.chat, color: Colors.grey),
+                  SizedBox(width: 10),
+                  Text('Tipologia chat'),
+                ],
+              ),
+              RadioListTile<SingingCharacter>(
+                title: const Text('Solo testo'),
+                value: SingingCharacter.testo,
+                groupValue: _character,
+                onChanged: (SingingCharacter? value) {
+                  setState(() {
+                    _character = value;
+                  });
+                  timer.cancel();
+                  timer_alert.cancel();
+                  print("UPDATE FIRESTORE");
+                  FirebaseFirestore.instance
+                      .collection('patients')
+                      .doc(cod_fiscale)
+                      .update({'status': 'online'});
+                },
+              ),
+              RadioListTile<SingingCharacter>(
+                title: const Text('Videochiamata'),
+                value: SingingCharacter.videochiamata,
+                groupValue: _character,
+                onChanged: (SingingCharacter? value) {
+                  setState(() {
+                    _character = value;
+                  });
+                  timer.cancel();
+                  timer_alert.cancel();
+                  print("UPDATE FIRESTORE");
+                  FirebaseFirestore.instance
+                      .collection('patients')
+                      .doc(cod_fiscale)
+                      .update({'status': 'online'});
+                },
+              ),
+              RadioListTile<SingingCharacter>(
+                title: const Text('Chiamata vocale'),
+                value: SingingCharacter.chiamata,
+                groupValue: _character,
+                onChanged: (SingingCharacter? value) {
+                  setState(() {
+                    _character = value;
+                  });
+                  timer.cancel();
+                  timer_alert.cancel();
+                  print("UPDATE FIRESTORE");
+                  FirebaseFirestore.instance
+                      .collection('patients')
+                      .doc(cod_fiscale)
+                      .update({'status': 'online'});
+                },
+              ),
+              _submitButton(),
+            ],
           ),
         ),
         onTap: () {
@@ -241,25 +241,23 @@ class _ModifyProfile extends State<ModifyProfile> {
 
   void callback() {
     print("ALERT\nCod_fiscale: " + cod_fiscale);
-    FirebaseFirestore.instance
-        .collection('notifications')
-        .add({
-              'alert': true,
-              'letto': false,
-              'cod_fiscale': cod_fiscale,
-              'nome': nome,
-              'cognome': cognome,
-              'ultimo_accesso': ultimo_accesso
-        });
+    FirebaseFirestore.instance.collection('notifications').add({
+      'alert': true,
+      'letto': false,
+      'cod_fiscale': cod_fiscale,
+      'nome': nome,
+      'cognome': cognome,
+      'ultimo_accesso': ultimo_accesso
+    });
   }
 
   Widget _submitButton() {
-     return Padding(
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
         onPressed: () {
-         bool flag;
-         Duration flash_duration = const Duration(seconds: 3);
+          bool flag;
+          Duration flash_duration = const Duration(seconds: 3);
           print("UPDATE FIRESTORE");
           FirebaseFirestore.instance
               .collection('patients')
@@ -284,22 +282,21 @@ class _ModifyProfile extends State<ModifyProfile> {
               'email': _email.text,
               'num_cellulare': _num_cell.text,
               'tipologia_chat': _character!.index
-            })
-            .then((value) {
-                  print("Notifica aggiunta\ncod_fiscale: $cod_fiscale, email: " 
-                                  + _email.text + ", num_cellulare: " + _num_cell.text 
-                                  + ", tipologia_chat: " + _character!.index.toString());
-                  flag = true;
-                  _showBasicsFlash(flag ,flash_duration);
-            })
-            .catchError((error) {
-                print("Errore nell'aggiunta della notifica: $error");
-                flag = false;
-                _showBasicsFlash(flag ,flash_duration);
+            }).then((value) {
+              print("Notifica aggiunta\ncod_fiscale: $cod_fiscale, email: " +
+                  _email.text +
+                  ", num_cellulare: " +
+                  _num_cell.text +
+                  ", tipologia_chat: " +
+                  _character!.index.toString());
+              flag = true;
+              _showBasicsFlash(flag, flash_duration);
+            }).catchError((error) {
+              print("Errore nell'aggiunta della notifica: $error");
+              flag = false;
+              _showBasicsFlash(flag, flash_duration);
             });
-            
           }
-          
         },
         child: const Text('Salva'),
       ),
@@ -352,61 +349,62 @@ class _ModifyProfile extends State<ModifyProfile> {
                 timer_alert.cancel();
                 timer = Timer(online_duration, handleTimeout);
                 timer_alert = Timer(alert_duration, callback);
-                
               },
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
-                controller: _email,
-                decoration: InputDecoration(
-                  icon: Icon(Icons.email),
-                  labelText: "E-mail",
-                ),
-                // initialValue: "$email",
-                // The validator receives the text that the user has entered.
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Inserisci e-mail";
-                  }
-                  return null;
-                },
-                onTap: () {
-                  print("UPDATE FIRESTORE");
-                  FirebaseFirestore.instance
-                      .collection('patients')
-                      .doc(cod_fiscale)
-                      .update({'status': 'online'});
-                  timer.cancel();
-                  timer_alert.cancel();
-                  timer = Timer(online_duration, handleTimeout);
-                  timer_alert = Timer(alert_duration, callback);
-                },
-                onChanged: (value) {
-                  print("UPDATE FIRESTORE");
-                  FirebaseFirestore.instance
-                      .collection('patients')
-                      .doc(cod_fiscale)
-                      .update({'status': 'online'});
-                  timer.cancel();
-                  timer_alert.cancel();
-                  timer = Timer(online_duration, handleTimeout);
-                  timer_alert = Timer(alert_duration, callback);
-                },
+              controller: _email,
+              decoration: InputDecoration(
+                icon: Icon(Icons.email),
+                labelText: "E-mail",
               ),
+              // initialValue: "$email",
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Inserisci e-mail";
+                }
+                return null;
+              },
+              onTap: () {
+                print("UPDATE FIRESTORE");
+                FirebaseFirestore.instance
+                    .collection('patients')
+                    .doc(cod_fiscale)
+                    .update({'status': 'online'});
+                timer.cancel();
+                timer_alert.cancel();
+                timer = Timer(online_duration, handleTimeout);
+                timer_alert = Timer(alert_duration, callback);
+              },
+              onChanged: (value) {
+                print("UPDATE FIRESTORE");
+                FirebaseFirestore.instance
+                    .collection('patients')
+                    .doc(cod_fiscale)
+                    .update({'status': 'online'});
+                timer.cancel();
+                timer_alert.cancel();
+                timer = Timer(online_duration, handleTimeout);
+                timer_alert = Timer(alert_duration, callback);
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  void _showBasicsFlash(bool flag, Duration duration ) {
+  void _showBasicsFlash(bool flag, Duration duration) {
     showFlash(
       context: context,
       duration: duration,
       builder: (context, controller) {
-        String text = flag ? "Richiesta inviata con successo" : "Errore, richiesta non inviata";
+        String text = flag
+            ? "Richiesta inviata con successo"
+            : "Errore, richiesta non inviata";
         var flashStyle = FlashBehavior.floating;
         return Flash(
           controller: controller,
@@ -421,5 +419,4 @@ class _ModifyProfile extends State<ModifyProfile> {
       },
     );
   }
-
 }

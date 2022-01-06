@@ -30,6 +30,8 @@ class Profile extends StatefulWidget {
   _Profile createState() => _Profile();
 }
 
+enum SingingCharacter { text, video_call, voice_call }
+
 class _Profile extends State<Profile> {
   late String nome;
   late String cognome;
@@ -49,19 +51,31 @@ class _Profile extends State<Profile> {
     cod_fiscale = widget.cod_fiscale;
     token = widget.token;
     super.initState();
+    switch (tipologia_chat) {
+      case 0:
+        _character = SingingCharacter.text;
+        break;
+      case 1:
+        _character = SingingCharacter.video_call;
+        break;
+      case 2:
+        _character = SingingCharacter.voice_call;
+        break;
+    }
   }
+
   Duration alert_duration = const Duration(seconds: 20);
   Duration online_duration = const Duration(seconds: 7);
   late Timer timer;
   late Timer timer_alert;
   String timerText = "Start";
+  SingingCharacter? _character;
 
   Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
     if (tooltip != 'Logout') {
       return IconButton(
         icon: Icon(icon),
         tooltip: tooltip,
-        iconSize: 40,
         onPressed: () {
           timer.cancel();
           timer_alert.cancel();
@@ -89,7 +103,6 @@ class _Profile extends State<Profile> {
       return IconButton(
         icon: Icon(icon),
         tooltip: tooltip,
-        iconSize: 40,
         onPressed: () {
           timer.cancel();
           timer_alert.cancel();
@@ -111,7 +124,6 @@ class _Profile extends State<Profile> {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         timer.cancel();
         timer_alert.cancel();
@@ -122,19 +134,18 @@ class _Profile extends State<Profile> {
             .update({'status': 'online'});
 
         Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => Patient_Home(
-                      cod_fiscale: cod_fiscale,
-                      nome: nome,
-                      cognome: cognome,
-                      email: email,
-                      num_cellulare: num_cellulare,
-                      tipologia_chat: tipologia_chat,
-                      token: token
-                      ),
-                  ),
-                );
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => Patient_Home(
+                cod_fiscale: cod_fiscale,
+                nome: nome,
+                cognome: cognome,
+                email: email,
+                num_cellulare: num_cellulare,
+                tipologia_chat: tipologia_chat,
+                token: token),
+          ),
+        );
       },
     );
   }
@@ -148,9 +159,7 @@ class _Profile extends State<Profile> {
         child: Scaffold(
           appBar: AppBar(
             leading: _iconButtonPop(context, Icons.arrow_back, 'Indietro'),
-            title: const Center(
-              child: Text("Profilo"),
-            ),
+            title: const Text("Profilo"),
             actions: [
               _iconButtonPush(context, Icons.edit, 'Modifica'),
               _iconButtonPush(context, Icons.logout, 'Logout'),
@@ -165,13 +174,18 @@ class _Profile extends State<Profile> {
               _card("$cod_fiscale", Icons.person),
               _card("$num_cellulare", Icons.smartphone),
               _card("$email", Icons.email),
-              const Text("\nTipologia chat"),
-              _checkboxListTile(
-                  "Solo testo", tipologia_chat == 0 ? true : false),
-              _checkboxListTile(
-                  "Videochiamata", tipologia_chat == 1 ? true : false),
-              _checkboxListTile(
-                  "Chiamata vocale", tipologia_chat == 2 ? true : false),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.chat, color: Colors.grey),
+                  SizedBox(width: 10),
+                  Text('Tipologia chat'),
+                ],
+              ),
+              _radioListTile("Solo testo", SingingCharacter.text),
+              _radioListTile("Videochiamata", SingingCharacter.video_call),
+              _radioListTile("Chiamata vocale", SingingCharacter.voice_call),
             ],
           ),
         ),
@@ -199,11 +213,11 @@ class _Profile extends State<Profile> {
     );
   }
 
-  Widget _checkboxListTile(String text, bool value) {
-    return CheckboxListTile(
+  Widget _radioListTile(String text, SingingCharacter value) {
+    return RadioListTile<SingingCharacter>(
       title: Text(text),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 100),
       value: value,
+      groupValue: _character,
       onChanged: null,
     );
   }
@@ -220,17 +234,13 @@ class _Profile extends State<Profile> {
 
   void callback() {
     print("ALERT\nCod_fiscale: " + cod_fiscale);
-    FirebaseFirestore.instance
-        .collection('notifications')
-        .add({
-              'alert': true,
-              'letto': false,
-              'cod_fiscale': cod_fiscale,
-              'nome': nome,
-              'cognome': cognome,
-              'ultimo_accesso': ultimo_accesso
-        });
+    FirebaseFirestore.instance.collection('notifications').add({
+      'alert': true,
+      'letto': false,
+      'cod_fiscale': cod_fiscale,
+      'nome': nome,
+      'cognome': cognome,
+      'ultimo_accesso': ultimo_accesso
+    });
   }
 }
-
-
