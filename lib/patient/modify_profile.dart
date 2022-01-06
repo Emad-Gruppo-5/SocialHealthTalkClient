@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flash/flash.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -76,7 +75,6 @@ class _ModifyProfile extends State<ModifyProfile> {
   late Timer timer;
   late Timer timer_alert;
   String timerText = "Start";
-  // bool _visible = false;
 
   Widget _iconButtonPush(
       BuildContext context, IconData icon, String tooltip, MyApp myApp) {
@@ -129,6 +127,8 @@ class _ModifyProfile extends State<ModifyProfile> {
     );
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     timer = Timer(online_duration, handleTimeout);
@@ -136,6 +136,7 @@ class _ModifyProfile extends State<ModifyProfile> {
     return MaterialApp(
       home: GestureDetector(
         child: Scaffold(
+          key: _scaffoldKey,
           appBar: AppBar(
             leading: _iconButtonPop(context, Icons.arrow_back, 'Indietro'),
             title: Text("Modifica dati"),
@@ -256,8 +257,6 @@ class _ModifyProfile extends State<ModifyProfile> {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
         onPressed: () {
-          bool flag;
-          Duration flash_duration = const Duration(seconds: 3);
           print("UPDATE FIRESTORE");
           FirebaseFirestore.instance
               .collection('patients')
@@ -289,12 +288,16 @@ class _ModifyProfile extends State<ModifyProfile> {
                   _num_cell.text +
                   ", tipologia_chat: " +
                   _character!.index.toString());
-              flag = true;
-              _showBasicsFlash(flag, flash_duration);
+              ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                  .showSnackBar(const SnackBar(
+                content: Text("Richiesta di modifica inviata"),
+              ));
             }).catchError((error) {
               print("Errore nell'aggiunta della notifica: $error");
-              flag = false;
-              _showBasicsFlash(flag, flash_duration);
+              ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                  .showSnackBar(const SnackBar(
+                content: Text("Impossibile inviare la richiesta"),
+              ));
             });
           }
         },
@@ -394,29 +397,6 @@ class _ModifyProfile extends State<ModifyProfile> {
           ),
         ],
       ),
-    );
-  }
-
-  void _showBasicsFlash(bool flag, Duration duration) {
-    showFlash(
-      context: context,
-      duration: duration,
-      builder: (context, controller) {
-        String text = flag
-            ? "Richiesta inviata con successo"
-            : "Errore, richiesta non inviata";
-        var flashStyle = FlashBehavior.floating;
-        return Flash(
-          controller: controller,
-          behavior: flashStyle,
-          position: FlashPosition.bottom,
-          boxShadows: kElevationToShadow[4],
-          horizontalDismissDirection: HorizontalDismissDirection.horizontal,
-          child: FlashBar(
-            content: Text(text),
-          ),
-        );
-      },
     );
   }
 }
