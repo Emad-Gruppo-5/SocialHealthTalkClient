@@ -106,7 +106,7 @@ class _Profile extends State<Profile> {
         onPressed: () {
           timer.cancel();
           DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
-          String ultimo_accesso = dateFormat.format(DateTime.now());
+          ultimo_accesso = dateFormat.format(DateTime.now());
           FirebaseFirestore.instance
               .collection('patients')
               .doc(cod_fiscale)
@@ -126,11 +126,6 @@ class _Profile extends State<Profile> {
       onPressed: () {
         timer.cancel();
         timer_alert.cancel();
-        print("UPDATE FIRESTORE");
-        FirebaseFirestore.instance
-            .collection('patients')
-            .doc(cod_fiscale)
-            .update({'status': 'online'});
 
         Navigator.pushReplacement(
           context,
