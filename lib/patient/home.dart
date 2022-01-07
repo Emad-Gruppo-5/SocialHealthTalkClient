@@ -30,8 +30,8 @@ class Patient_Home extends StatelessWidget {
       required this.tipologia_chat,
       required this.token});
 
-  Duration online_duration = const Duration(minutes: 5);
-  Duration alert_duration = const Duration(minutes: 15);
+  Duration online_duration = const Duration(seconds: 5);
+  Duration alert_duration = const Duration(seconds: 20);
   late Timer timer;
   late Timer timer_alert;
   String timerText = "Start";

@@ -70,8 +70,8 @@ class _ModifyProfile extends State<ModifyProfile> {
     super.initState();
   }
 
-  Duration alert_duration = const Duration(minutes: 15);
-  Duration online_duration = const Duration(minutes: 5);
+  Duration alert_duration = const Duration(seconds: 20);
+  Duration online_duration = const Duration(seconds: 5);
   late Timer timer;
   late Timer timer_alert;
   String timerText = "Start";
