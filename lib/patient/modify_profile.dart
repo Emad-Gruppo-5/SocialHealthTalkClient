@@ -70,8 +70,8 @@ class _ModifyProfile extends State<ModifyProfile> {
     super.initState();
   }
 
-  Duration alert_duration = const Duration(seconds: 20);
-  Duration online_duration = const Duration(seconds: 7);
+  Duration alert_duration = const Duration(minutes: 15);
+  Duration online_duration = const Duration(minutes: 5);
   late Timer timer;
   late Timer timer_alert;
   String timerText = "Start";
@@ -83,8 +83,7 @@ class _ModifyProfile extends State<ModifyProfile> {
       tooltip: tooltip,
       onPressed: () {
         timer.cancel();
-        timer_alert.cancel();
-        DateFormat dateFormat = DateFormat("dd/MM/yyyy HH:mm");
+        DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
         String ultimo_accesso = dateFormat.format(DateTime.now());
         FirebaseFirestore.instance
             .collection('patients')

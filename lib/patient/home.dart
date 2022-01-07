@@ -30,8 +30,8 @@ class Patient_Home extends StatelessWidget {
       required this.tipologia_chat,
       required this.token});
 
-  Duration online_duration = const Duration(seconds: 7);
-  Duration alert_duration = const Duration(seconds: 20);
+  Duration online_duration = const Duration(minutes: 15);
+  Duration alert_duration = const Duration(minutes: 5);
   late Timer timer;
   late Timer timer_alert;
   String timerText = "Start";
@@ -71,6 +71,14 @@ class Patient_Home extends StatelessWidget {
       icon: Icon(icon),
       tooltip: tooltip,
       onPressed: () {
+        timer.cancel();
+        DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+        String ultimo_accesso = dateFormat.format(DateTime.now());
+        FirebaseFirestore.instance
+            .collection('patients')
+            .doc(cod_fiscale)
+            .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
+
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => MyApp()));
       },
