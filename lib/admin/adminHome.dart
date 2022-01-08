@@ -19,7 +19,7 @@ class _AdminHome extends State<AdminHome> {
     });
   }
 
-  static final List _widgetOptions = <Widget>[
+  List _widgetOptions = <Widget>[
     MainAdmin(),
     ListaPazienti(),
     ListaDottori(),

@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'gender_swich.dart';
-import 'chat_swich.dart';
+import 'package:test_emad/admin/adminHome.dart';
+import 'package:test_emad/admin/lista_pazienti.dart';
+import 'gender_switch.dart';
+import 'chat_switch.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const CreaPaziente());
@@ -23,7 +25,11 @@ class CreaPaziente extends StatelessWidget {
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_sharp),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminHome(),
+                    ));
             },
           ),
           title: const Center(

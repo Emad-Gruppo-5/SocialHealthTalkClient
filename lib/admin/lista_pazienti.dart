@@ -13,6 +13,7 @@ class ListaPazienti extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: const Text('Lista pazienti'),
           actions: [
             IconButton(
@@ -46,7 +47,7 @@ class ListSearchState extends State<ListSearch> {
 
   static List<Map<String, String>> mainDataList = [];
 
-  Future<String> getActors() async {
+  Future<void> getActors() async {
     mainDataList.clear();
     var uri = Uri.parse('http://127.0.0.1:5000/lista_attori');
     print(uri);
@@ -81,7 +82,6 @@ class ListSearchState extends State<ListSearch> {
       newDataList = List.from(mainDataList);
     });
 
-    return data.body;
   }
 
   // Copy Main List into New List.

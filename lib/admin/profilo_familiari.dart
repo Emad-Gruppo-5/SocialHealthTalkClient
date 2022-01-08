@@ -3,7 +3,6 @@ import 'package:test_emad/admin/profilo_dottore_modifica.dart';
 import 'package:test_emad/admin/profilo_familiari_modifica.dart';
 import 'package:test_emad/admin/profilo_paziente_modifica.dart';
 
-void main() => runApp(const ProfiloFamiliare());
 
 /// This is the main application widget.
 class ProfiloFamiliare extends StatelessWidget {

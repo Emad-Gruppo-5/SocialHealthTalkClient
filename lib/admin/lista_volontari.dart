@@ -15,6 +15,7 @@ class ListaVolontari extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
             appBar: AppBar(
+              automaticallyImplyLeading: false,
               title: Text('Lista Volontari'),
               actions: [
                 IconButton(
@@ -86,7 +87,7 @@ class ListSearchState extends State<ListSearch> {
   }
 
   // Copy Main List into New List.
-  List<String> newDataList = List.from(mainDataList);
+ List<Map<String, String>> newDataList = List.from(mainDataList);
 
   onItemChanged(String value) {
     setState(() {
@@ -109,12 +110,12 @@ class ListSearchState extends State<ListSearch> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(12.0),
-            child: new Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new TextField(
+                TextField(
                   controller: _textController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Cerca',
                   ),
                   onChanged: onItemChanged,
@@ -126,15 +127,18 @@ class ListSearchState extends State<ListSearch> {
             child: ListView(
               padding: EdgeInsets.all(12.0),
               children: newDataList.map((data) {
+                print("STAMPA: " + data["cognome"]!);
                 return ListTile(
-                  title: Text(data),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfiloVolontario(),
-                    ),
-                  ),
-                );
+                    title: Text(data["cognome"]! + ' ' + data["nome"]!),
+                    onTap: () => {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ProfiloVolontario(),
+                            ),
+                          ),
+                        });
               }).toList(),
             ),
           )

@@ -12,6 +12,7 @@ class ListaDottori extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
             appBar: AppBar(
+              automaticallyImplyLeading: false,
               title: Text('Lista Dottori'),
               actions: [
                 IconButton(
@@ -43,7 +44,7 @@ class ListSearchState extends State<ListSearch> {
 
   static List<Map<String, String>> mainDataList = [];
 
-  Future<String> getActors() async {
+  Future<void> getActors() async {
     mainDataList.clear();
     var uri = Uri.parse('http://127.0.0.1:5000/lista_attori');
     print(uri);
@@ -64,12 +65,13 @@ class ListSearchState extends State<ListSearch> {
 
     var i = 0;
     while (i < json.decode(data.body).length) {
-      if(json.decode(data.body)[i]['cognome'].toString().compareTo('admin') != 0)
+      if(json.decode(data.body)[i]['cod_fiscale'].toString().compareTo('admin') != 0){
         mainDataList.add({
           'cognome': json.decode(data.body)[i]['cognome'],
           'nome': json.decode(data.body)[i]['nome'],
           'cod_fiscale': json.decode(data.body)[i]['cod_fiscale']
         });
+      } 
       i++;
     }
 
@@ -78,12 +80,10 @@ class ListSearchState extends State<ListSearch> {
     setState(() {
       newDataList = List.from(mainDataList);
     });
-
-    return data.body;
   }
 
   // Copy Main List into New List.
-  List<String> newDataList = List.from(mainDataList);
+ List<Map<String, String>> newDataList = List.from(mainDataList);
 
   onItemChanged(String value) {
     setState(() {
@@ -106,12 +106,12 @@ class ListSearchState extends State<ListSearch> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(12.0),
-            child: new Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new TextField(
+                TextField(
                   controller: _textController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Cerca',
                   ),
                   onChanged: onItemChanged,
@@ -123,15 +123,18 @@ class ListSearchState extends State<ListSearch> {
             child: ListView(
               padding: EdgeInsets.all(12.0),
               children: newDataList.map((data) {
+                print("STAMPA: " + data["cognome"]!);
                 return ListTile(
-                  title: Text(data),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfiloDottore(),
-                    ),
-                  ),
-                );
+                    title: Text(data["cognome"]! + ' ' + data["nome"]!),
+                    onTap: () => {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ProfiloDottore(),
+                            ),
+                          ),
+                        });
               }).toList(),
             ),
           )
