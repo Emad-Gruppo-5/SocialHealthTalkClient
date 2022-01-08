@@ -6,10 +6,8 @@ import 'main_dottore.dart';
 import 'modify_profile.dart';
 import 'package:http/http.dart' as http;
 
-
 /// This is the main application widget.
 class Profile extends StatelessWidget {
-  
   final String token;
   final String cod_fiscale;
   final String nome;
@@ -21,8 +19,8 @@ class Profile extends StatelessWidget {
     required this.cod_fiscale,
     required this.token,
     required this.nome,
-    required this.cognome, 
-    required this.email, 
+    required this.cognome,
+    required this.email,
     required this.num_cellulare,
     required this.specializzazione,
   });
@@ -35,7 +33,6 @@ class Profile extends StatelessWidget {
       iconButton = IconButton(
         icon: Icon(icon),
         tooltip: tooltip,
-        iconSize: 40,
         onPressed: () {
           Navigator.pop(context);
         },
@@ -44,9 +41,8 @@ class Profile extends StatelessWidget {
       iconButton = IconButton(
         icon: Icon(icon),
         tooltip: tooltip,
-        iconSize: 40,
         onPressed: () {
-          Navigator.pushReplacement(
+          Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => statelessWidget),
           );
@@ -62,16 +58,32 @@ class Profile extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: _iconButton(context, Icons.edit, 'Modifica', ModifyProfile(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,token: token, cod_fiscale: cod_fiscale)),
-          title: const Center(
-            child: Text("Profilo"),
-          ),
+          leading: _iconButton(
+              context,
+              Icons.edit,
+              'Modifica',
+              ModifyProfile(
+                  nome: nome,
+                  cognome: cognome,
+                  email: email,
+                  num_cellulare: num_cellulare,
+                  specializzazione: specializzazione,
+                  token: token,
+                  cod_fiscale: cod_fiscale)),
+          title: const Text("Profilo"),
           actions: [
             _iconButton(context, Icons.logout, 'Logout', LoginPage()),
           ],
         ),
         body: Center(
-          child: MyProfile(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,token: token, cod_fiscale: cod_fiscale),
+          child: MyProfile(
+              nome: nome,
+              cognome: cognome,
+              email: email,
+              num_cellulare: num_cellulare,
+              specializzazione: specializzazione,
+              token: token,
+              cod_fiscale: cod_fiscale),
         ),
       ),
     );
@@ -79,7 +91,6 @@ class Profile extends StatelessWidget {
 }
 
 class MyProfile extends StatefulWidget {
-  
   final String token;
   final String cod_fiscale;
   final String nome;
@@ -87,22 +98,22 @@ class MyProfile extends StatefulWidget {
   final String email;
   final String num_cellulare;
   final String specializzazione;
-  
-  MyProfile({required this.cod_fiscale,
+
+  MyProfile({
+    required this.cod_fiscale,
     required this.token,
     required this.nome,
-    required this.cognome, 
-    required this.email, 
+    required this.cognome,
+    required this.email,
     required this.num_cellulare,
-    required this.specializzazione,});
+    required this.specializzazione,
+  });
 
   MyProfileState createState() => MyProfileState();
 }
 
 // This is the stateless widget that the main application instantiates.
 class MyProfileState extends State<MyProfile> {
-
-
   late String token;
   late String cod_fiscale;
   late String nome;
@@ -121,9 +132,8 @@ class MyProfileState extends State<MyProfile> {
     cognome = widget.cognome;
     email = widget.email;
     num_cellulare = widget.num_cellulare;
-    specializzazione = widget.specializzazione; 
+    specializzazione = widget.specializzazione;
   }
-
 
   Widget _card(String title, IconData icon) {
     return Card(
@@ -134,20 +144,19 @@ class MyProfileState extends State<MyProfile> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-      return Column(
-        children: [
-          Text(
-            cognome + " " + nome,
-            style: const TextStyle(fontSize: 50),
-          ),
-          _card(cod_fiscale, Icons.person),
-          _card(num_cellulare, Icons.smartphone),
-          _card(email, Icons.email),
-          _card(specializzazione, Icons.medical_services), //TODO
-        ],
-      );
+    return Column(
+      children: [
+        Text(
+          nome + " " + cognome,
+          style: const TextStyle(fontSize: 30),
+        ),
+        _card(cod_fiscale, Icons.person),
+        _card(num_cellulare, Icons.smartphone),
+        _card(email, Icons.email),
+        _card(specializzazione, Icons.medical_services), //TODO
+      ],
+    );
   }
 }

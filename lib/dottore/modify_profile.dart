@@ -7,7 +7,6 @@ import 'main_dottore.dart';
 import 'profile.dart';
 import 'package:http/http.dart' as http;
 
-
 /// This is the main application widget.
 class ModifyProfile extends StatelessWidget {
   final String token;
@@ -21,8 +20,8 @@ class ModifyProfile extends StatelessWidget {
     required this.cod_fiscale,
     required this.token,
     required this.nome,
-    required this.cognome, 
-    required this.email, 
+    required this.cognome,
+    required this.email,
     required this.num_cellulare,
     required this.specializzazione,
   });
@@ -35,7 +34,6 @@ class ModifyProfile extends StatelessWidget {
       iconButton = IconButton(
         icon: Icon(icon),
         tooltip: tooltip,
-        iconSize: 40,
         onPressed: () {
           Navigator.pop(context);
         },
@@ -44,11 +42,10 @@ class ModifyProfile extends StatelessWidget {
       iconButton = IconButton(
         icon: Icon(icon),
         tooltip: tooltip,
-        iconSize: 40,
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => statelessWidget),
+            MaterialPageRoute(builder: (co) => statelessWidget),
           );
         },
       );
@@ -63,15 +60,43 @@ class ModifyProfile extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           leading: _iconButton(
-              context, Icons.arrow_back, 'Indietro', Profile(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,cod_fiscale: cod_fiscale, token: token)),
-          title: const Center(
-            child: Text("Modifica dati"),
-          ),
+              context,
+              Icons.arrow_back,
+              'Indietro',
+              Profile(
+                  nome: nome,
+                  cognome: cognome,
+                  email: email,
+                  num_cellulare: num_cellulare,
+                  specializzazione: specializzazione,
+                  cod_fiscale: cod_fiscale,
+                  token: token)),
+          title: const Text("Modifica dati"),
           actions: [
-            _iconButton(context, Icons.logout, 'Logout', MainDottore(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione , cod_fiscale: cod_fiscale, token: token,)),
+            _iconButton(
+                context,
+                Icons.logout,
+                'Logout',
+                MainDottore(
+                  nome: nome,
+                  cognome: cognome,
+                  email: email,
+                  num_cellulare: num_cellulare,
+                  specializzazione: specializzazione,
+                  cod_fiscale: cod_fiscale,
+                  token: token,
+                )),
           ],
         ),
-        body: Center(child: MyModifyProfile(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,cod_fiscale: cod_fiscale, token:token)),
+        body: Center(
+            child: MyModifyProfile(
+                nome: nome,
+                cognome: cognome,
+                email: email,
+                num_cellulare: num_cellulare,
+                specializzazione: specializzazione,
+                cod_fiscale: cod_fiscale,
+                token: token)),
       ),
     );
   }
@@ -90,8 +115,8 @@ class MyModifyProfile extends StatefulWidget {
     required this.cod_fiscale,
     required this.token,
     required this.nome,
-    required this.cognome, 
-    required this.email, 
+    required this.cognome,
+    required this.email,
     required this.num_cellulare,
     required this.specializzazione,
   });
@@ -102,7 +127,6 @@ class MyModifyProfile extends StatefulWidget {
 
 // This is the stateless widget that the main application instantiates.
 class _MyModifyProfile extends State<MyModifyProfile> {
-
   late String token;
   late String cod_fiscale;
   late String nome;
@@ -125,7 +149,6 @@ class _MyModifyProfile extends State<MyModifyProfile> {
     specializzazione = widget.specializzazione;
     super.initState();
   }
-
 
   Future<String> modificaUtente() async {
     var uri = Uri.parse('http://127.0.0.1:5000/modifica_utente');
@@ -203,16 +226,13 @@ class _MyModifyProfile extends State<MyModifyProfile> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(
-                Icons.smartphone,
-                "Numero di cellulare",
-                num_cellulare,
-                "Inserisci numero di cellulare"),
+            child: _textFormField(Icons.smartphone, "Numero di cellulare",
+                num_cellulare, "Inserisci numero di cellulare"),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(Icons.email, "E-mail",
-                email, "Inserisci e-mail"),
+            child: _textFormField(
+                Icons.email, "E-mail", email, "Inserisci e-mail"),
           ),
           Center(
             child: Padding(
@@ -235,15 +255,14 @@ class _MyModifyProfile extends State<MyModifyProfile> {
 
   @override
   Widget build(BuildContext context) {
-    
-      return Column(
-        children: [
-          Text(
-            cognome + " " + nome,
-            style: const TextStyle(fontSize: 50),
-          ),
-          _form(),
-        ],
-      );
+    return Column(
+      children: [
+        Text(
+          nome + " " + cognome,
+          style: const TextStyle(fontSize: 30),
+        ),
+        _form(),
+      ],
+    );
   }
 }

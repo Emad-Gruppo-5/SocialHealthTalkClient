@@ -71,7 +71,7 @@ class _Profile extends State<Profile> {
   String timerText = "Start";
   SingingCharacter? _character;
 
-  Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
+  Widget _iconButtonPush(IconData icon, String tooltip) {
     if (tooltip != 'Logout') {
       return IconButton(
         icon: Icon(icon),
@@ -119,7 +119,7 @@ class _Profile extends State<Profile> {
     }
   }
 
-  Widget _iconButtonPop(BuildContext context, IconData icon, String tooltip) {
+  Widget _iconButtonPop(IconData icon, String tooltip) {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
@@ -152,11 +152,11 @@ class _Profile extends State<Profile> {
       home: GestureDetector(
         child: Scaffold(
           appBar: AppBar(
-            leading: _iconButtonPop(context, Icons.arrow_back, 'Indietro'),
+            leading: _iconButtonPop(Icons.arrow_back, 'Indietro'),
             title: const Text("Profilo"),
             actions: [
-              _iconButtonPush(context, Icons.edit, 'Modifica'),
-              _iconButtonPush(context, Icons.logout, 'Logout'),
+              _iconButtonPush(Icons.edit, 'Modifica'),
+              _iconButtonPush(Icons.logout, 'Logout'),
             ],
           ),
           body: Column(
@@ -169,14 +169,7 @@ class _Profile extends State<Profile> {
               _card("$num_cellulare", Icons.smartphone),
               _card("$email", Icons.email),
               const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.chat, color: Colors.grey),
-                  SizedBox(width: 10),
-                  Text('Tipologia chat'),
-                ],
-              ),
+              Text('Tipologia chat'),
               _radioListTile("Solo testo", SingingCharacter.text),
               _radioListTile("Videochiamata", SingingCharacter.video_call),
               _radioListTile("Chiamata vocale", SingingCharacter.voice_call),

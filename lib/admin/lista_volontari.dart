@@ -15,15 +15,15 @@ class ListaVolontari extends StatelessWidget {
         home: Scaffold(
             appBar: AppBar(
               title: Text('Lista Volontari'),
-              leading: new IconButton(
-                icon: Icon(Icons.arrow_back_ios_sharp),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               actions: [
-                new IconButton(
-                  icon: Icon(Icons.add, color: Colors.white, size: 40),
+                IconButton(
+                  icon: Icon(Icons.add),
                   onPressed: () {
                     MaterialPageRoute(
                       builder: (context) => CreaNuovoVolontario(),

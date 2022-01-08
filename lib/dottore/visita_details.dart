@@ -4,22 +4,19 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-
 class TimePickerVisita extends StatelessWidget {
   final String date;
   final String token;
   final String cod_fiscale;
-  const TimePickerVisita({
-    required this.cod_fiscale,
-    required this.token, 
-    required this.date});
+  const TimePickerVisita(
+      {required this.cod_fiscale, required this.token, required this.date});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Seleziona orario',
       debugShowCheckedModeBanner: false,
-      home: CreateVisita2(cod_fiscale: cod_fiscale, token: token,date: date),
+      home: CreateVisita2(cod_fiscale: cod_fiscale, token: token, date: date),
     );
   }
 }
@@ -28,10 +25,8 @@ class CreateVisita2 extends StatefulWidget {
   final String date;
   final String token;
   final String cod_fiscale;
-  const CreateVisita2({
-    required this.cod_fiscale,
-    required this.token, 
-    required this.date});
+  const CreateVisita2(
+      {required this.cod_fiscale, required this.token, required this.date});
 
   @override
   _CreateVisita2State createState() => _CreateVisita2State(date: date);
@@ -61,7 +56,6 @@ class _CreateVisita2State extends State<CreateVisita2> {
     var uri = Uri.parse('http://127.0.0.1:5000/admin/attori_associati');
     print(uri);
 
-    
     print(cod_fiscale + "ukff");
 
     int role = 1;
@@ -157,80 +151,89 @@ class _CreateVisita2State extends State<CreateVisita2> {
   List<String> newDataList = List.from(mainDataList);
 
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: _selectTime,
-              child: Text('Seleziona Ora'),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Ora selezionata: ${_time.format(context)}',
-            ),
-            DropdownButton<String>(
-              value: dropdownValue,
-              icon: const Icon(Icons.arrow_downward),
-              elevation: 16,
-              style: const TextStyle(color: Colors.blue),
-              underline: Container(
-                height: 2,
-                color: Colors.blue,
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context)),
+          title: const Text("Crea visita"),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: _selectTime,
+                child: Text('Seleziona Ora'),
               ),
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownValue = newValue!;
-                });
-              },
-              items: <String>[
-                'Aggiungi notifica',
-                '5 minuti prima',
-                '10 minuti prima',
-                '30 minuti prima'
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            DropdownButton<String>(
-              value: dropdownValue2,
-              icon: const Icon(Icons.arrow_downward),
-              elevation: 16,
-              style: const TextStyle(color: Colors.blue),
-              underline: Container(
-                height: 2,
-                color: Colors.blue,
+              const SizedBox(height: 8),
+              Text(
+                'Ora selezionata: ${_time.format(context)}',
               ),
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownValue2 = newValue!;
-                });
-              },
-              items: newDataList.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (dropdownValue2 != 'Aggiungi Paziente') {
-                  creaVisitaServer();
-                } else {
-                  final snackBar = SnackBar(
-                    content: const Text('Seleziona orario della notifica'),
+              DropdownButton<String>(
+                value: dropdownValue,
+                icon: const Icon(Icons.arrow_downward),
+                elevation: 16,
+                style: const TextStyle(color: Colors.blue),
+                underline: Container(
+                  height: 2,
+                  color: Colors.blue,
+                ),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    dropdownValue = newValue!;
+                  });
+                },
+                items: <String>[
+                  'Aggiungi notifica',
+                  '5 minuti prima',
+                  '10 minuti prima',
+                  '30 minuti prima'
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
                   );
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                }
-              },
-              child: const Text('Salva'),
-            )
-          ],
+                }).toList(),
+              ),
+              DropdownButton<String>(
+                value: dropdownValue2,
+                icon: const Icon(Icons.arrow_downward),
+                elevation: 16,
+                style: const TextStyle(color: Colors.blue),
+                underline: Container(
+                  height: 2,
+                  color: Colors.blue,
+                ),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    dropdownValue2 = newValue!;
+                  });
+                },
+                items:
+                    newDataList.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (dropdownValue2 != 'Aggiungi Paziente') {
+                    creaVisitaServer();
+                  } else {
+                    final snackBar = SnackBar(
+                      content: const Text('Seleziona orario della notifica'),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
+                },
+                child: const Text('Salva'),
+              )
+            ],
+          ),
         ),
       ),
     );

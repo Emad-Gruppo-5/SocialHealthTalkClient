@@ -14,9 +14,7 @@ class Notifications extends StatelessWidget {
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
             tooltip: "Indietro",
           ),
           title: const Text(_title),
@@ -92,7 +90,7 @@ class MyNotifications extends StatelessWidget {
           children: snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data =
                 document.data()! as Map<String, dynamic>;
-                print(document.id);
+            print(document.id);
             print(data.toString());
             print(data);
             String subtitle = "";
@@ -141,50 +139,46 @@ class MyNotifications extends StatelessWidget {
               );
             }
 
-            return Dismissible(key: Key(document.id),
-                  onDismissed: (direction){
-                    _notificationsReference
-                    .doc(document.id)
-                    .delete();
+            return Dismissible(
+              key: Key(document.id),
+              onDismissed: (direction) {
+                _notificationsReference.doc(document.id).delete();
 
-                    ScaffoldMessenger.of(context)
+                ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text('Notifica rimossa')));
-
-
-                  },
-                  background: Container( color: Colors.red.shade300),
-                  child: Card(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      ListTile(
-                        leading: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Visibility(
-                              child: const Icon(Icons.circle,
-                                  color: Colors.blue, size: 15),
-                              visible: !data['letto'],
-                            ),
-                          ],
-                        ),
-                        title: Text(data['nome'] + " " + data['cognome']),
-                        subtitle: Text(subtitle),
-                        trailing: trailing,
-                        onLongPress: () => _notificationsReference
-                            .doc(document.id)
-                            .update({'letto': true})
-                            .then((value) => print("Notification Updated"))
-                            .catchError((error) =>
-                                print("Failed to update notifications: $error")),
+              },
+              background: Container(color: Colors.red.shade300),
+              child: Card(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    ListTile(
+                      leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Visibility(
+                            child: const Icon(Icons.circle,
+                                color: Colors.blue, size: 15),
+                            visible: !data['letto'],
+                          ),
+                        ],
                       ),
-                  
-                      row,
-                    ],
-                  ),
+                      title: Text(data['nome'] + " " + data['cognome']),
+                      subtitle: Text(subtitle),
+                      trailing: trailing,
+                      onLongPress: () => _notificationsReference
+                          .doc(document.id)
+                          .update({'letto': true})
+                          .then((value) => print("Notification Updated"))
+                          .catchError((error) =>
+                              print("Failed to update notifications: $error")),
+                    ),
+                    row,
+                  ],
                 ),
-                );
-              }).toList(),
+              ),
+            );
+          }).toList(),
         );
       },
     );

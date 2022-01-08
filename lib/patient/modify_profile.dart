@@ -76,8 +76,7 @@ class _ModifyProfile extends State<ModifyProfile> {
   late Timer timer_alert;
   String timerText = "Start";
 
-  Widget _iconButtonPush(
-      BuildContext context, IconData icon, String tooltip, MyApp myApp) {
+  Widget _iconButtonPush(IconData icon, String tooltip, MyApp myApp) {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
@@ -96,7 +95,7 @@ class _ModifyProfile extends State<ModifyProfile> {
     );
   }
 
-  Widget _iconButtonPop(BuildContext context, IconData icon, String tooltip) {
+  Widget _iconButtonPop(IconData icon, String tooltip) {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
@@ -137,10 +136,10 @@ class _ModifyProfile extends State<ModifyProfile> {
         child: Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
-            leading: _iconButtonPop(context, Icons.arrow_back, 'Indietro'),
+            leading: _iconButtonPop(Icons.arrow_back, 'Indietro'),
             title: Text("Modifica dati"),
             actions: [
-              _iconButtonPush(context, Icons.logout, 'Logout', MyApp()),
+              _iconButtonPush(Icons.logout, 'Logout', MyApp()),
             ],
           ),
           body: Column(
@@ -151,14 +150,7 @@ class _ModifyProfile extends State<ModifyProfile> {
               ),
               _form(),
               const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.chat, color: Colors.grey),
-                  SizedBox(width: 10),
-                  Text('Tipologia chat'),
-                ],
-              ),
+              Text('Tipologia chat'),
               RadioListTile<SingingCharacter>(
                 title: const Text('Solo testo'),
                 value: SingingCharacter.testo,

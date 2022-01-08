@@ -15,19 +15,19 @@ class ListaPazienti extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Lista pazienti'),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_sharp),
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pushReplacement(
-                  context, 
-                  MaterialPageRoute(
-                    builder: (context) => AdminHome(),
-                  ),
-                );
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminHome(),
+                ),
+              );
             },
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.add, color: Colors.white),
+              icon: const Icon(Icons.add),
               onPressed: () {
                 Navigator.push(
                     context,
@@ -78,10 +78,11 @@ class ListSearchState extends State<ListSearch> {
 
     var i = 0;
     while (i < json.decode(data.body).length) {
-      mainDataList.add(
-          {'cognome' : json.decode(data.body)[i]['cognome'],
-           'nome' : json.decode(data.body)[i]['nome'],
-           'cod_fiscale' : json.decode(data.body)[i]['cod_fiscale']});
+      mainDataList.add({
+        'cognome': json.decode(data.body)[i]['cognome'],
+        'nome': json.decode(data.body)[i]['nome'],
+        'cod_fiscale': json.decode(data.body)[i]['cod_fiscale']
+      });
       i++;
     }
 
@@ -132,16 +133,16 @@ class ListSearchState extends State<ListSearch> {
               children: newDataList.map((data) {
                 print("STAMPA: " + data["cognome"]!);
                 return ListTile(
-                  title: Text(data["cognome"]! + ' ' + data["nome"]!),
-                  onTap: () => {
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfiloPaziente(data["cod_fiscale"]!),
-                    ),
-                  ),
-                  }
-                );
+                    title: Text(data["cognome"]! + ' ' + data["nome"]!),
+                    onTap: () => {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ProfiloPaziente(data["cod_fiscale"]!),
+                            ),
+                          ),
+                        });
               }).toList(),
             ),
           )

@@ -2,18 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:test_emad/dottore/visita_details.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 /// My app class to display the date range picker
 class createVisita extends StatefulWidget {
-
   final String token;
-  final String cod_fiscale; 
+  final String cod_fiscale;
 
-  createVisita({
-    required this.cod_fiscale,
-    required this.token
-  } );
+  createVisita({required this.cod_fiscale, required this.token});
 
   @override
   createVisitaState createState() => createVisitaState();
@@ -21,7 +17,6 @@ class createVisita extends StatefulWidget {
 
 /// State for MyApp
 class createVisitaState extends State<createVisita> {
-
   late String cod_fiscale;
   late String token;
 
@@ -41,7 +36,7 @@ class createVisitaState extends State<createVisita> {
     setState(() {
       if (args.value is PickerDateRange) {
         _range = '${DateFormat('dd/MM/yyyy').format(args.value.startDate)} -'
-        // ignore: lines_longer_than_80_chars
+            // ignore: lines_longer_than_80_chars
             ' ${DateFormat('dd/MM/yyyy').format(args.value.endDate ?? args.value.startDate)}';
       } else if (args.value is DateTime) {
         _selectedDate = args.value.toString();
@@ -54,15 +49,25 @@ class createVisitaState extends State<createVisita> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                TimePickerVisita(cod_fiscale: cod_fiscale, token: token, date: _selectedDate)));
+            builder: (context) => TimePickerVisita(
+                cod_fiscale: cod_fiscale, token: token, date: _selectedDate)));
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('it'),
+        ],
+        locale: const Locale('it'),
         home: Scaffold(
-
+            appBar: AppBar(
+              title: const Text("Pianifica visita"),
+            ),
             body: Stack(
               children: <Widget>[
                 Positioned(
@@ -75,7 +80,11 @@ class createVisitaState extends State<createVisita> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Selected date: $_selectedDate'),
+                      Center(
+                          child: Text(
+                        'Seleziona un giorno',
+                        style: const TextStyle(fontSize: 30),
+                      )),
                     ],
                   ),
                 ),
