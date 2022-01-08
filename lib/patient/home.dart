@@ -30,7 +30,7 @@ class Patient_Home extends StatelessWidget {
       required this.tipologia_chat,
       required this.token});
 
-  Duration online_duration = const Duration(seconds: 5);
+  Duration online_duration = const Duration(seconds: 7);
   Duration alert_duration = const Duration(seconds: 20);
   late Timer timer;
   late Timer timer_alert;
@@ -41,6 +41,7 @@ class Patient_Home extends StatelessWidget {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
+      iconSize: 40,
       onPressed: () {
         timer.cancel();
         timer_alert.cancel();
@@ -70,15 +71,8 @@ class Patient_Home extends StatelessWidget {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
+      iconSize: 40,
       onPressed: () {
-        timer.cancel();
-        DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
-        ultimo_accesso = dateFormat.format(DateTime.now());
-        FirebaseFirestore.instance
-            .collection('patients')
-            .doc(cod_fiscale)
-            .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
-
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => MyApp()));
       },
@@ -90,7 +84,7 @@ class Patient_Home extends StatelessWidget {
     timer = Timer(online_duration, handleTimeout);
     timer_alert = Timer(alert_duration, callback);
 
-    print("UPDATE FIRESTORE");
+    // print("UPDATE FIRESTORE");
     FirebaseFirestore.instance
         .collection('patients')
         .doc(cod_fiscale)
@@ -110,16 +104,7 @@ class Patient_Home extends StatelessWidget {
               _iconButtonPop(context, Icons.logout, 'Logout'),
             ],
           ),
-          body: Center(
-            child: ListView(
-              children: [
-                _card('Hai preso la pillola?', 'Dott. Bianchi\nOre: 9:30'),
-                _card(
-                    'Videochiamata con Gianni Valeri', '(Parente)\nOre: 17:30'),
-                _card(cod_fiscale.toString(), 'prova prova prova'),
-              ],
-            ),
-          ),
+          body: const MyNotifications(),
         ),
         onTap: () {
           print("TAP UTENTE");
@@ -154,36 +139,135 @@ class Patient_Home extends StatelessWidget {
         .doc(cod_fiscale)
         .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
-
-  Future<void> callback() async {
+  
+  void callback() {
     print("ALERT\nCod_fiscale: " + cod_fiscale);
-
-    var status;
-
-    await FirebaseFirestore.instance
-        .collection('patients')
-        .doc(cod_fiscale)
-        .get()
-        .then((DocumentSnapshot doc) {
-      if (doc.exists) {
-        status = doc.data();
-        print(status);
-        print(status["status"].toString().compareTo("2022/01/08 16:50"));
-        if (status["status"].toString().compareTo("online") == 0 ||
-            (status["status"].toString().compareTo("offline") == 0 &&
-                status["ultimo_accesso"].toString().compareTo(ultimo_accesso) ==
-                    1))
-          timer_alert.cancel();
-        else
-          FirebaseFirestore.instance.collection('notifications').add({
-            'alert': true,
-            'letto': false,
-            'cod_fiscale': cod_fiscale,
-            'nome': nome,
-            'cognome': cognome,
-            'ultimo_accesso': ultimo_accesso
-          });
-      }
-    });
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .add({
+              'alert': true,
+              'letto': false,
+              'cod_fiscale': cod_fiscale,
+              'nome': nome,
+              'cognome': cognome,
+              'ultimo_accesso': ultimo_accesso
+        });
   }
 }
+
+
+class MyNotifications extends StatelessWidget {
+  const MyNotifications({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Stream<QuerySnapshot> _notificationsStream = FirebaseFirestore
+        .instance
+        .collection('reminder')
+        .orderBy('data', descending: true)
+        .snapshots();
+    CollectionReference _notificationsReference =
+    FirebaseFirestore.instance.collection('reminder');
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: _notificationsStream,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return const Text('Something went wrong');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        return ListView(
+          children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data =
+            document.data()! as Map<String, dynamic>;
+            print(document.id);
+            print(data.toString());
+            print(data);
+            String subtitle = "";
+            Icon trailing;
+            Row row;
+            if (data['questions']) {
+              subtitle = "ora: " + data['data'];
+              row = Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  TextButton(
+                    child: const Icon(Icons.mic_none_sharp),
+                    onPressed: () {/* ... */},
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    child: const Text('No'),
+                    onPressed: () {/* ... */},
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    child: const Text('Si'),
+                    onPressed: () {/* ... */},
+                  ),
+                  const SizedBox(width: 8),
+                ],
+              );
+            } else {
+              subtitle = "Visita";
+              row = Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  const SizedBox(width: 8),
+                ],
+              );
+            }
+
+            return Dismissible(key: Key(document.id),
+              onDismissed: (direction){
+                _notificationsReference
+                    .doc(document.id)
+                    .delete();
+
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('Notifica rimossa')));
+
+
+              },
+              background: Container( color: Colors.red.shade300),
+              child: Card(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    ListTile(
+                      leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Visibility(
+                            child: const Icon(Icons.circle,
+                                color: Colors.blue, size: 15),
+                            visible: !data['letto'],
+                          ),
+                        ],
+                      ),
+                      title: Text(data['nome'] + " " + data['cognome']),
+                      subtitle: Text(subtitle),
+                      onLongPress: () => _notificationsReference
+                          .doc(document.id)
+                          .update({'letto': true})
+                          .then((value) => print("Notification Updated"))
+                          .catchError((error) =>
+                          print("Failed to update notifications: $error")),
+                    ),
+
+                    row,
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+}
+
