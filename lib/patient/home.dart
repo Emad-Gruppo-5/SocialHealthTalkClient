@@ -155,15 +155,35 @@ class Patient_Home extends StatelessWidget {
         .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
 
-  void callback() {
+  Future<void> callback() async {
     print("ALERT\nCod_fiscale: " + cod_fiscale);
-    FirebaseFirestore.instance.collection('notifications').add({
-      'alert': true,
-      'letto': false,
-      'cod_fiscale': cod_fiscale,
-      'nome': nome,
-      'cognome': cognome,
-      'ultimo_accesso': ultimo_accesso
+
+    var status;
+
+    await FirebaseFirestore.instance
+        .collection('patients')
+        .doc(cod_fiscale)
+        .get()
+        .then((DocumentSnapshot doc) {
+      if (doc.exists) {
+        status = doc.data();
+        print(status);
+        print(status["status"].toString().compareTo("2022/01/08 16:50"));
+        if (status["status"].toString().compareTo("online") == 0 ||
+            (status["status"].toString().compareTo("offline") == 0 &&
+                status["ultimo_accesso"].toString().compareTo(ultimo_accesso) ==
+                    1))
+          timer_alert.cancel();
+        else
+          FirebaseFirestore.instance.collection('notifications').add({
+            'alert': true,
+            'letto': false,
+            'cod_fiscale': cod_fiscale,
+            'nome': nome,
+            'cognome': cognome,
+            'ultimo_accesso': ultimo_accesso
+          });
+      }
     });
   }
 }
