@@ -1,24 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:test_emad/admin/crea_nuovo_dottore.dart';
 import 'package:test_emad/admin/profilo_dottore.dart';
 import 'package:test_emad/admin/profilo_paziente_modifica.dart';
-
+import 'package:http/http.dart' as http;
 import 'profilo_paziente.dart';
 
 class ListaDottori extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
+    return Scaffold(
             appBar: AppBar(
               title: Text('Lista Dottori'),
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
               actions: [
                 IconButton(
                   icon: Icon(Icons.add),
@@ -30,7 +24,7 @@ class ListaDottori extends StatelessWidget {
                 ),
               ],
             ),
-            body: Center(child: ListSearch())));
+            body: Center(child: ListSearch()));
   }
 }
 
@@ -41,25 +35,66 @@ class ListSearch extends StatefulWidget {
 class ListSearchState extends State<ListSearch> {
   TextEditingController _textController = TextEditingController();
 
-  static List<String> mainDataList = [
-    "Dottore 1",
-    "Dottore 2",
-    "Dottore 3",
-    "Dottore 4",
-    "Dottore 5",
-    "Dottore 6",
-    "Dottore 7",
-    "Dottore 8",
-  ];
+  @protected
+  @mustCallSuper
+  void initState() {
+    getActors();
+  }
+
+  static List<Map<String, String>> mainDataList = [];
+
+  Future<String> getActors() async {
+    mainDataList.clear();
+    var uri = Uri.parse('http://127.0.0.1:5000/lista_attori');
+    print(uri);
+
+    int role = 2;
+    Map<String, int> message = {
+      "role": role,
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+
+    var i = 0;
+    while (i < json.decode(data.body).length) {
+      if(json.decode(data.body)[i]['cognome'].toString().compareTo('admin') != 0)
+        mainDataList.add({
+          'cognome': json.decode(data.body)[i]['cognome'],
+          'nome': json.decode(data.body)[i]['nome'],
+          'cod_fiscale': json.decode(data.body)[i]['cod_fiscale']
+        });
+      i++;
+    }
+
+    print(mainDataList);
+
+    setState(() {
+      newDataList = List.from(mainDataList);
+    });
+
+    return data.body;
+  }
 
   // Copy Main List into New List.
   List<String> newDataList = List.from(mainDataList);
 
   onItemChanged(String value) {
     setState(() {
-      newDataList = mainDataList
-          .where((string) => string.toLowerCase().contains(value.toLowerCase()))
-          .toList();
+      newDataList = List.from(mainDataList
+                    .where((element) => element["nome"]!
+                                        .toLowerCase()
+                                        .contains(value.toLowerCase()) 
+                                        ||
+                                        element["cognome"]!
+                                        .toLowerCase()
+                                        .contains(value.toLowerCase()) ));
     });
   }
 

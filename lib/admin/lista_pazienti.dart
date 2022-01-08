@@ -14,22 +14,11 @@ class ListaPazienti extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Lista pazienti'),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AdminHome(),
-                ),
-              );
-            },
-          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const CreaPaziente(),
@@ -52,12 +41,12 @@ class ListSearchState extends State<ListSearch> {
   @protected
   @mustCallSuper
   void initState() {
-    getPatient();
+    getActors();
   }
 
   static List<Map<String, String>> mainDataList = [];
 
-  Future<String> getPatient() async {
+  Future<String> getActors() async {
     mainDataList.clear();
     var uri = Uri.parse('http://127.0.0.1:5000/lista_attori');
     print(uri);
@@ -100,9 +89,14 @@ class ListSearchState extends State<ListSearch> {
 
   onItemChanged(String value) {
     setState(() {
-      // newDataList = mainDataList
-      //     .where((map) => map[""].toLowerCase().contains(value.toLowerCase()))
-      //     .toList();
+      newDataList = List.from(mainDataList
+                    .where((element) => element["nome"]!
+                                        .toLowerCase()
+                                        .contains(value.toLowerCase()) 
+                                        ||
+                                        element["cognome"]!
+                                        .toLowerCase()
+                                        .contains(value.toLowerCase()) ));
     });
   }
 
@@ -135,7 +129,7 @@ class ListSearchState extends State<ListSearch> {
                 return ListTile(
                     title: Text(data["cognome"]! + ' ' + data["nome"]!),
                     onTap: () => {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
