@@ -5,7 +5,8 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'gender_swich.dart';
+import 'chat_swich.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const CreaPaziente());
@@ -52,12 +53,17 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   TextEditingController _cont3 = TextEditingController();
   TextEditingController _cont4 = TextEditingController();
   TextEditingController _cont5 = TextEditingController();
-  int val = -1;
+  TextEditingController _cont6 = TextEditingController();
+  String sesso = '';
+  //TextEditingController _cont7 = TextEditingController();
+  TextEditingController _cont8 = TextEditingController();
+  int chat_mode = 0;
 
   Future<void> creaPazienteServer() async {
     var uri = Uri.parse('http://127.0.0.1:5000/crea_utente');
     print(uri);
-    CollectionReference patients = FirebaseFirestore.instance.collection('patients');
+    CollectionReference patients =
+        FirebaseFirestore.instance.collection('patients');
     int role = 1;
     print(senddata);
 
@@ -68,50 +74,47 @@ class _MyModifyProfile extends State<MyModifyProfile> {
       "cognome": senddata["cognome"],
       "num_cellulare": senddata["num_cellulare"],
       "email": senddata["email"],
-      "tipologia_chat": val.toString(),
+      "tipologia_chat": chat_mode,
+      "eta": senddata['eta'].toString(),
+      "sesso": sesso,
+      "titolo_studio": senddata['titolo_studio']
     };
     var body = json.encode(message);
     var data;
     print("\nBODY:: " + body);
 
-
     data = await http.post(uri,
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8'
-    },
-    body: body);
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
 
-    if(data.statusCode == 200){
+    if (data.statusCode == 200) {
       patients.doc(message['cod_fiscale']).set({
-          'nome': message['nome'],
-          'cognome': message['cognome'],
-          'status': 'offline',
-          'ultimo_accesso': 'Nessun accesso'
-        })
-        .catchError((error) => {
-          print("ERRORE LATO FIRESTORE: err: " + error)
-        });
+        'nome': message['nome'],
+        'cognome': message['cognome'],
+        'status': 'offline',
+        'ultimo_accesso': 'Nessun accesso'
+      }).catchError((error) => {print("ERRORE LATO FIRESTORE: err: " + error)});
 
-          // creaPazienteServer();
-          final snackBar = SnackBar(
-            content: const Text('Utente inserito con successo'),
-          );
-          // Find the ScaffoldMessenger in the widget tree
-          // and use it to show a SnackBar.
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-         
-    }else{
+      // creaPazienteServer();
+      final snackBar = SnackBar(
+        content: const Text('Utente inserito con successo'),
+      );
+      // Find the ScaffoldMessenger in the widget tree
+      // and use it to show a SnackBar.
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
       print("ERRORE LATO POSTGRESQL: err: ");
       const snackBar = const SnackBar(
-            content: Text('Utente non inserito'),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        content: Text('Utente non inserito'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
-    
   }
 
-  Widget _textFormField(
-      IconData icon, String labelText, String validator, String i, TextEditingController _cont) {
+  Widget _textFormField(IconData icon, String labelText, String validator,
+      String i, TextEditingController _cont) {
     return TextFormField(
       controller: _cont,
       decoration: InputDecoration(
@@ -120,9 +123,9 @@ class _MyModifyProfile extends State<MyModifyProfile> {
       ),
       // The validator receives the text that the user has entered.
       validator: (value) {
-        if(labelText == "Numero di cellulare"){
+        if (labelText == "Numero di cellulare") {
           int? val = int.tryParse(value!) ?? 0;
-          if (value == null || value.isEmpty || val==0) {
+          if (value == null || value.isEmpty || val == 0) {
             return validator;
           }
         }
@@ -137,6 +140,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
 
   Widget _form() {
     final _formKey = GlobalKey<FormState>();
+    String select_chat_mode;
 
     return Form(
       key: _formKey,
@@ -150,77 +154,134 @@ class _MyModifyProfile extends State<MyModifyProfile> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child:
-                _textFormField(Icons.people, "Nome", "Inserisci nome", "nome", _cont2),
+            child: _textFormField(
+                Icons.people, "Nome", "Inserisci nome", "nome", _cont2),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _textFormField(Icons.people, "Cognome", "Inserisci cognome",
+                "cognome", _cont3),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: _textFormField(
-                Icons.people, "Cognome", "Inserisci cognome", "cognome", _cont3),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _textFormField(Icons.smartphone, "Numero di cellulare",
-                "Inserisci numero di cellulare (deve contenere solo numeri)", "num_cellulare", _cont4),
+                Icons.smartphone,
+                "Numero di cellulare",
+                "Inserisci numero di cellulare (deve contenere solo numeri)",
+                "num_cellulare",
+                _cont4),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: _textFormField(
                 Icons.email, "E-mail", "Inserisci e-mail", "email", _cont5),
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _textFormField(
+                Icons.cake, "Età", "Inserisci età", "eta", _cont6),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                const Text("Sesso:  ", style: TextStyle(fontSize: 15)),
+                GenderSwitch(
+                  onToggle: (Gender gender) {
+                    sesso = gender.toString().split('.').last;
+                    print('>>>>>>>>>> Gender ' + sesso);
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _textFormField(Icons.work, "Titolo di studio",
+                "Inserisci titolo di studio", "titolo_studio", _cont8),
+          ),
           const Padding(
             padding: EdgeInsets.all(8.0),
-            child: Text(
-              "Tipologia Chat",
-              style: TextStyle(fontSize: 15),
+            child: Text("Tipologia chat:", style: TextStyle(fontSize: 15)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                ChatSwitch(
+                  onToggle: (Chat chat) {
+                    select_chat_mode = chat.toString().split('.').last;
+                    switch (select_chat_mode) {
+                      case 'testo':
+                        chat_mode = 0;
+                        break;
+                      case 'vocale':
+                        chat_mode = 1;
+                        break;
+                      case 'video':
+                        chat_mode = 2;
+                        break;
+                      default:
+                    }
+                    print('>>>>>>>>>> mode: ' + chat_mode.toString());
+                  },
+                ),
+              ],
             ),
           ),
-          ListTile(
-            title: const Text("Solo testo"),
-            leading: Radio(
-              value: 0,
-              groupValue: val,
-              onChanged: (value) {
-                setState(() {
-                  val = 0;
-                });
-              },
-              activeColor: Colors.blue,
-            ),
-          ),
-          ListTile(
-            title: const Text("Videochiamata"),
-            leading: Radio(
-              value: 1,
-              groupValue: val,
-              onChanged: (value) {
-                setState(() {
-                  val = 1;
-                });
-              },
-              activeColor: Colors.blue,
-            ),
-          ),
-          ListTile(
-            title: const Text("Chiamata vocale"),
-            leading: Radio(
-              value: 2,
-              groupValue: val,
-              onChanged: (value) {
-                setState(() {
-                  val = 2;
-                });
-              },
-              activeColor: Colors.blue,
-            ),
-          ),
+          // const Padding(
+          //   padding: EdgeInsets.all(8.0),
+          //   child: Text(
+          //     "Tipologia Chat",
+          //     style: TextStyle(fontSize: 15),
+          //   ),
+          // ),
+          // ListTile(
+          //   title: const Text("Solo testo"),
+          //   leading: Radio(
+          //     value: 0,
+          //     groupValue: val,
+          //     onChanged: (value) {
+          //       setState(() {
+          //         val = 0;
+          //       });
+          //     },
+          //     activeColor: Colors.blue,
+          //   ),
+          // ),
+          // ListTile(
+          //   title: const Text("Videochiamata"),
+          //   leading: Radio(
+          //     value: 1,
+          //     groupValue: val,
+          //     onChanged: (value) {
+          //       setState(() {
+          //         val = 1;
+          //       });
+          //     },
+          //     activeColor: Colors.blue,
+          //   ),
+          // ),
+          // ListTile(
+          //   title: const Text("Chiamata vocale"),
+          //   leading: Radio(
+          //     value: 2,
+          //     groupValue: val,
+          //     onChanged: (value) {
+          //       setState(() {
+          //         val = 2;
+          //       });
+          //     },
+          //     activeColor: Colors.blue,
+          //   ),
+          // ),
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: ElevatedButton(
                 onPressed: () {
                   // Validate returns true if the form is valid, or false otherwise.
-                  if (_formKey.currentState!.validate() && val>=0) {
+                  if (_formKey.currentState!.validate() && chat_mode >= 0) {
                     creaPazienteServer();
                   } else {
                     final snackBar = SnackBar(

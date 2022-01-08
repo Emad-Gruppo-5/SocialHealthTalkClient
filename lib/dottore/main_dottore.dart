@@ -1,14 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:test_emad/dottore/profile.dart';
 import 'package:test_emad/dottore/patient_list_page.dart';
 import 'package:test_emad/dottore/visita.dart';
 
-
-
 /// This is the main application widget.
 class MainDottore extends StatelessWidget {
-  
   final String token;
   final String cod_fiscale;
   final String nome;
@@ -21,31 +17,32 @@ class MainDottore extends StatelessWidget {
     required this.cod_fiscale,
     required this.token,
     required this.nome,
-    required this.cognome, 
-    required this.email, 
+    required this.cognome,
+    required this.email,
     required this.num_cellulare,
     required this.specializzazione,
-
   });
-
 
   static const String _title = 'Social Health Talk';
 
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
+    return MaterialApp(
       title: _title,
-      home: MyStatefulWidget(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,token: token, cod_fiscale: cod_fiscale),
+      home: MyStatefulWidget(
+          nome: nome,
+          cognome: cognome,
+          email: email,
+          num_cellulare: num_cellulare,
+          specializzazione: specializzazione,
+          token: token,
+          cod_fiscale: cod_fiscale),
     );
   }
-
-
 }
-
 
 /// This is the stateful widget that the main application instantiates.
 class MyStatefulWidget extends StatefulWidget {
-
   final String token;
   final String cod_fiscale;
   final String nome;
@@ -58,8 +55,8 @@ class MyStatefulWidget extends StatefulWidget {
     required this.cod_fiscale,
     required this.token,
     required this.nome,
-    required this.cognome, 
-    required this.email, 
+    required this.cognome,
+    required this.email,
     required this.num_cellulare,
     required this.specializzazione,
   });
@@ -80,7 +77,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   late String specializzazione;
   late List<Widget> _widgetOptions;
   static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   @override
   void initState() {
@@ -92,9 +89,23 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     num_cellulare = widget.num_cellulare;
     specializzazione = widget.specializzazione;
     _widgetOptions = <Widget>[
-    List_page(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,cod_fiscale: cod_fiscale , token: token),
-    createVisita(cod_fiscale: cod_fiscale , token: token),
-    Profile(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione , cod_fiscale: cod_fiscale , token: token),
+      List_page(
+          nome: nome,
+          cognome: cognome,
+          email: email,
+          num_cellulare: num_cellulare,
+          specializzazione: specializzazione,
+          cod_fiscale: cod_fiscale,
+          token: token),
+      createVisita(cod_fiscale: cod_fiscale, token: token),
+      Profile(
+          nome: nome,
+          cognome: cognome,
+          email: email,
+          num_cellulare: num_cellulare,
+          specializzazione: specializzazione,
+          cod_fiscale: cod_fiscale,
+          token: token),
     ];
     super.initState();
   }
@@ -132,7 +143,4 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       ),
     );
   }
-
-
 }
-

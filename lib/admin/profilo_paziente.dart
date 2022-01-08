@@ -196,6 +196,9 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                       _card(profilo["num_cellulare"].toString(),
                           Icons.smartphone),
                       _card(profilo["email"], Icons.email),
+                      _card2(profilo["eta"], 'Età:'),
+                      _card2(profilo["sesso"], "sesso:"),
+                      _card2(profilo["titolo_studio"], "Titolo di studio:"),
                       const Text("\nTipologia chat"),
                       _checkboxListTile("Solo testo",
                           profilo["tipologia_chat"] == 0 ? true : false),
@@ -238,6 +241,15 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
     return Card(
       child: ListTile(
         leading: Icon(icon),
+        title: Text(title),
+      ),
+    );
+  }
+
+  Widget _card2(String title, String text) {
+    return Card(
+      child: ListTile(
+        leading: Text(text),
         title: Text(title),
       ),
     );

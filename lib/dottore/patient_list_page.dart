@@ -59,6 +59,23 @@ class List_page extends StatelessWidget {
                             ? Colors.greenAccent
                             : Colors.redAccent,
                       ),
+                      onTap: () {
+                        //  print("COD cazzo:" + patient.id);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DetailPatient(
+                                    cod_fiscale: cod_fiscale,
+                                    token: token,
+                                    nome: nome,
+                                    cognome: cognome,
+                                    email: email,
+                                    specializzazione: specializzazione,
+                                    num_cellulare: num_cellulare,
+                                    paz_cod_fiscale: patient.id,
+                                  )),
+                        );
+                      },
                     ),
                   );
                 }).toList(),
@@ -73,6 +90,7 @@ class List_page extends StatelessWidget {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
+      iconSize: 40,
       onPressed: () {
         Navigator.pushReplacement(
           context,
