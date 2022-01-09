@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class Notifications extends StatelessWidget {
   Notifications({Key? key}) : super(key: key);
@@ -11,6 +14,7 @@ class Notifications extends StatelessWidget {
     return MaterialApp(
       title: _title,
       home: Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -21,7 +25,7 @@ class Notifications extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.clear_all),
-              onPressed: () => showDialog<String>(
+              onPressed: () => showDialog<void>(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
                   title: const Text('ATTENZIONE!'),
@@ -40,8 +44,16 @@ class Notifications extends StatelessWidget {
                           });
 
                           print("Notifications Deleted");
+
+                          ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                              .showSnackBar(const SnackBar(
+                                  content: Text('Notifiche rimosse')));
                         }).catchError((error) => print(
                                 "Failed to delete notifications: $error"));
+                        ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                            .showSnackBar(const SnackBar(
+                                content: Text(
+                                    'Impossibile rimuovere le notifiche')));
                       },
                       child: const Text('Si'),
                     ),
@@ -65,90 +77,33 @@ class Notifications extends StatelessWidget {
 class MyNotifications extends StatelessWidget {
   const MyNotifications({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _alerts() {
     final Stream<QuerySnapshot> _notificationsStream = FirebaseFirestore
         .instance
         .collection('notifications')
-        .orderBy('ultimo_accesso', descending: true)
+        .where('alert', isEqualTo: true)
         .snapshots();
     CollectionReference _notificationsReference =
         FirebaseFirestore.instance.collection('notifications');
 
     return StreamBuilder<QuerySnapshot>(
-      stream: _notificationsStream,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return const Text('Something went wrong');
-        }
+        stream: _notificationsStream,
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Something went wrong');
+          }
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        return ListView(
-          children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> data =
-                document.data()! as Map<String, dynamic>;
-            print(document.id);
-            print(data.toString());
-            print(data);
-            String subtitle = "";
-            Icon trailing;
-            Row row;
-            if (data['alert']) {
-              subtitle = "Ultimo accesso: " + data['ultimo_accesso'];
-              trailing = const Icon(Icons.warning, color: Colors.red);
-              row = Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  TextButton(
-                    child: const Text('Dottori'),
-                    onPressed: () {/* ... */},
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    child: const Text('Familiari'),
-                    onPressed: () {/* ... */},
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    child: const Text('Volontari'),
-                    onPressed: () {/* ... */},
-                  ),
-                  const SizedBox(width: 8),
-                ],
-              );
-            } else {
-              subtitle = "Vuole aggiornare il suo profilo";
-              trailing = const Icon(Icons.edit, color: Colors.yellow);
-              row = Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  TextButton(
-                    child: const Text('Aggiorna'),
-                    onPressed: () {/* ... */},
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    child: const Text('Non aggiornare'),
-                    onPressed: () {/* ... */},
-                  ),
-                  const SizedBox(width: 8),
-                ],
-              );
-            }
+          return ListView(
+            shrinkWrap: true,
+            children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data =
+                  document.data()! as Map<String, dynamic>;
 
-            return Dismissible(
-              key: Key(document.id),
-              onDismissed: (direction) {
-                _notificationsReference.doc(document.id).delete();
-
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Notifica rimossa')));
-              },
-              background: Container(color: Colors.red.shade300),
-              child: Card(
+              return Card(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
@@ -164,23 +119,234 @@ class MyNotifications extends StatelessWidget {
                         ],
                       ),
                       title: Text(data['nome'] + " " + data['cognome']),
-                      subtitle: Text(subtitle),
-                      trailing: trailing,
+                      subtitle:
+                          Text("Ultimo accesso: " + data['ultimo_accesso']),
+                      trailing: IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () => showDialog<void>(
+                              context: context,
+                              barrierDismissible:
+                                  false, // user must tap button!
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('ATTENZIONE!'),
+                                  content: SingleChildScrollView(
+                                    child: ListBody(
+                                      children: const <Widget>[
+                                        Text('Vuoi rimuovere l\'alert?'),
+                                      ],
+                                    ),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('Si'),
+                                      onPressed: () {
+                                        _notificationsReference
+                                            .doc(document.id)
+                                            .delete();
+                                        Navigator.of(context).pop();
+                                        ScaffoldMessenger.of(
+                                                _scaffoldKey.currentContext!)
+                                            .showSnackBar(const SnackBar(
+                                                content:
+                                                    Text('Alert rimossa')));
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text('No'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              }),
+                          color: Colors.red),
+                      onTap: () => showDialog<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SimpleDialog(
+                              title: const Text(
+                                  'Seleziona l\'azione da svolgere:'),
+                              children: <Widget>[
+                                SimpleDialogOption(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Email ai dottori'),
+                                ),
+                                SimpleDialogOption(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Email ai familiari'),
+                                ),
+                                SimpleDialogOption(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Email ai volontari'),
+                                ),
+                              ],
+                            );
+                          }),
                       onLongPress: () => _notificationsReference
                           .doc(document.id)
-                          .update({'letto': true})
+                          .update({'letto': !data['letto']})
                           .then((value) => print("Notification Updated"))
                           .catchError((error) =>
                               print("Failed to update notifications: $error")),
                     ),
-                    row,
                   ],
                 ),
-              ),
-            );
-          }).toList(),
-        );
-      },
+              );
+            }).toList(),
+          );
+        });
+  }
+
+  Widget _updates() {
+    final Stream<QuerySnapshot> _notificationsStream = FirebaseFirestore
+        .instance
+        .collection('notifications')
+        .where('alert', isEqualTo: false)
+        .snapshots();
+    CollectionReference _notificationsReference =
+        FirebaseFirestore.instance.collection('notifications');
+
+    return StreamBuilder<QuerySnapshot>(
+        stream: _notificationsStream,
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Something went wrong');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return ListView(
+            shrinkWrap: true,
+            children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data =
+                  document.data()! as Map<String, dynamic>;
+
+              return Card(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    ListTile(
+                      leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Visibility(
+                            child: const Icon(Icons.circle,
+                                color: Colors.blue, size: 15),
+                            visible: !data['letto'],
+                          ),
+                        ],
+                      ),
+                      title: Text(data['nome'] + " " + data['cognome']),
+                      subtitle: const Text("Vuole aggiornare il suo profilo"),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => showDialog<void>(
+                          context: context,
+                          barrierDismissible: false, // user must tap button!
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('ATTENZIONE!'),
+                              content: SingleChildScrollView(
+                                child: ListBody(
+                                  children: const <Widget>[
+                                    Text(
+                                        'Vuoi rimuovere la notifica per la modifica del profilo?'),
+                                  ],
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('Si'),
+                                  onPressed: () {
+                                    _notificationsReference
+                                        .doc(document.id)
+                                        .delete();
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(
+                                            _scaffoldKey.currentContext!)
+                                        .showSnackBar(const SnackBar(
+                                            content: Text(
+                                                'Notifica per la modifica del profilo rimossa')));
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text('No'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        color: Colors.red,
+                      ),
+                      onTap: () => showDialog<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SimpleDialog(
+                              title: const Text(
+                                  'Selezione l\'azione da svolgere:'),
+                              children: <Widget>[
+                                SimpleDialogOption(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Aggiorna i dati'),
+                                ),
+                                SimpleDialogOption(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Non aggiornare i dati'),
+                                ),
+                              ],
+                            );
+                          }),
+                      onLongPress: () => _notificationsReference
+                          .doc(document.id)
+                          .update({'letto': !data['letto']})
+                          .then((value) => print("Notification Read"))
+                          .catchError((error) =>
+                              print("Failed to read notifications: $error")),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          );
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        ExpansionTile(
+          leading: const Icon(Icons.warning, color: Colors.red),
+          title: const Text('Alerts'),
+          children: <Widget>[
+            _alerts(),
+          ],
+        ),
+        ExpansionTile(
+          leading: const Icon(Icons.edit, color: Colors.yellow),
+          title: const Text('Modifica profilo'),
+          children: <Widget>[
+            _updates(),
+          ],
+        ),
+      ],
     );
   }
 }

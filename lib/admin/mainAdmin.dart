@@ -27,8 +27,10 @@ class MyMainAdmin extends State<MainAdmin> {
   Widget build(BuildContext context) {
     int online, offline, _notificationsLength;
 
-    final Stream<QuerySnapshot> _notifications =
-        FirebaseFirestore.instance.collection('notifications').snapshots();
+    final Stream<QuerySnapshot> _notifications = FirebaseFirestore.instance
+        .collection('notifications')
+        .where('letto', isEqualTo: false)
+        .snapshots();
 
     return Scaffold(
       appBar: AppBar(
