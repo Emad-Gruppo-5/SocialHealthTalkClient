@@ -25,11 +25,12 @@ class CreaPaziente extends StatelessWidget {
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_sharp),
             onPressed: () {
-              Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AdminHome(),
-                    ));
+              Navigator.pop(context);
+              //   Navigator.pushReplacement(
+              //         context,
+              //         MaterialPageRoute(
+              //           builder: (context) => AdminHome(),
+              //         ));
             },
           ),
           title: const Center(

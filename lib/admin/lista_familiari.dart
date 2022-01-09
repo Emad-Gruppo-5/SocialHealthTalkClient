@@ -68,7 +68,6 @@ class ListSearchState extends State<ListSearch> {
 
     var i = 0;
     while (i < json.decode(data.body).length) {
-      
       mainDataList.add({
         'cognome': json.decode(data.body)[i]['cognome'],
         'nome': json.decode(data.body)[i]['nome'],
@@ -87,18 +86,13 @@ class ListSearchState extends State<ListSearch> {
   }
 
   // Copy Main List into New List.
- List<Map<String, String>> newDataList = List.from(mainDataList);
+  List<Map<String, String>> newDataList = List.from(mainDataList);
 
   onItemChanged(String value) {
     setState(() {
-      newDataList = List.from(mainDataList
-                    .where((element) => element["nome"]!
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()) 
-                                        ||
-                                        element["cognome"]!
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()) ));
+      newDataList = List.from(mainDataList.where((element) =>
+          element["nome"]!.toLowerCase().contains(value.toLowerCase()) ||
+          element["cognome"]!.toLowerCase().contains(value.toLowerCase())));
     });
   }
 
@@ -131,11 +125,10 @@ class ListSearchState extends State<ListSearch> {
                 return ListTile(
                     title: Text(data["cognome"]! + ' ' + data["nome"]!),
                     onTap: () => {
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  ProfiloFamiliare(),
+                              builder: (context) => ProfiloFamiliare(),
                             ),
                           ),
                         });

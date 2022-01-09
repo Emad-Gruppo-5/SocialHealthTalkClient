@@ -19,7 +19,7 @@ class ListaPazienti extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () {
-                Navigator.pushReplacement(
+                Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const CreaPaziente(),
@@ -81,7 +81,6 @@ class ListSearchState extends State<ListSearch> {
     setState(() {
       newDataList = List.from(mainDataList);
     });
-
   }
 
   // Copy Main List into New List.
@@ -89,14 +88,9 @@ class ListSearchState extends State<ListSearch> {
 
   onItemChanged(String value) {
     setState(() {
-      newDataList = List.from(mainDataList
-                    .where((element) => element["nome"]!
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()) 
-                                        ||
-                                        element["cognome"]!
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()) ));
+      newDataList = List.from(mainDataList.where((element) =>
+          element["nome"]!.toLowerCase().contains(value.toLowerCase()) ||
+          element["cognome"]!.toLowerCase().contains(value.toLowerCase())));
     });
   }
 
@@ -129,7 +123,7 @@ class ListSearchState extends State<ListSearch> {
                 return ListTile(
                     title: Text(data["cognome"]! + ' ' + data["nome"]!),
                     onTap: () => {
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>

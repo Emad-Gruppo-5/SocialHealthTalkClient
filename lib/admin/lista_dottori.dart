@@ -11,21 +11,21 @@ class ListaDottori extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: Text('Lista Dottori'),
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: () {
-                    MaterialPageRoute(
-                      builder: (context) => CreaNuovoDottore(),
-                    );
-                  },
-                ),
-              ],
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text('Lista Dottori'),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () {
+                MaterialPageRoute(
+                  builder: (context) => CreaNuovoDottore(),
+                );
+              },
             ),
-            body: Center(child: ListSearch()));
+          ],
+        ),
+        body: Center(child: ListSearch()));
   }
 }
 
@@ -65,13 +65,17 @@ class ListSearchState extends State<ListSearch> {
 
     var i = 0;
     while (i < json.decode(data.body).length) {
-      if(json.decode(data.body)[i]['cod_fiscale'].toString().compareTo('admin') != 0){
+      if (json
+              .decode(data.body)[i]['cod_fiscale']
+              .toString()
+              .compareTo('admin') !=
+          0) {
         mainDataList.add({
           'cognome': json.decode(data.body)[i]['cognome'],
           'nome': json.decode(data.body)[i]['nome'],
           'cod_fiscale': json.decode(data.body)[i]['cod_fiscale']
         });
-      } 
+      }
       i++;
     }
 
@@ -83,18 +87,13 @@ class ListSearchState extends State<ListSearch> {
   }
 
   // Copy Main List into New List.
- List<Map<String, String>> newDataList = List.from(mainDataList);
+  List<Map<String, String>> newDataList = List.from(mainDataList);
 
   onItemChanged(String value) {
     setState(() {
-      newDataList = List.from(mainDataList
-                    .where((element) => element["nome"]!
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()) 
-                                        ||
-                                        element["cognome"]!
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()) ));
+      newDataList = List.from(mainDataList.where((element) =>
+          element["nome"]!.toLowerCase().contains(value.toLowerCase()) ||
+          element["cognome"]!.toLowerCase().contains(value.toLowerCase())));
     });
   }
 
@@ -127,11 +126,10 @@ class ListSearchState extends State<ListSearch> {
                 return ListTile(
                     title: Text(data["cognome"]! + ' ' + data["nome"]!),
                     onTap: () => {
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  ProfiloDottore(),
+                              builder: (context) => ProfiloDottore(),
                             ),
                           ),
                         });
