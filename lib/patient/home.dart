@@ -37,7 +37,7 @@ class Patient_Home extends StatelessWidget {
   String timerText = "Start";
   late String ultimo_accesso;
 
-  CollectionReference _notificationsReference = FirebaseFirestore.instance.collection('questions');
+  CollectionReference _notificationsReference = FirebaseFirestore.instance.collection('prova');
 
 
   Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
@@ -93,8 +93,7 @@ class Patient_Home extends StatelessWidget {
         .collection('patients')
         .doc(cod_fiscale)
         .update({'status': 'online'});
-    DateFormat dateFormat = DateFormat("yyyy/MM/dd");
-    DateFormat hourFormat = DateFormat("HH:mm");
+    DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
     return MaterialApp(
       
       home: GestureDetector(
@@ -112,7 +111,9 @@ class Patient_Home extends StatelessWidget {
           ),
           body: StreamBuilder<QuerySnapshot>(
               stream: _notificationsReference
-                      .where('cod_fiscale_paziente', isEqualTo: cod_fiscale)
+                      // .where('cod_fiscale_paziente', isEqualTo: cod_fiscale)
+                      // .where('data_domanda', isLessThanOrEqualTo: dateFormat.format(DateTime.now()))
+                      // .orderBy("data_domanda", descending: true)
                       .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 print(DateTime.now());
@@ -127,15 +128,10 @@ class Patient_Home extends StatelessWidget {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 }
-
-                List<Map<String, dynamic>> elements = []; 
-                snapshot.data!.docs.map((DocumentSnapshot document){
-                  Map<String, dynamic> data =
-                    document.data()! as Map<String, dynamic>;
-                    elements.add(data);
-                });
-                elements.sort((a, b) => a["data_domanda"].compareTo(b["data_domanda"]));
-                print(elements.toString());
+                if (snapshot.data!.docs.isEmpty) {
+                    return Center( child: Image.asset('assets/images/promemoria.png'));
+                }
+                else
                 return ListView(
                   children: snapshot.data!.docs.map((DocumentSnapshot document) {
                     Map<String, dynamic> data =
@@ -143,50 +139,6 @@ class Patient_Home extends StatelessWidget {
                     String subtitle = "";
                     Icon trailing;
                     print(data.toString());
-                    
-                    // Row row;
-                    // if (data['letto'].toString().compareTo("s") == 0) {
-                    //   subtitle = "Ultimo accesso: " + data['ultimo_accesso'];
-                    //   trailing = const Icon(Icons.warning, color: Colors.red);
-                    //   row = Row(
-                    //     mainAxisAlignment: MainAxisAlignment.end,
-                    //     children: <Widget>[
-                    //       TextButton(
-                    //         child: const Text('Dottori'),
-                    //         onPressed: () {/* ... */},
-                    //       ),
-                    //       const SizedBox(width: 8),
-                    //       TextButton(
-                    //         child: const Text('Familiari'),
-                    //         onPressed: () {/* ... */},
-                    //       ),
-                    //       const SizedBox(width: 8),
-                    //       TextButton(
-                    //         child: const Text('Volontari'),
-                    //         onPressed: () {/* ... */},
-                    //       ),
-                    //       const SizedBox(width: 8),
-                    //     ],
-                    //   );
-                    // } else {
-                    //   subtitle = "Vuole aggiornare il suo profilo";
-                    //   trailing = const Icon(Icons.edit, color: Colors.yellow);
-                    //   row = Row(
-                    //     mainAxisAlignment: MainAxisAlignment.end,
-                    //     children: <Widget>[
-                    //       TextButton(
-                    //         child: const Text('Aggiorna'),
-                    //         onPressed: () {/* ... */},
-                    //       ),
-                    //       const SizedBox(width: 8),
-                    //       TextButton(
-                    //         child: const Text('Non aggiornare'),
-                    //         onPressed: () {/* ... */},
-                    //       ),
-                    //       const SizedBox(width: 8),
-                    //     ],
-                    //   );
-                    // }
 
                     return Center(
                       child: Card(
@@ -207,13 +159,35 @@ class Patient_Home extends StatelessWidget {
                               title: Text(data['testo_domanda']),
                               subtitle: Text("Inviata da: " + data["nome"] + " " + data["cognome"] + "\n" 
                                             + data["data_domanda"] + " " + data["ora_domanda"]),
-                              // trailing: trailing,
-                              onLongPress: () => _notificationsReference
+                              onTap: () {
+                                _notificationsReference
                                   .doc(document.id)
                                   .update({'letto': true})
                                   .then((value) => print("Notification Updated"))
                                   .catchError((error) =>
-                                      print("Failed to update notifications: $error")),
+                                      print("Failed to update notifications: $error"));
+                                showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  title: Text(data['testo_domanda']),
+                                  content: const Text('Hai preso la pillola?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, 'Cancel'),
+                                      child: const Text('Si'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, 'OK'),
+                                      child: const Text('No'),
+                                    ),
+                                    IconButton(
+                                      onPressed: () => Navigator.pop(context, 'Keyboard voice'),
+                                      icon: const Icon(Icons.mic_none_sharp, color: Colors.blue),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              },
                             ),
                             // row,
                           ],
