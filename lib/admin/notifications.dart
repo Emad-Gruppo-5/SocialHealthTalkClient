@@ -97,111 +97,115 @@ class MyNotifications extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          return ListView(
-            shrinkWrap: true,
-            children: snapshot.data!.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data =
-                  document.data()! as Map<String, dynamic>;
+          if (snapshot.data!.docs.isEmpty) {
+            return const Text("Nessuna notifica");
+          } else {
+            return ListView(
+              shrinkWrap: true,
+              children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                Map<String, dynamic> data =
+                    document.data()! as Map<String, dynamic>;
 
-              return Card(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    ListTile(
-                      leading: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Visibility(
-                            child: const Icon(Icons.circle,
-                                color: Colors.blue, size: 15),
-                            visible: !data['letto'],
-                          ),
-                        ],
-                      ),
-                      title: Text(data['nome'] + " " + data['cognome']),
-                      subtitle:
-                          Text("Ultimo accesso: " + data['ultimo_accesso']),
-                      trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () => showDialog<void>(
-                              context: context,
-                              barrierDismissible:
-                                  false, // user must tap button!
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('ATTENZIONE!'),
-                                  content: SingleChildScrollView(
-                                    child: ListBody(
-                                      children: const <Widget>[
-                                        Text('Vuoi rimuovere l\'alert?'),
-                                      ],
+                return Card(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ListTile(
+                        leading: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Visibility(
+                              child: const Icon(Icons.circle,
+                                  color: Colors.blue, size: 15),
+                              visible: !data['letto'],
+                            ),
+                          ],
+                        ),
+                        title: Text(data['nome'] + " " + data['cognome']),
+                        subtitle:
+                            Text("Ultimo accesso: " + data['ultimo_accesso']),
+                        trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () => showDialog<void>(
+                                context: context,
+                                barrierDismissible:
+                                    false, // user must tap button!
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('ATTENZIONE!'),
+                                    content: SingleChildScrollView(
+                                      child: ListBody(
+                                        children: const <Widget>[
+                                          Text('Vuoi rimuovere l\'alert?'),
+                                        ],
+                                      ),
                                     ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: const Text('Si'),
+                                        onPressed: () {
+                                          _notificationsReference
+                                              .doc(document.id)
+                                              .delete();
+                                          Navigator.of(context).pop();
+                                          ScaffoldMessenger.of(
+                                                  _scaffoldKey.currentContext!)
+                                              .showSnackBar(const SnackBar(
+                                                  content:
+                                                      Text('Alert rimossa')));
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: const Text('No'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                }),
+                            color: Colors.red),
+                        onTap: () => showDialog<void>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return SimpleDialog(
+                                title: const Text(
+                                    'Seleziona l\'azione da svolgere:'),
+                                children: <Widget>[
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Email ai dottori'),
                                   ),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: const Text('Si'),
-                                      onPressed: () {
-                                        _notificationsReference
-                                            .doc(document.id)
-                                            .delete();
-                                        Navigator.of(context).pop();
-                                        ScaffoldMessenger.of(
-                                                _scaffoldKey.currentContext!)
-                                            .showSnackBar(const SnackBar(
-                                                content:
-                                                    Text('Alert rimossa')));
-                                      },
-                                    ),
-                                    TextButton(
-                                      child: const Text('No'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                );
-                              }),
-                          color: Colors.red),
-                      onTap: () => showDialog<void>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return SimpleDialog(
-                              title: const Text(
-                                  'Seleziona l\'azione da svolgere:'),
-                              children: <Widget>[
-                                SimpleDialogOption(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Email ai dottori'),
-                                ),
-                                SimpleDialogOption(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Email ai familiari'),
-                                ),
-                                SimpleDialogOption(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Email ai volontari'),
-                                ),
-                              ],
-                            );
-                          }),
-                      onLongPress: () => _notificationsReference
-                          .doc(document.id)
-                          .update({'letto': !data['letto']})
-                          .then((value) => print("Notification Updated"))
-                          .catchError((error) =>
-                              print("Failed to update notifications: $error")),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          );
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Email ai familiari'),
+                                  ),
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Email ai volontari'),
+                                  ),
+                                ],
+                              );
+                            }),
+                        onLongPress: () => _notificationsReference
+                            .doc(document.id)
+                            .update({'letto': !data['letto']})
+                            .then((value) => print("Notification Updated"))
+                            .catchError((error) => print(
+                                "Failed to update notifications: $error")),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            );
+          }
         });
   }
 
@@ -225,106 +229,110 @@ class MyNotifications extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          return ListView(
-            shrinkWrap: true,
-            children: snapshot.data!.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data =
-                  document.data()! as Map<String, dynamic>;
+          if (snapshot.data!.docs.isEmpty) {
+            return const Text("Nessuna notifica");
+          } else {
+            return ListView(
+              shrinkWrap: true,
+              children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                Map<String, dynamic> data =
+                    document.data()! as Map<String, dynamic>;
 
-              return Card(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    ListTile(
-                      leading: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Visibility(
-                            child: const Icon(Icons.circle,
-                                color: Colors.blue, size: 15),
-                            visible: !data['letto'],
-                          ),
-                        ],
-                      ),
-                      title: Text(data['nome'] + " " + data['cognome']),
-                      subtitle: const Text("Vuole aggiornare il suo profilo"),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () => showDialog<void>(
-                          context: context,
-                          barrierDismissible: false, // user must tap button!
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('ATTENZIONE!'),
-                              content: SingleChildScrollView(
-                                child: ListBody(
-                                  children: const <Widget>[
-                                    Text(
-                                        'Vuoi rimuovere la notifica per la modifica del profilo?'),
-                                  ],
-                                ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('Si'),
-                                  onPressed: () {
-                                    _notificationsReference
-                                        .doc(document.id)
-                                        .delete();
-                                    Navigator.of(context).pop();
-                                    ScaffoldMessenger.of(
-                                            _scaffoldKey.currentContext!)
-                                        .showSnackBar(const SnackBar(
-                                            content: Text(
-                                                'Notifica per la modifica del profilo rimossa')));
-                                  },
-                                ),
-                                TextButton(
-                                  child: const Text('No'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                return Card(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ListTile(
+                        leading: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Visibility(
+                              child: const Icon(Icons.circle,
+                                  color: Colors.blue, size: 15),
+                              visible: !data['letto'],
+                            ),
+                          ],
                         ),
-                        color: Colors.red,
+                        title: Text(data['nome'] + " " + data['cognome']),
+                        subtitle: const Text("Vuole aggiornare il suo profilo"),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () => showDialog<void>(
+                            context: context,
+                            barrierDismissible: false, // user must tap button!
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('ATTENZIONE!'),
+                                content: SingleChildScrollView(
+                                  child: ListBody(
+                                    children: const <Widget>[
+                                      Text(
+                                          'Vuoi rimuovere la notifica per la modifica del profilo?'),
+                                    ],
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('Si'),
+                                    onPressed: () {
+                                      _notificationsReference
+                                          .doc(document.id)
+                                          .delete();
+                                      Navigator.of(context).pop();
+                                      ScaffoldMessenger.of(
+                                              _scaffoldKey.currentContext!)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'Notifica per la modifica del profilo rimossa')));
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: const Text('No'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                          color: Colors.red,
+                        ),
+                        onTap: () => showDialog<void>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return SimpleDialog(
+                                title: const Text(
+                                    'Selezione l\'azione da svolgere:'),
+                                children: <Widget>[
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Aggiorna i dati'),
+                                  ),
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Non aggiornare i dati'),
+                                  ),
+                                ],
+                              );
+                            }),
+                        onLongPress: () => _notificationsReference
+                            .doc(document.id)
+                            .update({'letto': !data['letto']})
+                            .then((value) => print("Notification Read"))
+                            .catchError((error) =>
+                                print("Failed to read notifications: $error")),
                       ),
-                      onTap: () => showDialog<void>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return SimpleDialog(
-                              title: const Text(
-                                  'Selezione l\'azione da svolgere:'),
-                              children: <Widget>[
-                                SimpleDialogOption(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Aggiorna i dati'),
-                                ),
-                                SimpleDialogOption(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Non aggiornare i dati'),
-                                ),
-                              ],
-                            );
-                          }),
-                      onLongPress: () => _notificationsReference
-                          .doc(document.id)
-                          .update({'letto': !data['letto']})
-                          .then((value) => print("Notification Read"))
-                          .catchError((error) =>
-                              print("Failed to read notifications: $error")),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          );
+                    ],
+                  ),
+                );
+              }).toList(),
+            );
+          }
         });
   }
 
