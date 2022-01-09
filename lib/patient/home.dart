@@ -36,6 +36,10 @@ class Patient_Home extends StatelessWidget {
   late Timer timer_alert;
   String timerText = "Start";
   late String ultimo_accesso;
+
+  CollectionReference _notificationsReference = FirebaseFirestore.instance.collection('questions');
+
+
   Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
     print("cod_fiscale: " + cod_fiscale);
     return IconButton(
@@ -89,8 +93,10 @@ class Patient_Home extends StatelessWidget {
         .collection('patients')
         .doc(cod_fiscale)
         .update({'status': 'online'});
-
+    DateFormat dateFormat = DateFormat("yyyy/MM/dd");
+    DateFormat hourFormat = DateFormat("HH:mm");
     return MaterialApp(
+      
       home: GestureDetector(
         child: Scaffold(
           appBar: AppBar(
@@ -104,7 +110,120 @@ class Patient_Home extends StatelessWidget {
               _iconButtonPop(context, Icons.logout, 'Logout'),
             ],
           ),
-          body: const MyNotifications(),
+          body: StreamBuilder<QuerySnapshot>(
+              stream: _notificationsReference
+                      .where('cod_fiscale_paziente', isEqualTo: cod_fiscale)
+                      .snapshots(),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                print(DateTime.now());
+
+                
+
+                if (snapshot.hasError) {
+                  print(snapshot.error);
+                  return const Text('Something went wrong');
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                List<Map<String, dynamic>> elements = []; 
+                snapshot.data!.docs.map((DocumentSnapshot document){
+                  Map<String, dynamic> data =
+                    document.data()! as Map<String, dynamic>;
+                    elements.add(data);
+                });
+                elements.sort((a, b) => a["data_domanda"].compareTo(b["data_domanda"]));
+                print(elements.toString());
+                return ListView(
+                  children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                    Map<String, dynamic> data =
+                    document.data()! as Map<String, dynamic>;
+                    String subtitle = "";
+                    Icon trailing;
+                    print(data.toString());
+                    
+                    // Row row;
+                    // if (data['letto'].toString().compareTo("s") == 0) {
+                    //   subtitle = "Ultimo accesso: " + data['ultimo_accesso'];
+                    //   trailing = const Icon(Icons.warning, color: Colors.red);
+                    //   row = Row(
+                    //     mainAxisAlignment: MainAxisAlignment.end,
+                    //     children: <Widget>[
+                    //       TextButton(
+                    //         child: const Text('Dottori'),
+                    //         onPressed: () {/* ... */},
+                    //       ),
+                    //       const SizedBox(width: 8),
+                    //       TextButton(
+                    //         child: const Text('Familiari'),
+                    //         onPressed: () {/* ... */},
+                    //       ),
+                    //       const SizedBox(width: 8),
+                    //       TextButton(
+                    //         child: const Text('Volontari'),
+                    //         onPressed: () {/* ... */},
+                    //       ),
+                    //       const SizedBox(width: 8),
+                    //     ],
+                    //   );
+                    // } else {
+                    //   subtitle = "Vuole aggiornare il suo profilo";
+                    //   trailing = const Icon(Icons.edit, color: Colors.yellow);
+                    //   row = Row(
+                    //     mainAxisAlignment: MainAxisAlignment.end,
+                    //     children: <Widget>[
+                    //       TextButton(
+                    //         child: const Text('Aggiorna'),
+                    //         onPressed: () {/* ... */},
+                    //       ),
+                    //       const SizedBox(width: 8),
+                    //       TextButton(
+                    //         child: const Text('Non aggiornare'),
+                    //         onPressed: () {/* ... */},
+                    //       ),
+                    //       const SizedBox(width: 8),
+                    //     ],
+                    //   );
+                    // }
+
+                    return Center(
+                      child: Card(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            ListTile(
+                              leading: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Visibility(
+                                    child: const Icon(Icons.circle,
+                                        color: Colors.blue, size: 15),
+                                    visible: !data['letto'],
+                                  ),
+                                ],
+                              ),
+                              title: Text(data['testo_domanda']),
+                              subtitle: Text("Inviata da: " + data["nome"] + " " + data["cognome"] + "\n" 
+                                            + data["data_domanda"] + " " + data["ora_domanda"]),
+                              // trailing: trailing,
+                              onLongPress: () => _notificationsReference
+                                  .doc(document.id)
+                                  .update({'letto': true})
+                                  .then((value) => print("Notification Updated"))
+                                  .catchError((error) =>
+                                      print("Failed to update notifications: $error")),
+                            ),
+                            // row,
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
         ),
         onTap: () {
           print("TAP UTENTE");
@@ -154,120 +273,3 @@ class Patient_Home extends StatelessWidget {
         });
   }
 }
-
-
-class MyNotifications extends StatelessWidget {
-  const MyNotifications({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final Stream<QuerySnapshot> _notificationsStream = FirebaseFirestore
-        .instance
-        .collection('reminder')
-        .orderBy('data', descending: true)
-        .snapshots();
-    CollectionReference _notificationsReference =
-    FirebaseFirestore.instance.collection('reminder');
-
-    return StreamBuilder<QuerySnapshot>(
-      stream: _notificationsStream,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return const Text('Something went wrong');
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        }
-
-        return ListView(
-          children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> data =
-            document.data()! as Map<String, dynamic>;
-            print(document.id);
-            print(data.toString());
-            print(data);
-            String subtitle = "";
-            Icon trailing;
-            Row row;
-            if (data['questions']) {
-              subtitle = "ora: " + data['data'];
-              row = Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  TextButton(
-                    child: const Icon(Icons.mic_none_sharp),
-                    onPressed: () {/* ... */},
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    child: const Text('No'),
-                    onPressed: () {/* ... */},
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    child: const Text('Si'),
-                    onPressed: () {/* ... */},
-                  ),
-                  const SizedBox(width: 8),
-                ],
-              );
-            } else {
-              subtitle = "Visita";
-              row = Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  const SizedBox(width: 8),
-                ],
-              );
-            }
-
-            return Dismissible(key: Key(document.id),
-              onDismissed: (direction){
-                _notificationsReference
-                    .doc(document.id)
-                    .delete();
-
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Notifica rimossa')));
-
-
-              },
-              background: Container( color: Colors.red.shade300),
-              child: Card(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    ListTile(
-                      leading: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Visibility(
-                            child: const Icon(Icons.circle,
-                                color: Colors.blue, size: 15),
-                            visible: !data['letto'],
-                          ),
-                        ],
-                      ),
-                      title: Text(data['nome'] + " " + data['cognome']),
-                      subtitle: Text(subtitle),
-                      onLongPress: () => _notificationsReference
-                          .doc(document.id)
-                          .update({'letto': true})
-                          .then((value) => print("Notification Updated"))
-                          .catchError((error) =>
-                          print("Failed to update notifications: $error")),
-                    ),
-
-                    row,
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        );
-      },
-    );
-  }
-}
-

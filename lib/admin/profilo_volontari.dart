@@ -4,7 +4,6 @@ import 'package:test_emad/admin/profilo_familiari_modifica.dart';
 import 'package:test_emad/admin/profilo_paziente_modifica.dart';
 import 'package:test_emad/admin/profilo_volontari_modifica.dart';
 
-void main() => runApp(const ProfiloVolontario());
 
 /// This is the main application widget.
 class ProfiloVolontario extends StatelessWidget {
