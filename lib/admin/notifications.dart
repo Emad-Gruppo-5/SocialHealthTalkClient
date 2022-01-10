@@ -47,12 +47,13 @@ class Notifications extends StatelessWidget {
                           ScaffoldMessenger.of(_scaffoldKey.currentContext!)
                               .showSnackBar(const SnackBar(
                                   content: Text('Notifiche rimosse')));
-                        }).catchError((error) => print(
-                                "Failed to delete notifications: $error"));
-                        ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-                            .showSnackBar(const SnackBar(
-                                content: Text(
-                                    'Impossibile rimuovere le notifiche')));
+                        }).catchError((error) {
+                          print("Failed to delete notifications: $error");
+                          ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                              .showSnackBar(const SnackBar(
+                                  content: Text(
+                                      'Impossibile rimuovere le notifiche')));
+                        });
                       },
                       child: const Text('Si'),
                     ),
