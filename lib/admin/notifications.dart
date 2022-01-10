@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class Notifications extends StatelessWidget {
-  Notifications({Key? key}) : super(key: key);
+  const Notifications({Key? key}) : super(key: key);
 
   static const String _title = 'Notifiche';
 
@@ -68,9 +67,7 @@ class Notifications extends StatelessWidget {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          child : MyNotifications()
-        ) ,
+        body: SingleChildScrollView(child: MyNotifications()),
       ),
     );
   }
@@ -177,18 +174,33 @@ class MyNotifications extends StatelessWidget {
                                   SimpleDialogOption(
                                     onPressed: () {
                                       Navigator.pop(context);
+                                      ScaffoldMessenger.of(
+                                              _scaffoldKey.currentContext!)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'Email inviata ai dottori')));
                                     },
                                     child: const Text('Email ai dottori'),
                                   ),
                                   SimpleDialogOption(
                                     onPressed: () {
                                       Navigator.pop(context);
+                                      ScaffoldMessenger.of(
+                                              _scaffoldKey.currentContext!)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'Email inviata ai familiari')));
                                     },
                                     child: const Text('Email ai familiari'),
                                   ),
                                   SimpleDialogOption(
                                     onPressed: () {
                                       Navigator.pop(context);
+                                      ScaffoldMessenger.of(
+                                              _scaffoldKey.currentContext!)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'Email inviata ai volontari')));
                                     },
                                     child: const Text('Email ai volontari'),
                                   ),
@@ -310,12 +322,22 @@ class MyNotifications extends StatelessWidget {
                                   SimpleDialogOption(
                                     onPressed: () {
                                       Navigator.pop(context);
+                                      ScaffoldMessenger.of(
+                                              _scaffoldKey.currentContext!)
+                                          .showSnackBar(const SnackBar(
+                                              content:
+                                                  Text('Dati aggiornati')));
                                     },
                                     child: const Text('Aggiorna i dati'),
                                   ),
                                   SimpleDialogOption(
                                     onPressed: () {
                                       Navigator.pop(context);
+                                      ScaffoldMessenger.of(
+                                              _scaffoldKey.currentContext!)
+                                          .showSnackBar(const SnackBar(
+                                              content:
+                                                  Text('Dati non aggiornati')));
                                     },
                                     child: const Text('Non aggiornare i dati'),
                                   ),
