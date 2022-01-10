@@ -37,7 +37,7 @@ class Patient_Home extends StatelessWidget {
   String timerText = "Start";
   late String ultimo_accesso;
 
-  CollectionReference _notificationsReference = FirebaseFirestore.instance.collection('prova');
+  CollectionReference _notificationsReference = FirebaseFirestore.instance.collection('questions');
 
 
   Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
@@ -93,7 +93,8 @@ class Patient_Home extends StatelessWidget {
         .collection('patients')
         .doc(cod_fiscale)
         .update({'status': 'online'});
-    DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
+    print(dateFormat.format(DateTime.now()));
     return MaterialApp(
       
       home: GestureDetector(
@@ -111,13 +112,13 @@ class Patient_Home extends StatelessWidget {
           ),
           body: StreamBuilder<QuerySnapshot>(
               stream: _notificationsReference
-                      // .where('cod_fiscale_paziente', isEqualTo: cod_fiscale)
-                      // .where('data_domanda', isLessThanOrEqualTo: dateFormat.format(DateTime.now()))
-                      // .orderBy("data_domanda", descending: true)
+                      .where('cod_fiscale_paziente', isEqualTo: cod_fiscale)
+                      .where('data_domanda', isLessThanOrEqualTo: dateFormat.format(DateTime.now()))
+                      .orderBy("data_domanda", descending: true)
                       .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                print(DateTime.now());
-
+                
+                
                 
 
                 if (snapshot.hasError) {
@@ -158,7 +159,7 @@ class Patient_Home extends StatelessWidget {
                               ),
                               title: Text(data['testo_domanda']),
                               subtitle: Text("Inviata da: " + data["nome"] + " " + data["cognome"] + "\n" 
-                                            + data["data_domanda"] + " " + data["ora_domanda"]),
+                                            + data["data_domanda"]),
                               onTap: () {
                                 _notificationsReference
                                   .doc(document.id)
@@ -169,8 +170,8 @@ class Patient_Home extends StatelessWidget {
                                 showDialog<String>(
                                 context: context,
                                 builder: (BuildContext context) => AlertDialog(
-                                  title: Text(data['testo_domanda']),
-                                  content: const Text('Hai preso la pillola?'),
+                                  title: Text("Domanda:"),
+                                  content: Text(data['testo_domanda'].toString()),
                                   actions: <Widget>[
                                     TextButton(
                                       onPressed: () => Navigator.pop(context, 'Cancel'),
@@ -235,15 +236,15 @@ class Patient_Home extends StatelessWidget {
   
   void callback() {
     print("ALERT\nCod_fiscale: " + cod_fiscale);
-    FirebaseFirestore.instance
-        .collection('notifications')
-        .add({
-              'alert': true,
-              'letto': false,
-              'cod_fiscale': cod_fiscale,
-              'nome': nome,
-              'cognome': cognome,
-              'ultimo_accesso': ultimo_accesso
-        });
+    // FirebaseFirestore.instance
+    //     .collection('notifications')
+    //     .add({
+    //           'alert': true,
+    //           'letto': false,
+    //           'cod_fiscale': cod_fiscale,
+    //           'nome': nome,
+    //           'cognome': cognome,
+    //           'ultimo_accesso': ultimo_accesso
+    //     });
   }
 }

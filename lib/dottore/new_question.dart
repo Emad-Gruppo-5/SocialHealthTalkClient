@@ -2,13 +2,17 @@
 
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
+import 'package:test_emad/main.dart';
 import 'main_dottore.dart';
 import 'profile.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// This is the main application widget.
 class NewQuestion extends StatelessWidget {
-
+  final String paz_cod_fiscale;
   final String token;
   final String cod_fiscale;
   final String nome;
@@ -16,7 +20,8 @@ class NewQuestion extends StatelessWidget {
   final String email;
   final String num_cellulare;
   final String specializzazione;
-  const NewQuestion({
+  NewQuestion({
+    required this.paz_cod_fiscale,
     required this.cod_fiscale,
     required this.token,
     required this.nome,
@@ -25,7 +30,10 @@ class NewQuestion extends StatelessWidget {
     required this.num_cellulare,
     required this.specializzazione,
   } );
-
+  TextEditingController _testo_domanda = TextEditingController();
+  TextEditingController _data_domanda = TextEditingController();
+  List<bool> isChecked = [false, true, false];
+  String dropdownValue = 'Una volta';
   Widget _iconButton(BuildContext context, IconData icon, String tooltip,
       StatelessWidget statelessWidget) {
     IconButton iconButton;
@@ -56,59 +64,7 @@ class NewQuestion extends StatelessWidget {
     return iconButton;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          leading: _iconButton(
-              context, Icons.arrow_back, 'Indietro', Profile(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,cod_fiscale: cod_fiscale, token:token)),
-          title: const Center(
-            child: Text("Modifica dati"),
-          ),
-          actions: [
-            _iconButton(context, Icons.logout, 'Logout', MainDottore(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,cod_fiscale: cod_fiscale, token:token)),
-          ],
-        ),
-        body: const Center(child: MyNewQuestion()),
-      ),
-    );
-  }
-}
-
-/// This is the stateful widget that the main application instantiates.
-class MyNewQuestion extends StatefulWidget {
-  const MyNewQuestion({Key? key}) : super(key: key);
-
-  @override
-  State<MyNewQuestion> createState() => _MyNewQuestion();
-}
-
-// This is the stateless widget that the main application instantiates.
-class _MyNewQuestion extends State<MyNewQuestion> {
-  List<bool> isChecked = [false, true, false];
-
-  String dropdownValue = 'Una volta';
-
-  Widget _textFormField(
-      IconData icon, String labelText, String initialValue, String validator) {
-    return TextFormField(
-      decoration: InputDecoration(
-        icon: Icon(icon),
-        labelText: labelText,
-      ),
-      initialValue: initialValue,
-      // The validator receives the text that the user has entered.
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return validator;
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _form() {
+   Widget _form() {
     final _formKey = GlobalKey<FormState>();
 
     return Form(
@@ -119,28 +75,36 @@ class _MyNewQuestion extends State<MyNewQuestion> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: _textFormField(Icons.help_center_rounded, "Inserisci domanda",
-                "Qual'è il tuo livello di pressione", "Inserisci domanda"),
+                "Ricordati di inserire la domanda", _testo_domanda),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: DateTimePicker(
+              controller: _data_domanda,
               type: DateTimePickerType.dateTimeSeparate,
               dateMask: 'd MMM, yyyy',
-              initialValue: DateTime.now().toString(),
-              firstDate: DateTime(2000),
+              locale : const Locale("it","IT"),
+              initialDate: DateTime.now(),
+              firstDate: DateTime.now().subtract(Duration(days: 0)),
               lastDate: DateTime(2100),
               icon: const Icon(Icons.event),
-              dateLabelText: 'Date',
-              timeLabelText: "Hour",
+              dateLabelText: 'Data',
+              timeLabelText: "Ora",
               selectableDayPredicate: (date) {
+                _textFormField(Icons.help_center_rounded,
+                                "Inserisci data",
+                                "Ricordati di inserire la data",
+                                _data_domanda);
                 return true;
               },
-              onChanged: (val) => print(val),
-              validator: (val) {
+              onChanged: (val) { 
                 print(val);
-                return null;
+                  _textFormField(Icons.help_center_rounded,
+                                "Inserisci data",
+                                "Ricordati di inserire la data",
+                                _data_domanda);
+                
               },
-              onSaved: (val) => print(val),
             ),
           ),
           Padding(
@@ -159,9 +123,7 @@ class _MyNewQuestion extends State<MyNewQuestion> {
                     color: Colors.grey,
                   ),
                   onChanged: (String? newValue) {
-                    setState(() {
                       dropdownValue = newValue!;
-                    });
                   },
                   items: <String>['Una volta', 'Ogni giorno', 'Ogni settimana', 'Ogni mese']
                       .map<DropdownMenuItem<String>>((String value) {
@@ -179,9 +141,24 @@ class _MyNewQuestion extends State<MyNewQuestion> {
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: ElevatedButton(
                 onPressed: () {
+                  DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+                  print("DATI DA INVIARE:\nTesto: " + _testo_domanda.text);
+                  print("Data: " + _data_domanda.text);
+                  print("Ripeti: " + dropdownValue);
+                  print(nome + " " + cognome + " " + cod_fiscale);
                   // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate()) {
-                    // If the form is valid
+                    CollectionReference questions = FirebaseFirestore.instance.collection('questions');
+                    questions.add({
+                      'cod_fiscale_dottore' : cod_fiscale,
+                      'cod_fiscale_paziente': paz_cod_fiscale,
+                      'cognome': cognome,
+                      'nome': nome,
+                      'letto': false,
+                      'data_domanda':  _data_domanda.text,
+                      'ripeti': dropdownValue,
+                      'testo_domanda': _testo_domanda.text
+                    });
                   }
                 },
                 child: const Text('Salva'),
@@ -193,17 +170,57 @@ class _MyNewQuestion extends State<MyNewQuestion> {
     );
   }
 
+  Widget _textFormField(
+      IconData icon, String labelText, String validator, TextEditingController _con) {
+    return TextFormField(
+      controller: _con,
+      decoration: InputDecoration(
+        icon: Icon(icon),
+        labelText: labelText,
+      ),
+      // The validator receives the text that the user has entered.
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return validator;
+        }
+        return null;
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text(
-          "Nuova domanda",
-          style: TextStyle(fontSize: 30),
+    return MaterialApp(
+      localizationsDelegates: [
+         GlobalMaterialLocalizations.delegate
+       ],
+       supportedLocales: [
+         const Locale('it')
+       ],
+      home: Scaffold(
+        appBar: AppBar(
+          leading: _iconButton(
+              context, Icons.arrow_back, 'Indietro', Profile(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,cod_fiscale: cod_fiscale, token:token)),
+          title: const Center(
+            child: Text("Modifica dati"),
+          ),
+          actions: [
+            _iconButton(context, Icons.logout, 'Logout', LoginPage()),
+          ],
         ),
-        _form(),
-      ],
+        body: Center(
+                child : Column(
+                  children: [
+                    const Text(
+                      "Nuova domanda",
+                      style: TextStyle(fontSize: 30),
+                    ),
+                    _form(),
+                  ],
+                ),
+        ),
+      ),
     );
   }
 }
+
