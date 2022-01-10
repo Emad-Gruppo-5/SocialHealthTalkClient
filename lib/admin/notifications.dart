@@ -68,7 +68,9 @@ class Notifications extends StatelessWidget {
             ),
           ],
         ),
-        body: const MyNotifications(),
+        body: SingleChildScrollView(
+          child : MyNotifications()
+        ) ,
       ),
     );
   }

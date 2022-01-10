@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:test_emad/dottore/new_question.dart';
+import 'package:test_emad/main.dart';
 import 'main_dottore.dart';
 import 'patient_list_item.dart';
 import 'new_question.dart';
@@ -27,7 +28,7 @@ class DetailPatient extends StatefulWidget {
     required this.email,
     required this.num_cellulare,
     required this.specializzazione,
-    required this.paz_cod_fiscale,
+    required this.paz_cod_fiscale, 
   });
 
   @override
@@ -163,14 +164,7 @@ class MyDetailPatient extends State<DetailPatient> {
                 context,
                 Icons.logout,
                 'Logout',
-                MainDottore(
-                    nome: nome,
-                    cognome: cognome,
-                    email: email,
-                    num_cellulare: num_cellulare,
-                    specializzazione: specializzazione,
-                    cod_fiscale: cod_fiscale,
-                    token: token)),
+                LoginPage()),
           ],
         ),
         floatingActionButton: FloatingActionButton(
@@ -179,6 +173,7 @@ class MyDetailPatient extends State<DetailPatient> {
               CupertinoPageRoute(
                   fullscreenDialog: true,
                   builder: (context) => NewQuestion(
+                      paz_cod_fiscale: paz_cod_fiscale,
                       nome: nome,
                       cognome: cognome,
                       email: email,
@@ -191,7 +186,8 @@ class MyDetailPatient extends State<DetailPatient> {
           backgroundColor: Colors.green,
           child: const Icon(Icons.add),
         ),
-        body: Column(
+        body: SingleChildScrollView(
+          child: Column(
           children: [
             FutureBuilder(
               future: getprofiledata(),
@@ -200,7 +196,7 @@ class MyDetailPatient extends State<DetailPatient> {
                   Map<String, dynamic> data = Map.from(snapshot.data!);
                   var profilo =
                       json.decode(json.encode(data["paziente"]).toString());
-
+                  print(profilo);
                   return SingleChildScrollView(
                     child: Column(
                       children: [
@@ -208,54 +204,32 @@ class MyDetailPatient extends State<DetailPatient> {
                           profilo["nome"] + ' ' + profilo["cognome"],
                           style: const TextStyle(fontSize: 40),
                         ),
-                        _card(profilo["cod_fiscale"], Icons.person),
-                        _card(profilo["num_cellulare"].toString(),
+                        _card(profilo["cod_fiscale"] == null ? "null" : profilo["cod_fiscale"], Icons.person),
+                        _card(profilo["num_cellulare"] == null ? "null" : profilo["num_cellulare"],
                             Icons.smartphone),
-                        _card(profilo["email"], Icons.email),
-                        _card2(profilo["eta"].toString(), 'Età:'),
-                        _card2(profilo["sesso"], 'Sesso:'),
-                        _card2(profilo["titolo_studio"], 'Titolo di studio:'),
+                        _card(profilo["email"] == null ? "null" : profilo["email"], Icons.email),
+                        _card2(profilo["eta"] == null ? "null" : profilo["eta"], 'Età:'),
+                        _card2(profilo["sesso"] == null ? "null" : profilo["sesso"], 'Sesso:'),
+                        _card2(profilo["titolo_studio"] == null ? "null" : profilo["titolo_studio"], 'Titolo di studio:'),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: _textFormField(Icons.notes, "Note paziente",
-                              profilo["note"], ""),
+                              profilo["note"] == null ? "null" : profilo["note"], ""),
                         ),
                       ],
                     ),
                   );
                   // return Center(child: Text("NON FUNZIONA"));
                 } else {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 }
               },
             ),
           ],
+          ),
         ),
       ),
     );
   }
 }
 
-
-
-// body: Center(
-//           Column(
-//             children: [
-//               Text(
-//                 patient.name! + ' ' + patient.surname!,
-//                 style: const TextStyle(fontSize: 40),
-//               ),
-//               _card(patient.codFiscale!, Icons.person),
-//               _card(patient.numCell!, Icons.smartphone),
-//               _card(patient.email!, Icons.email),
-//               _card2(patient.eta!.toString(), 'Età:'),
-//               _card2(patient.sesso!, 'Sesso:'),
-//               _card2(patient.specializzazione!, 'Titolo di studio:'),
-//               Padding(
-//                 padding: const EdgeInsets.all(8.0),
-//                 child: _textFormField(
-//                     Icons.notes, "Note paziente", patient.note!, ""),
-//               ),
-//             ],
-//           ),
-//         ),

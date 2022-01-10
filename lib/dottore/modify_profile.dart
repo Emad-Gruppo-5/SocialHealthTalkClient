@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:test_emad/main.dart';
 import 'main_dottore.dart';
 import 'profile.dart';
 import 'package:http/http.dart' as http;
@@ -35,7 +36,11 @@ class ModifyProfile extends StatelessWidget {
         icon: Icon(icon),
         tooltip: tooltip,
         onPressed: () {
-          Navigator.pop(context);
+            Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginPage(),
+                      ));
         },
       );
     } else {
@@ -77,15 +82,7 @@ class ModifyProfile extends StatelessWidget {
                 context,
                 Icons.logout,
                 'Logout',
-                MainDottore(
-                  nome: nome,
-                  cognome: cognome,
-                  email: email,
-                  num_cellulare: num_cellulare,
-                  specializzazione: specializzazione,
-                  cod_fiscale: cod_fiscale,
-                  token: token,
-                )),
+                LoginPage()),
           ],
         ),
         body: Center(

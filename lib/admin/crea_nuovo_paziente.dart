@@ -236,52 +236,6 @@ class _MyModifyProfile extends State<MyModifyProfile> {
               ],
             ),
           ),
-          // const Padding(
-          //   padding: EdgeInsets.all(8.0),
-          //   child: Text(
-          //     "Tipologia Chat",
-          //     style: TextStyle(fontSize: 15),
-          //   ),
-          // ),
-          // ListTile(
-          //   title: const Text("Solo testo"),
-          //   leading: Radio(
-          //     value: 0,
-          //     groupValue: val,
-          //     onChanged: (value) {
-          //       setState(() {
-          //         val = 0;
-          //       });
-          //     },
-          //     activeColor: Colors.blue,
-          //   ),
-          // ),
-          // ListTile(
-          //   title: const Text("Videochiamata"),
-          //   leading: Radio(
-          //     value: 1,
-          //     groupValue: val,
-          //     onChanged: (value) {
-          //       setState(() {
-          //         val = 1;
-          //       });
-          //     },
-          //     activeColor: Colors.blue,
-          //   ),
-          // ),
-          // ListTile(
-          //   title: const Text("Chiamata vocale"),
-          //   leading: Radio(
-          //     value: 2,
-          //     groupValue: val,
-          //     onChanged: (value) {
-          //       setState(() {
-          //         val = 2;
-          //       });
-          //     },
-          //     activeColor: Colors.blue,
-          //   ),
-          // ),
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),

@@ -45,6 +45,8 @@ dependencies:
   badges: ^2.0.2 
   syncfusion_flutter_datepicker: ^19.4.40
   date_time_picker: "^2.1.0"
+  flutter_localizations:
+    sdk: flutter
  
 dev_dependencies:
   flutter_test:
@@ -67,6 +69,7 @@ flutter:
   assets:
       - assets/images/SHT.png
       - assets/images/loading.gif
+      - assets/images/promemoria.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
