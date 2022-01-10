@@ -38,7 +38,7 @@ class Patient_Home extends StatelessWidget {
   late String ultimo_accesso;
 
   CollectionReference _notificationsReference = FirebaseFirestore.instance.collection('questions_to_answer');
-
+  
 
   Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
     print("cod_fiscale: " + cod_fiscale);
@@ -113,7 +113,6 @@ class Patient_Home extends StatelessWidget {
           body: StreamBuilder<QuerySnapshot>(
               stream: _notificationsReference
                       .where('cod_fiscale_paziente', isEqualTo: cod_fiscale)
-                      .where('data_domanda', isLessThanOrEqualTo: dateFormat.format(DateTime.now()))
                       .orderBy("data_domanda", descending: true)
                       .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {

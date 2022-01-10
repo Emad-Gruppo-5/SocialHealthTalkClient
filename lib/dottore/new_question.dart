@@ -32,6 +32,7 @@ class NewQuestion extends StatelessWidget {
   } );
   TextEditingController _testo_domanda = TextEditingController();
   TextEditingController _data_domanda = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<bool> isChecked = [false, true, false];
   String dropdownValue = 'Una volta';
   Widget _iconButton(BuildContext context, IconData icon, String tooltip,
@@ -159,7 +160,11 @@ class NewQuestion extends StatelessWidget {
                       'ripeti': dropdownValue,
                       'testo_domanda': _testo_domanda.text
                     });
+                    ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                      .showSnackBar(const SnackBar(
+                    content: Text("Domanda inviata con successo")));
                   }
+
                 },
                 child: const Text('Salva'),
               ),
@@ -198,6 +203,7 @@ class NewQuestion extends StatelessWidget {
          const Locale('it')
        ],
       home: Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           leading: _iconButton(
               context, Icons.arrow_back, 'Indietro', Profile(nome: nome, cognome: cognome, email: email, num_cellulare: num_cellulare, specializzazione: specializzazione ,cod_fiscale: cod_fiscale, token:token)),
