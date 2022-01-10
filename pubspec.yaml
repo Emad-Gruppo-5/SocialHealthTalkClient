@@ -45,9 +45,10 @@ dependencies:
   badges: ^2.0.2 
   syncfusion_flutter_datepicker: ^19.4.40
   date_time_picker: "^2.1.0"
-  flutter_localizations:
-    sdk: flutter
- 
+  record: ^3.0.2
+  just_audio: ^0.9.18
+  flutter_downloader: ^1.5.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
