@@ -37,7 +37,7 @@ class Patient_Home extends StatelessWidget {
   String timerText = "Start";
   late String ultimo_accesso;
 
-  CollectionReference _notificationsReference = FirebaseFirestore.instance.collection('questions');
+  CollectionReference _notificationsReference = FirebaseFirestore.instance.collection('questions_to_answer');
 
 
   Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
