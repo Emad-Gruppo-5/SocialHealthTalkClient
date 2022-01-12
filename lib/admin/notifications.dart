@@ -75,7 +75,78 @@ class Notifications extends StatelessWidget {
 }
 
 class MyNotifications extends StatelessWidget {
-  const MyNotifications({Key? key}) : super(key: key);
+  List<bool> doctors = [true, false, true], familiars = [true, false, true];
+
+  Future _showAlertDialog(BuildContext context) {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Seleziona l\'azione da svolgere'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    const Text("Dottori"),
+                    CheckboxListTile(
+                        value: doctors[0],
+                        onChanged: (value) => setState(() {
+                              doctors[0] = value!;
+                            }),
+                        title: const Text("Dottore 1")),
+                    CheckboxListTile(
+                        value: doctors[1],
+                        onChanged: (value) => setState(() {
+                              doctors[1] = value!;
+                            }),
+                        title: const Text("Dottore 2")),
+                    CheckboxListTile(
+                        value: doctors[2],
+                        onChanged: (value) => setState(() {
+                              doctors[2] = value!;
+                            }),
+                        title: const Text("Dottore 3")),
+                    const SizedBox(height: 10),
+                    const Text("Familiari"),
+                    CheckboxListTile(
+                        value: familiars[0],
+                        onChanged: (value) => setState(() {
+                              familiars[0] = value!;
+                            }),
+                        title: const Text("Familiare 1")),
+                    CheckboxListTile(
+                        value: familiars[1],
+                        onChanged: (value) => setState(() {
+                              familiars[1] = value!;
+                            }),
+                        title: const Text("Familiare 2")),
+                    CheckboxListTile(
+                        value: familiars[2],
+                        onChanged: (value) => setState(() {
+                              familiars[2] = value!;
+                            }),
+                        title: const Text("Familiare 3")),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                          .showSnackBar(const SnackBar(
+                              content: Text('Email/SMS inviati')));
+                    },
+                    child: const Text("Invia")),
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Non inviare"))
+              ],
+            );
+          });
+        });
+  }
 
   Widget _alerts() {
     final Stream<QuerySnapshot> _notificationsStream = FirebaseFirestore
@@ -165,49 +236,7 @@ class MyNotifications extends StatelessWidget {
                                   );
                                 }),
                             color: Colors.red),
-                        onTap: () => showDialog<void>(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return SimpleDialog(
-                                title: const Text(
-                                    'Seleziona l\'azione da svolgere:'),
-                                children: <Widget>[
-                                  SimpleDialogOption(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      ScaffoldMessenger.of(
-                                              _scaffoldKey.currentContext!)
-                                          .showSnackBar(const SnackBar(
-                                              content: Text(
-                                                  'Email inviata ai dottori')));
-                                    },
-                                    child: const Text('Email ai dottori'),
-                                  ),
-                                  SimpleDialogOption(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      ScaffoldMessenger.of(
-                                              _scaffoldKey.currentContext!)
-                                          .showSnackBar(const SnackBar(
-                                              content: Text(
-                                                  'Email inviata ai familiari')));
-                                    },
-                                    child: const Text('Email ai familiari'),
-                                  ),
-                                  SimpleDialogOption(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      ScaffoldMessenger.of(
-                                              _scaffoldKey.currentContext!)
-                                          .showSnackBar(const SnackBar(
-                                              content: Text(
-                                                  'Email inviata ai volontari')));
-                                    },
-                                    child: const Text('Email ai volontari'),
-                                  ),
-                                ],
-                              );
-                            }),
+                        onTap: () => _showAlertDialog(context),
                         onLongPress: () => _notificationsReference
                             .doc(document.id)
                             .update({'letto': !data['letto']})
