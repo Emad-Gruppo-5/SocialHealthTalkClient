@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -74,8 +76,42 @@ class Notifications extends StatelessWidget {
   }
 }
 
+Future<void> sendEmail(List<Map<String,String>> addresses) async {
+  var uri = Uri.parse('http://127.0.0.1:5000/alert');
+  print(uri);
+
+  print(addresses);
+  await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: json.encode(addresses));
+}
+
+Future<String> getActors(String cod_fiscale) async {
+    
+    List<Map<String, dynamic>> mainDataList = [];
+    var uri = Uri.parse('http://127.0.0.1:5000/attori_associati');
+    print(uri);
+
+    Map<String, dynamic> message = {
+      "role": 1,
+      "cod_fiscale": cod_fiscale
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+    return data.body;
+  }
+
 class MyNotifications extends StatelessWidget {
-  List<bool> doctors = [true, false, true], familiars = [true, false, true];
+  List<Map<String, dynamic>> actors = [];
 
   Future _showAlertDialog(BuildContext context) {
     return showDialog<void>(
@@ -84,64 +120,46 @@ class MyNotifications extends StatelessWidget {
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Seleziona l\'azione da svolgere'),
+              title: const Text('Invia l\'alert a:'),
               content: SingleChildScrollView(
                 child: ListBody(
-                  children: <Widget>[
-                    const Text("Dottori"),
-                    CheckboxListTile(
-                        value: doctors[0],
-                        onChanged: (value) => setState(() {
-                              doctors[0] = value!;
-                            }),
-                        title: const Text("Dottore 1")),
-                    CheckboxListTile(
-                        value: doctors[1],
-                        onChanged: (value) => setState(() {
-                              doctors[1] = value!;
-                            }),
-                        title: const Text("Dottore 2")),
-                    CheckboxListTile(
-                        value: doctors[2],
-                        onChanged: (value) => setState(() {
-                              doctors[2] = value!;
-                            }),
-                        title: const Text("Dottore 3")),
-                    const SizedBox(height: 10),
-                    const Text("Familiari"),
-                    CheckboxListTile(
-                        value: familiars[0],
-                        onChanged: (value) => setState(() {
-                              familiars[0] = value!;
-                            }),
-                        title: const Text("Familiare 1")),
-                    CheckboxListTile(
-                        value: familiars[1],
-                        onChanged: (value) => setState(() {
-                              familiars[1] = value!;
-                            }),
-                        title: const Text("Familiare 2")),
-                    CheckboxListTile(
-                        value: familiars[2],
-                        onChanged: (value) => setState(() {
-                              familiars[2] = value!;
-                            }),
-                        title: const Text("Familiare 3")),
-                  ],
+                  children: actors.map((data) {
+                    return CheckboxListTile(
+                      value: data["value"],
+                              onChanged: (value) => setState(() {
+                                data["value"] = value;
+                              }),
+                              title: Text(data["categoria"] + ": " + data["nome"] + " " + data["cognome"]),
+                    );
+                  }).toList(),
                 ),
               ),
               actions: [
+                
+                TextButton(
+                    onPressed: () => {
+                    actors.clear(),
+                    Navigator.pop(context),
+                    },
+                    child: const Text("Non inviare")),
                 TextButton(
                     onPressed: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-                          .showSnackBar(const SnackBar(
-                              content: Text('Email/SMS inviati')));
+                      List<Map<String,String>> addresses = [];
+
+                      for(int i =0; i<actors.length;i++) if(actors[i]["value"]) addresses.add({ "email": actors[i]["email"]});
+                      
+                      print(addresses);
+                      // RACCOLTA EMAIL e poi INVIO EMAILS
+                      sendEmail(addresses).then((val) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                            .showSnackBar(const SnackBar(
+                                content: Text('Email/SMS inviati')));
+                        actors.clear();
+                      });
+                      
                     },
                     child: const Text("Invia")),
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Non inviare"))
               ],
             );
           });
@@ -236,8 +254,38 @@ class MyNotifications extends StatelessWidget {
                                   );
                                 }),
                             color: Colors.red),
-                        onTap: () => _showAlertDialog(context),
-                        onLongPress: () => _notificationsReference
+                        onTap: () => {
+
+                          getActors(data['cod_fiscale']).then((value) { 
+      
+                            for (int i = 0; i < json.decode(value)["dottori"].length; i++) {
+                              actors.add({
+                                'cognome': json.decode(value)["dottori"][i]['cognome'],
+                                'nome': json.decode(value)["dottori"][i]['nome'],
+                                'cod_fiscale': json.decode(value)["dottori"][i]['cod_fiscale'],
+                                'email': json.decode(value)["dottori"][i]['email'],
+                                'num_cellulare': json.decode(value)["dottori"][i]['num_cellulare'],
+                                'value': false,
+                                'categoria': 'D'
+                              });
+                            }
+
+                            for (int i = 0; i < json.decode(value)["familiari"].length; i++) {
+                              actors.add({
+                                'cognome': json.decode(value)["familiari"][i]['cognome'],
+                                'nome': json.decode(value)["familiari"][i]['nome'],
+                                'cod_fiscale': json.decode(value)["familiari"][i]['cod_fiscale'],
+                                'email': json.decode(value)["familiari"][i]['email'],
+                                'num_cellulare': json.decode(value)["familiari"][i]['num_cellulare'],
+                                'value': false,
+                                'categoria': 'F'
+                              });
+                            }
+                            _showAlertDialog(context);
+                            
+                          })
+                          },
+                          onLongPress: () => _notificationsReference
                             .doc(document.id)
                             .update({'letto': !data['letto']})
                             .then((value) => print("Notification Updated"))
