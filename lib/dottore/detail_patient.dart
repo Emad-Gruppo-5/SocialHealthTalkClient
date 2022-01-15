@@ -28,7 +28,7 @@ class DetailPatient extends StatefulWidget {
     required this.email,
     required this.num_cellulare,
     required this.specializzazione,
-    required this.paz_cod_fiscale, 
+    required this.paz_cod_fiscale,
   });
 
   @override
@@ -144,27 +144,17 @@ class MyDetailPatient extends State<DetailPatient> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: _iconButton(
-              context,
-              Icons.arrow_back,
-              'Indietro',
-              MainDottore(
-                  nome: nome,
-                  cognome: cognome,
-                  email: email,
-                  num_cellulare: num_cellulare,
-                  specializzazione: specializzazione,
-                  cod_fiscale: cod_fiscale,
-                  token: token)),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_sharp),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: const Center(
             child: Text("Profilo"),
           ),
           actions: [
-            _iconButton(
-                context,
-                Icons.logout,
-                'Logout',
-                LoginPage()),
+            _iconButton(context, Icons.logout, 'Logout', LoginPage()),
           ],
         ),
         floatingActionButton: FloatingActionButton(
@@ -188,48 +178,74 @@ class MyDetailPatient extends State<DetailPatient> {
         ),
         body: SingleChildScrollView(
           child: Column(
-          children: [
-            FutureBuilder(
-              future: getprofiledata(),
-              builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-                if (snapshot.hasData) {
-                  Map<String, dynamic> data = Map.from(snapshot.data!);
-                  var profilo =
-                      json.decode(json.encode(data["paziente"]).toString());
-                  print(profilo);
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Text(
-                          profilo["nome"] + ' ' + profilo["cognome"],
-                          style: const TextStyle(fontSize: 40),
-                        ),
-                        _card(profilo["cod_fiscale"] == null ? "null" : profilo["cod_fiscale"], Icons.person),
-                        _card(profilo["num_cellulare"] == null ? "null" : profilo["num_cellulare"],
-                            Icons.smartphone),
-                        _card(profilo["email"] == null ? "null" : profilo["email"], Icons.email),
-                        _card2(profilo["eta"] == null ? "null" : profilo["eta"], 'Età:'),
-                        _card2(profilo["sesso"] == null ? "null" : profilo["sesso"], 'Sesso:'),
-                        _card2(profilo["titolo_studio"] == null ? "null" : profilo["titolo_studio"], 'Titolo di studio:'),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: _textFormField(Icons.notes, "Note paziente",
-                              profilo["note"] == null ? "null" : profilo["note"], ""),
-                        ),
-                      ],
-                    ),
-                  );
-                  // return Center(child: Text("NON FUNZIONA"));
-                } else {
-                  return Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
-          ],
+            children: [
+              FutureBuilder(
+                future: getprofiledata(),
+                builder:
+                    (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                  if (snapshot.hasData) {
+                    Map<String, dynamic> data = Map.from(snapshot.data!);
+                    var profilo =
+                        json.decode(json.encode(data["paziente"]).toString());
+                    print(profilo);
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Text(
+                            profilo["nome"] + ' ' + profilo["cognome"],
+                            style: const TextStyle(fontSize: 40),
+                          ),
+                          _card(
+                              profilo["cod_fiscale"] == null
+                                  ? "null"
+                                  : profilo["cod_fiscale"],
+                              Icons.person),
+                          _card(
+                              profilo["num_cellulare"] == null
+                                  ? "null"
+                                  : profilo["num_cellulare"],
+                              Icons.smartphone),
+                          _card(
+                              profilo["email"] == null
+                                  ? "null"
+                                  : profilo["email"],
+                              Icons.email),
+                          _card2(
+                              profilo["eta"] == null ? "null" : profilo["eta"],
+                              'Età:'),
+                          _card2(
+                              profilo["sesso"] == null
+                                  ? "null"
+                                  : profilo["sesso"],
+                              'Sesso:'),
+                          _card2(
+                              profilo["titolo_studio"] == null
+                                  ? "null"
+                                  : profilo["titolo_studio"],
+                              'Titolo di studio:'),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: _textFormField(
+                                Icons.notes,
+                                "Note paziente",
+                                profilo["note"] == null
+                                    ? "null"
+                                    : profilo["note"],
+                                ""),
+                          ),
+                        ],
+                      ),
+                    );
+                    // return Center(child: Text("NON FUNZIONA"));
+                  } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
-
