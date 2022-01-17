@@ -147,7 +147,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     timer = Timer(online_duration, handleTimeout);
     timer_alert = Timer(alert_duration, callback);
 
-    // print("UPDATE FIRESTORE");
     FirebaseFirestore.instance
         .collection('patients')
         .doc(cod_fiscale)

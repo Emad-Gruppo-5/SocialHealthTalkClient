@@ -188,7 +188,7 @@ class MyDetailPatient extends State<DetailPatient> {
                 Navigator.of(context).push(
                   CupertinoPageRoute(
                       fullscreenDialog: true,
-                      builder: (context) => const QuestionsHistory()),
+                      builder: (context) => QuestionsHistory(cod_fiscale_paziente: paz_cod_fiscale, cod_fiscale_dottore: cod_fiscale )),
                 );
               },
               backgroundColor: Colors.green,

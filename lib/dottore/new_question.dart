@@ -117,7 +117,8 @@ class NewQuestion extends StatelessWidget {
                           _data_domanda_DA);
                     },
                   ),
-                )),
+                )
+                ),
             Visibility(
               visible: _repeat,
               child: Column(
