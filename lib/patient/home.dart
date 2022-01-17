@@ -88,7 +88,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   late String token;
   late String cod_fiscale;
 
-
   Duration online_duration = const Duration(seconds: 7);
   Duration alert_duration = const Duration(seconds: 20);
   late Timer timer;
@@ -96,8 +95,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   String timerText = "Start";
   late String ultimo_accesso;
 
-  CollectionReference _notificationsReference = FirebaseFirestore.instance.collection('questions_to_answer');
-  
+  CollectionReference _notificationsReference =
+      FirebaseFirestore.instance.collection('questions_to_answer');
 
   Widget _iconButtonPush(BuildContext context, IconData icon, String tooltip) {
     print("cod_fiscale: " + cod_fiscale);
@@ -154,7 +153,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
     print(dateFormat.format(DateTime.now()));
     return MaterialApp(
-      
       home: GestureDetector(
         child: Scaffold(
           appBar: AppBar(
@@ -169,32 +167,30 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             ],
           ),
           body: StreamBuilder<QuerySnapshot>(
-              stream: _notificationsReference
-                      .where('cod_fiscale_paziente', isEqualTo: cod_fiscale)
-                      .orderBy("data_domanda", descending: true)
-                      .snapshots(),
-              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                
-                
-                
+            stream: _notificationsReference
+                .where('cod_fiscale_paziente', isEqualTo: cod_fiscale)
+                .orderBy("data_domanda", descending: true)
+                .snapshots(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                print(snapshot.error);
+                return const Text('Something went wrong');
+              }
 
-                if (snapshot.hasError) {
-                  print(snapshot.error);
-                  return const Text('Something went wrong');
-                }
-
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.data!.docs.isEmpty) {
-                    return Center( child: Image.asset('assets/images/promemoria.png'));
-                }
-                else
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.data!.docs.isEmpty) {
+                return Center(
+                    child: Image.asset('assets/images/promemoria.png'));
+              } else
                 // ignore: curly_braces_in_flow_control_structures
                 return ListView(
-                  children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                  children:
+                      snapshot.data!.docs.map((DocumentSnapshot document) {
                     Map<String, dynamic> data =
-                    document.data()! as Map<String, dynamic>;
+                        document.data()! as Map<String, dynamic>;
                     String subtitle = "";
                     Icon trailing;
                     print(data.toString());
@@ -216,15 +212,20 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                 ],
                               ),
                               title: Text(data['testo_domanda']),
-                              subtitle: Text("Inviata da: " + data["nome"] + " " + data["cognome"] + "\n" 
-                                            + data["data_domanda"]),
+                              subtitle: Text("Inviata da: " +
+                                  data["nome"] +
+                                  " " +
+                                  data["cognome"] +
+                                  "\n" +
+                                  data["data_domanda"]),
                               onTap: () {
                                 _notificationsReference
-                                  .doc(document.id)
-                                  .update({'letto': true})
-                                  .then((value) => print("Notification Updated"))
-                                  .catchError((error) =>
-                                      print("Failed to update notifications: $error"));
+                                    .doc(document.id)
+                                    .update({'letto': true})
+                                    .then((value) =>
+                                        print("Notification Updated"))
+                                    .catchError((error) => print(
+                                        "Failed to update notifications: $error"));
                                 showDialog(
                                   context: context,
                                   builder: (context) {
@@ -234,9 +235,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                         return AlertDialog(
                                           title: Text(data['testo_domanda']),
                                           content: TextField(
-                                            onChanged: (value) {},
+                                            onChanged: (value) {
+                                              risposta = value;
+                                            },
                                             controller: _textFieldController,
-                                            decoration: const InputDecoration(hintText: "Risposta testuale"),
+                                            decoration: const InputDecoration(
+                                                hintText: "Risposta testuale"),
                                           ),
                                           actions: <Widget>[
                                             IconButton(
@@ -250,9 +254,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                                   setState(() {
                                                     _isRecording = false;
                                                   });
-                                                  _stop(data);
-                                                  document.reference.delete();
-                                                  Navigator.pop(context, 'Cancel');
+                                                  _stop(data, document);
+                                                  Navigator.pop(
+                                                      context, 'Cancel');
                                                 }
                                                 startOrStop();
                                               },
@@ -260,20 +264,21 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                if(_isRecording==false){
-                                                  sendText(data);
-                                                  document.reference.delete();
-                                                  Navigator.pop(context, 'Cancel');}
-                                                else {
+                                                if (_isRecording == false) {
+                                                  print(_textFieldController);
+                                                  sendText(data, risposta, document);
+                                                  Navigator.pop(
+                                                      context, 'Cancel');
+                                                } else {
                                                   const snackBar = SnackBar(
                                                     content: Text(
                                                         'Impossibile inviare testo mentre si sta registrando'),
                                                   );
                                                   // Find the ScaffoldMessenger in the widget tree
                                                   // and use it to show a SnackBar.
-                                                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(snackBar);
                                                 }
-
                                               },
                                               child: const Text('Invio'),
                                             ),
@@ -292,8 +297,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     );
                   }).toList(),
                 );
-              },
-            ),
+            },
+          ),
         ),
         onTap: () {
           print("TAP UTENTE");
@@ -328,7 +333,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         .doc(cod_fiscale)
         .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
-  
+
   void callback() {
     print("ALERT\nCod_fiscale: " + cod_fiscale);
     // FirebaseFirestore.instance
@@ -342,12 +347,14 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     //           'ultimo_accesso': ultimo_accesso
     //     });
   }
+
   bool _isRecording = false;
   bool _isPaused = false;
   int _recordDuration = 0;
   final _audioRecorder = Record();
   Amplitude? _amplitude;
   var _textFieldController;
+  String risposta = " ";
 
   @override
   void initState() {
@@ -410,7 +417,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   late String path2;
 
-  Future<void> _stop(Map data) async {
+  _stop(Map data, DocumentSnapshot<Object?> document) async {
     final path = await _audioRecorder.stop();
     setState(() {
       _isRecording = false;
@@ -425,7 +432,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     // Find the ScaffoldMessenger in the widget tree
     // and use it to show a SnackBar.
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    sendFile(data);
+    return sendFile(data, document);
   }
 
   _icon() {
@@ -495,22 +502,26 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return "$hoursStr:$minutesStr:$secondsStr";
   }
 
-  sendFile(Map fireData) async {
+  sendFile(Map fireData, DocumentSnapshot<Object?> document) async {
     try {
+      var uri;
       File file = File(path2);
       file.openRead();
       List<int> fileBytes = await file.readAsBytes();
       String base64String = base64Encode(fileBytes);
       final fileString = 'data:audio/mp3;base64,$base64String';
-      var uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
+      if (kIsWeb) {
+        uri = Uri.parse('http://127.0.0.1:5000/aggiungi_domanda');
+      } else
+        uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
       Map<String, String> message = {
-        "audio": fileString,
+        "audio_risposta": fileString,
         "data_risposta": DateTime.now().toString(),
         "cod_fiscale_paziente": cod_fiscale,
         "data_domanda": fireData["data_domanda"],
         "testo_domanda": fireData["testo_domanda"],
-        "cod_fiscale_dottore" : fireData["cod_fiscale_dottore"],
+        "cod_fiscale_dottore": fireData["cod_fiscale_dottore"],
         "testo_risposta": " ",
       };
       var body = json.encode(message);
@@ -522,28 +533,39 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           body: body);
       print('Response status: ${data.statusCode}');
       print('Response body: ' + data.body);
-
+      if (data.statusCode != 200) {
+        print("ERRORE LATO POSTGRESQL: err: ");
+        const snackBar = const SnackBar(
+          content: Text('Risposta non inserita'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        document.reference.delete();
+      }
+      return data.statusCode;
     } catch (e) {
       print(e.toString());
 
       return null;
     }
-
   }
 
-  Future<void> sendText(Map fireData) async {
-    var uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
-    print(uri);
+  sendText(Map fireData, String value, DocumentSnapshot<Object?> document) async {
+    var uri;
+    if (kIsWeb) {
+      uri = Uri.parse('http://127.0.0.1:5000/aggiungi_domanda');
+    } else
+      uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
+
     int role = 1;
 
     Map<String, dynamic> message = {
-      "testo_risposta": _textFieldController,
+      "testo_risposta": value,
       "data_risposta": DateTime.now().toString(),
       "cod_fiscale_paziente": cod_fiscale,
       "data_domanda": fireData["data_domanda"],
       "testo_domanda": fireData["testo_domanda"],
-      "cod_fiscale_dottore" : fireData["cod_fiscale_dottore"],
-      "audio" : " "
+      "cod_fiscale_dottore": fireData["cod_fiscale_dottore"],
+      "audio_risposta": " "
     };
     var body = json.encode(message);
     var data;
@@ -562,6 +584,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       // Find the ScaffoldMessenger in the widget tree
       // and use it to show a SnackBar.
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      document.reference.delete();
     } else {
       print("ERRORE LATO POSTGRESQL: err: ");
       const snackBar = const SnackBar(
@@ -569,5 +592,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
+    return data.statusCode;
   }
 }
