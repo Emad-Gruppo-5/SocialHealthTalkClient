@@ -162,6 +162,7 @@ class MyDetailPatient extends State<DetailPatient> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton(
+              heroTag: "btn1",
               onPressed: () {
                 Navigator.of(context).push(
                   CupertinoPageRoute(
@@ -184,6 +185,7 @@ class MyDetailPatient extends State<DetailPatient> {
               height: 10,
             ),
             FloatingActionButton(
+              heroTag: "btn2",
               onPressed: () {
                 Navigator.of(context).push(
                   CupertinoPageRoute(

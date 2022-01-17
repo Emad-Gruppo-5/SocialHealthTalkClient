@@ -21,14 +21,13 @@ class _QuestionsHistory extends State<QuestionsHistory> {
   late String cod_fiscale_paziente;
   late String cod_fiscale_dottore;  
   
-  DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+  DateFormat dateFormat = DateFormat("yyyy-MM-dd");
   // late TextEditingController _data_domande = new TextEditingController(text: dateFormat.format(DateTime.now()));
-  TextEditingController _data_domande = TextEditingController();
+  late TextEditingController _data_domande = TextEditingController(text: dateFormat.format(DateTime.now()));
   @override
   void initState() {
     cod_fiscale_paziente = widget.cod_fiscale_paziente;
-    cod_fiscale_dottore = widget.cod_fiscale_dottore; 
-    getListaDomande(dateFormat.format(DateTime.now())); 
+    cod_fiscale_dottore = widget.cod_fiscale_dottore;  
     super.initState();
   }
 
@@ -42,7 +41,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
     print(uri);
 
     Map<String, dynamic> message = {
-      "data_query": _data_domande,
+      "data_query": dateFormat,
       "cod_fiscale_paziente": cod_fiscale_paziente,
       "cod_fiscale_dottore": cod_fiscale_dottore
     };
@@ -56,18 +55,23 @@ class _QuestionsHistory extends State<QuestionsHistory> {
     print('Response status: ${data.statusCode}');
     print('Response body: ' + data.body);
 
-    for (int i=0; i < json.decode(data.body).length; i++) {
-      _closed_questions.add({
+    if(data.statusCode==200){
+      for (int i=0; i < json.decode(data.body).length; i++) {
+        _closed_questions.add({
 
-        'id_domanda': json.decode(data.body)[i]['id_domanda'],
-        'testo_domanda': json.decode(data.body)[i]['testo_domanda'],
-        'testo_risposta': json.decode(data.body)[i]['testo_risposta'],
-        'audio_risposta': json.decode(data.body)[i]['audio_risposta'],
-        'data_risposta': json.decode(data.body)[i]['data_risposta'],
-        
-      });
+          'id_domanda': json.decode(data.body)[i]['id_domanda'],
+          'testo_domanda': json.decode(data.body)[i]['testo_domanda'],
+          'testo_risposta': json.decode(data.body)[i]['testo_risposta'],
+          'audio_risposta': json.decode(data.body)[i]['audio_risposta'],
+          'data_risposta': json.decode(data.body)[i]['data_risposta'],
+          
+        });
+      }
     }
-
+    else{
+      print("VUOTO");
+    }
+     
     return _closed_questions;
   }
 
@@ -78,7 +82,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
       row = new Row(
         children: [
           const Icon(Icons.volume_up_outlined, color: Colors.blue),
-          Text("Risposta audio")
+          Text(" Risposta audio")
         ],
       );
     }
@@ -86,7 +90,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
       row = new Row(
         children: [
           const Icon(Icons.keyboard_alt_outlined, color: Colors.blue),
-          Text("Risposta testuale")
+          Text(" Risposta testuale")
         ],
       );
     }
@@ -170,9 +174,12 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: ElevatedButton(
                       onPressed: () {
-                        getListaDomande(_data_domande.text);
+                        setState(() {
+                          // getListaDomande(_data_domande.text);
+                        });
+                        
                       },
-                      child: const Text('Salva'),
+                      child: const Text('Cerca'),
                     ),
                   ),
                 ),
@@ -243,47 +250,48 @@ class _QuestionsHistory extends State<QuestionsHistory> {
             //   ],
             // ),
 
-            // ExpansionTile(
-            //    leading: const Icon(
-            //     Icons.close,
-            //     color: Colors.red,
-            //   ),
-            //   title: const Text('Domande chiuse'),
-            //   children: <Widget>[
-            //     FutureBuilder(
-            //       future: getListaDomande(_data_domande.text),
-            //       builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot){
+            ExpansionTile(
+               leading: const Icon(
+                Icons.close,
+                color: Colors.red,
+              ),
+              title: const Text('Domande chiuse'),
+              children: <Widget>[
+                FutureBuilder(
+                  future: getListaDomande(_data_domande.text),
+                  builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot){
                     
-            //         if (snapshot.hasData) {
+                    if (!snapshot.data!.isEmpty) {
+                      
+                      List<Map<String, dynamic>> lista = List.from(snapshot.data!);
+                      
 
-            //           List<Map<String, dynamic>> lista = List.from(snapshot.data!);
-
-
-            //           return ListView(
-            //             children: lista.map((data){
-            //               return Center(
-            //                     child: Card(
-            //                       child: Column(
-            //                         mainAxisSize: MainAxisSize.min,
-            //                         children: <Widget>[
-            //                           ListTile(
-            //                             title: Text(data['testo_domanda'] ),
-            //                             subtitle: (data["audio"]==null && data["testo_risposta"]!=null) ? getSubtitle(false)  : getSubtitle(true),
-            //                             // QUI BISOGNA CAPIRE COME RIPRODURRE L'AUDIO DELLA RISPOSTA
-            //                           ),
-            //                         ],
-            //                       ),
-            //                     ),
-            //                   );
-            //             }).toList(),
-            //           );
-            //         }
-            //         else{
-            //           return const Center(child: CircularProgressIndicator());
-            //         }
-            //     })
-            //   ],
-            // ),
+                      return ListView(
+                        shrinkWrap: true,
+                        children: lista.map((data){
+                          return Center(
+                                child: Card(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      ListTile(
+                                        title: Text(data['testo_domanda'] ),
+                                        subtitle: (json.encode(data["audio"]).compareTo("null")==0 && json.encode(data["testo_risposta"]).compareTo("null")!=0) ? getSubtitle(false)  : getSubtitle(true),
+                                        // QUI BISOGNA CAPIRE COME RIPRODURRE L'AUDIO DELLA RISPOSTA
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                        }).toList(),
+                      );
+                    }
+                    else{
+                      return const Center(child: Text("Non ci sono domande per il giorno selezionato"));
+                    }
+                })
+              ],
+            ),
           ],
           ),
         ),
