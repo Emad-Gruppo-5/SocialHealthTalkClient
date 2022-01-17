@@ -146,8 +146,8 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                     type: DateTimePickerType.date,
                     dateMask: 'd MMM, yyyy',
                     locale: const Locale("it", "IT"),
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now().subtract(Duration(days: 0)),
+                    // initialDate: DateTime.now(),
+                    firstDate: DateTime(2010),
                     lastDate: DateTime(2100),
                     icon: const Icon(Icons.event),
                     dateLabelText: 'Data',
@@ -186,74 +186,75 @@ class _QuestionsHistory extends State<QuestionsHistory> {
               ],
               ),
             ),
-            // ExpansionTile(
-            //   leading: const Icon(Icons.question_answer),
-            //   title: const Text('Domande aperte'),
-            //   children: [
-            //     StreamBuilder<QuerySnapshot>(
-            //       stream: _opened_questions
-            //               .where('cod_fiscale_paziente', isEqualTo: cod_fiscale_paziente)
-            //               .where('cod_fiscale_dottore', isEqualTo: cod_fiscale_dottore)
-            //               .where("data_domanda", isEqualTo: _data_domande.text)
-            //               .orderBy("data_domanda", descending: true)
-            //               .snapshots(),
-            //       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            ExpansionTile(
+              leading: const Icon(Icons.question_answer),
+              title: const Text('Domande aperte'),
+              children: [
+                StreamBuilder<QuerySnapshot>(
+                  stream: _opened_questions
+                          .where('cod_fiscale_paziente', isEqualTo: cod_fiscale_paziente)
+                          .where('cod_fiscale_dottore', isEqualTo: cod_fiscale_dottore)
+                          .where('data_domanda', isGreaterThan: _data_domande.text + " 00:00")
+                          .where('data_domanda', isLessThan: _data_domande.text + " 23:59")
+                          .orderBy('data_domanda', descending: true)
+                          .snapshots(),
+                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     
-            //         if (snapshot.hasError) {
-            //           print(snapshot.error);
-            //           return const Text('Something went wrong');
-            //         }
+                    if (snapshot.hasError) {
+                      print(snapshot.error);
+                      return const Text('Something went wrong');
+                    }
 
-            //         if (snapshot.connectionState == ConnectionState.waiting) {
-            //           return Center(child: CircularProgressIndicator());
-            //         }
-            //         if (snapshot.data!.docs.isEmpty) {
-            //             return Center( child: Image.asset('assets/images/promemoria.png'));
-            //         }
-            //         else
-            //         return ListView(
-            //           children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            //             Map<String, dynamic> data =
-            //             document.data()! as Map<String, dynamic>;
-            //             String subtitle = "";
-            //             Icon trailing;
-            //             print(data.toString());
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.data!.docs.isEmpty) {
+                        return const Center(child: Text("Non ci sono domande aperte per il giorno selezionato"));
+                    }
+                    else
+                    return ListView(
+                      shrinkWrap: true,
+                      children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                        Map<String, dynamic> data =
+                        document.data()! as Map<String, dynamic>;
+                        String subtitle = "";
+                        Icon trailing;
+                        print(data.toString());
 
-            //             return Center(
-            //               child: Card(
-            //                 child: Column(
-            //                   mainAxisSize: MainAxisSize.min,
-            //                   children: <Widget>[
-            //                     ListTile(
-            //                       leading: Column(
-            //                         mainAxisAlignment: MainAxisAlignment.center,
-            //                         children: <Widget>[
-            //                           Visibility(
-            //                             child: const Icon(Icons.remove_red_eye_outlined ,
-            //                                 color: Colors.blue),
-            //                             visible: data['letto'],
-            //                           ),
-            //                         ],
-            //                       ),
-            //                       title: Text(data['testo_domanda']),
-            //                       subtitle: Text("Data: " + data["data_domanda"]),
-            //                     ),
-            //                     // row,
-            //                   ],
-            //                 ),
-            //               ),
-            //             );
-            //           }).toList(),
-            //         );
-            //       },
-            //       )
-            //   ],
-            // ),
+                        return Center(
+                          child: Card(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                ListTile(
+                                  leading: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Visibility(
+                                        child: const Icon(Icons.remove_red_eye_outlined ,
+                                            color: Colors.blue),
+                                        visible: data['letto'],
+                                      ),
+                                    ],
+                                  ),
+                                  title: Text(data['testo_domanda']),
+                                  subtitle: Text("Data: " + data["data_domanda"]),
+                                ),
+                                // row,
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                  )
+              ],
+            ),
 
             ExpansionTile(
                leading: const Icon(
-                Icons.close,
-                color: Colors.red,
+                Icons.auto_stories_sharp,
               ),
               title: const Text('Domande chiuse'),
               children: <Widget>[
@@ -287,7 +288,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                       );
                     }
                     else{
-                      return const Center(child: Text("Non ci sono domande per il giorno selezionato"));
+                      return const Center(child: Text("Non ci sono domande chiuse per il giorno selezionato"));
                     }
                 })
               ],
