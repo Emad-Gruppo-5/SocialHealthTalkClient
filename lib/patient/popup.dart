@@ -213,7 +213,7 @@ class MyPopupState extends State<MyPopup> {
 
       Map<String, String> message = {
         "audio": fileString,
-        "id": ,//TODO id_domanda
+        "id": 2.toString(),//TODO id_domanda
         "date": DateTime.now().toString()
       };
       var body = json.encode(message);
@@ -241,7 +241,7 @@ class MyPopupState extends State<MyPopup> {
 
     Map<String, dynamic> message = {
       "risposta": _textFieldController,
-      "id": ,//TODO id_domanda
+      "id": 2.toString(),//TODO id_domanda
       "date": DateTime.now().toString()
     };
     var body = json.encode(message);
