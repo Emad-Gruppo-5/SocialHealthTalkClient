@@ -31,7 +31,9 @@ class NewQuestion extends StatelessWidget {
     required this.specializzazione,
   });
   TextEditingController _testo_domanda = TextEditingController();
-  TextEditingController _data_domanda = TextEditingController();
+  TextEditingController _data_domanda_DA = TextEditingController();
+  TextEditingController _data_domanda_A = TextEditingController();
+  TextEditingController _ora_domanda = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<bool> isChecked = [false, true, false];
   String dropdownValue = 'Una volta';
@@ -88,7 +90,7 @@ class NewQuestion extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: DateTimePicker(
-                    controller: _data_domanda,
+                    controller: _data_domanda_DA,
                     type: DateTimePickerType.dateTimeSeparate,
                     dateMask: 'd MMM, yyyy',
                     locale: const Locale("it", "IT"),
@@ -103,7 +105,7 @@ class NewQuestion extends StatelessWidget {
                           Icons.help_center_rounded,
                           "Inserisci data",
                           "Ricordati di inserire la data",
-                          _data_domanda);
+                          _data_domanda_DA);
                       return true;
                     },
                     onChanged: (val) {
@@ -112,7 +114,7 @@ class NewQuestion extends StatelessWidget {
                           Icons.help_center_rounded,
                           "Inserisci data",
                           "Ricordati di inserire la data",
-                          _data_domanda);
+                          _data_domanda_DA);
                     },
                   ),
                 )),
@@ -123,7 +125,7 @@ class NewQuestion extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: DateTimePicker(
-                      controller: _data_domanda,
+                      controller: _data_domanda_DA,
                       type: DateTimePickerType.date,
                       dateMask: 'd MMM, yyyy',
                       locale: const Locale("it", "IT"),
@@ -137,7 +139,7 @@ class NewQuestion extends StatelessWidget {
                             Icons.help_center_rounded,
                             "Inserisci data",
                             "Ricordati di inserire la data",
-                            _data_domanda);
+                            _data_domanda_DA);
                         return true;
                       },
                       onChanged: (val) {
@@ -146,14 +148,14 @@ class NewQuestion extends StatelessWidget {
                             Icons.help_center_rounded,
                             "Inserisci data",
                             "Ricordati di inserire la data",
-                            _data_domanda);
+                            _data_domanda_DA);
                       },
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: DateTimePicker(
-                      controller: _data_domanda,
+                      controller: _data_domanda_A,
                       type: DateTimePickerType.date,
                       dateMask: 'd MMM, yyyy',
                       locale: const Locale("it", "IT"),
@@ -167,7 +169,7 @@ class NewQuestion extends StatelessWidget {
                             Icons.help_center_rounded,
                             "Inserisci data",
                             "Ricordati di inserire la data",
-                            _data_domanda);
+                            _data_domanda_A);
                         return true;
                       },
                       onChanged: (val) {
@@ -176,14 +178,14 @@ class NewQuestion extends StatelessWidget {
                             Icons.help_center_rounded,
                             "Inserisci data",
                             "Ricordati di inserire la data",
-                            _data_domanda);
+                            _data_domanda_A);
                       },
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: DateTimePicker(
-                      controller: _data_domanda,
+                      controller: _ora_domanda,
                       type: DateTimePickerType.time,
                       locale: const Locale("it", "IT"),
                       icon: const Icon(Icons.access_time),
@@ -193,7 +195,7 @@ class NewQuestion extends StatelessWidget {
                             Icons.help_center_rounded,
                             "Inserisci ora",
                             "Ricordati di inserire l'ora'",
-                            _data_domanda);
+                            _ora_domanda);
                         return true;
                       },
                       onChanged: (val) {
@@ -202,7 +204,7 @@ class NewQuestion extends StatelessWidget {
                             Icons.help_center_rounded,
                             "Inserisci ora",
                             "Ricordati di inserire l'ora",
-                            _data_domanda);
+                            _ora_domanda);
                       },
                     ),
                   ),
@@ -215,6 +217,9 @@ class NewQuestion extends StatelessWidget {
               onChanged: (bool value) {
                 setState(() {
                   _repeat = value;
+                  _data_domanda_DA.clear();
+                  _data_domanda_A.clear();
+                  _ora_domanda.clear();
                 });
               },
               secondary: const Icon(Icons.repeat),
@@ -226,10 +231,18 @@ class NewQuestion extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
-                    print("DATI DA INVIARE:\nTesto: " + _testo_domanda.text);
-                    print("Data: " + _data_domanda.text);
-                    print("Ripeti: " + dropdownValue);
-                    print(nome + " " + cognome + " " + cod_fiscale);
+                    print(_repeat);
+                    print(_data_domanda_DA.text);
+                    print(_data_domanda_A.text);
+                    print(_ora_domanda);
+                    var dif;
+                    if(_repeat == true){
+                      dif = DateTime.parse(_data_domanda_DA.text).difference(DateTime.parse(_data_domanda_A.text)).inDays.abs();
+                      print("DIFFERENZA: " + dif.toString() );
+
+                    }
+                    
+                    
                     // Validate returns true if the form is valid, or false otherwise.
                     if (_formKey.currentState!.validate()) {
                       CollectionReference questions =
@@ -240,8 +253,8 @@ class NewQuestion extends StatelessWidget {
                         'cognome': cognome,
                         'nome': nome,
                         'letto': false,
-                        'data_domanda': _data_domanda.text,
-                        'ripeti': dropdownValue,
+                        'data_domanda': _repeat == true ? _data_domanda_DA.text + " " + _ora_domanda.text : _data_domanda_DA.text,
+                        'ripeti': _repeat == true ? dif : 0,
                         'testo_domanda': _testo_domanda.text
                       });
                       ScaffoldMessenger.of(_scaffoldKey.currentContext!)

@@ -1,22 +1,40 @@
 // ignore_for_file: unnecessary_const
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
-
-void main() => runApp(const ProfiloPazienteModifica());
+import 'package:test_emad/admin/lista_dottori_seach.dart';
+import 'lista_familiari_search.dart';
+import 'package:http/http.dart' as http;
 
 /// This is the main application widget.
 class ProfiloPazienteModifica extends StatelessWidget {
-  const ProfiloPazienteModifica({Key? key}) : super(key: key);
+  final String cod_fiscale;
+  final String nome;
+  final String cognome;
+  final String email;
+  final String num_cellulare;
+  final int tipologia_chat;
+  final List<dynamic> lista_familiari;
+  final List<dynamic> lista_dottori;
 
+  ProfiloPazienteModifica({
+    required this.cod_fiscale,
+    required this.nome,
+    required this.cognome,
+    required this.email,
+    required this.num_cellulare,
+    required this.tipologia_chat,
+    required this.lista_familiari,
+    required this.lista_dottori,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
+          leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_sharp),
-            onPressed: (){
+            onPressed: () {
               Navigator.pop(context);
             },
           ),
@@ -24,7 +42,17 @@ class ProfiloPazienteModifica extends StatelessWidget {
             child: Text("Modifica dati"),
           ),
         ),
-        body: const SingleChildScrollView(child: MyModifyProfile()),
+        body: SingleChildScrollView(
+            child: MyModifyProfile(
+          nome: nome,
+          cognome: cognome,
+          cod_fiscale: cod_fiscale,
+          email: email,
+          num_cellulare: num_cellulare,
+          tipologia_chat: tipologia_chat,
+          lista_dottori: lista_dottori,
+          lista_familiari: lista_familiari,
+        )),
       ),
     );
   }
@@ -32,32 +60,239 @@ class ProfiloPazienteModifica extends StatelessWidget {
 
 /// This is the stateful widget that the main application instantiates.
 class MyModifyProfile extends StatefulWidget {
-  const MyModifyProfile({Key? key}) : super(key: key);
+  final String cod_fiscale;
+  final String nome;
+  final String cognome;
+  final String email;
+  final String num_cellulare;
+  final int tipologia_chat;
+  final List<dynamic> lista_familiari;
+  final List<dynamic> lista_dottori;
 
+  MyModifyProfile({
+    required this.cod_fiscale,
+    required this.nome,
+    required this.cognome,
+    required this.email,
+    required this.num_cellulare,
+    required this.tipologia_chat,
+    required this.lista_familiari,
+    required this.lista_dottori,
+  });
   @override
   State<MyModifyProfile> createState() => _MyModifyProfile();
 }
 
 // This is the stateless widget that the main application instantiates.
 class _MyModifyProfile extends State<MyModifyProfile> {
-  List<bool> isChecked = [false, true, false];
-  List<Person> persons1 = [];
+  late String cod_fiscale;
+  late String nome;
+  late String cognome;
+  late String email;
+  late String num_cellulare;
+  late int tipologia_chat;
+  late List<dynamic> lista_dottori;
+  late List<dynamic> lista_familiari;
+  Map<String, dynamic> senddata = {};
 
-  List<Person> persons2 = [];
+  List<bool> isChecked = [false, true, false];
 
   @override
   void initState() {
+    cod_fiscale = widget.cod_fiscale;
+    tipologia_chat = widget.tipologia_chat;
+    nome = widget.nome;
+    cognome = widget.cognome;
+    email = widget.email;
+    num_cellulare = widget.num_cellulare;
+    lista_dottori = widget.lista_dottori;
+    lista_familiari = widget.lista_familiari;
     //adding item to list, you can add using json from network
-    persons1.add(Person(id:"1", name:"Dottore 1", phone:"1111111111"));
-    persons1.add(Person(id:"2", name:"Dottore 2", phone:"22222222222"));
-    persons1.add(Person(id:"3", name:"Dottore 3", phone:"33333333333"));
-
-
-    persons2.add(Person(id:"4", name:"Fam 1", phone:"1111111111"));
-    persons2.add(Person(id:"5", name:"Fam 2", phone:"22222222222"));
-    persons2.add(Person(id:"6", name:"Fam 3", phone:"33333333333"));
 
     super.initState();
+  }
+
+  static List<Map<String, String>> mainDataList = [];
+  static List<Map<String, String>> secondDataList = [];
+
+  Future<void> getActors(String cod_fiscale) async {
+    mainDataList.clear();
+    secondDataList.clear();
+    var uri = Uri.parse('http://127.0.0.1:5000/attori_associati');
+    print(uri);
+
+    int role = 1;
+    Map<String, String> message = {
+      "role": role.toString(),
+      "cod_fiscale": cod_fiscale,
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+
+    var i = 0;
+    while (i < json.decode(data.body).length) {
+      if (json
+              .decode(data.body)["lista_dottori"]
+              .toString()
+              .compareTo('lista_dottori') ==
+          1) {
+        mainDataList.add({
+          'cognome': json.decode(data.body)[i]['cognome'],
+          'nome': json.decode(data.body)[i]['nome'],
+          'cod_fiscale': json.decode(data.body)[i]['cod_fiscale']
+        });
+      } else {
+        secondDataList.add({
+          'cognome': json.decode(data.body)[i]['cognome'],
+          'nome': json.decode(data.body)[i]['nome'],
+          'cod_fiscale': json.decode(data.body)[i]['cod_fiscale']
+        });
+      }
+      i++;
+    }
+  }
+
+  Future<Map<String, dynamic>> updateProfileData() async {
+    print("Inizio funzione");
+    var message = {"role": 1, "cod_fiscale": cod_fiscale};
+
+    var body = json.encode(message);
+
+    var uri = Uri.parse('http://127.0.0.1:5000/attori_associati');
+
+    var attori_associati = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+
+    Map<String, dynamic> resp = {};
+    resp['familiari'] = json.decode(attori_associati.body)["familiari"];
+    resp['dottori'] = json.decode(attori_associati.body)["dottori"];
+
+    lista_dottori.clear();
+    lista_familiari.clear();
+
+    lista_familiari = json.decode(json.encode(resp["familiari"]).toString());
+    lista_dottori = json.decode(json.encode(resp["dottori"]).toString());
+    return resp;
+  }
+
+  // Copy Main List into New List.
+  List<Map<String, String>> newDataList = List.from(mainDataList);
+
+  Future<String> AssociaDottore(String dot_cod_fiscale, int role) async {
+    var uri = Uri.parse('http://127.0.0.1:5000/associa_attore');
+    print(uri);
+
+    print(dot_cod_fiscale + "ukff");
+
+    print(senddata);
+    Map<String, String> message = {
+      "user_cod_fiscale": dot_cod_fiscale,
+      "role": role.toString(),
+      "paziente_cod_fiscale": cod_fiscale,
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+
+    if (data.statusCode == 200) {
+      final snackBar = SnackBar(
+        content: const Text('Associato con successo'),
+      );
+      // Find the ScaffoldMessenger in the widget tree
+      // and use it to show a SnackBar.
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
+      const snackBar = const SnackBar(
+        content: Text('Non associato'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
+    return data.body;
+  }
+
+  Future<String> RimuoviAssociazione(String dot_cod_fiscale, int role) async {
+    var uri = Uri.parse('http://127.0.0.1:5000/rimuovi_associazione');
+    print(uri);
+
+    print(dot_cod_fiscale + "ukff");
+
+    print(senddata);
+    Map<String, String> message = {
+      "user_cod_fiscale": dot_cod_fiscale,
+      "role": role.toString(),
+      "paziente_cod_fiscale": cod_fiscale,
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+
+    if (data.statusCode == 200) {
+      final snackBar = SnackBar(
+        content: const Text('Associazione rimossa con successo'),
+      );
+      // Find the ScaffoldMessenger in the widget tree
+      // and use it to show a SnackBar.
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
+      const snackBar = const SnackBar(
+        content: Text('Associazione non rimossa'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
+    return data.body;
+  }
+
+  void _navigateAndDisplaySelection(BuildContext context, int role) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    var result;
+    if (role == 2) {
+      result = await Navigator.push(
+        context,
+        // Create the SelectionScreen in the next step.
+        MaterialPageRoute(builder: (context) => listaDottoriSeach()),
+      );
+    }
+    if (role == 4) {
+      result = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ListaFamiliariSearch()),
+      );
+    }
+    if (result != null) {
+      AssociaDottore(result.toString(), role);
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('$result')));
+      await updateProfileData();
+      setState(() {
+        //refresh UI after deleting element from list
+      });
+    }
   }
 
   Widget _textFormField(
@@ -89,110 +324,119 @@ class _MyModifyProfile extends State<MyModifyProfile> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: _textFormField(Icons.smartphone, "Numero di cellulare",
-                "+39 331 313 3141", "Inserisci numero di cellulare"),
+                num_cellulare, "Inserisci numero di cellulare"),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(Icons.email, "E-mail", "mariorossi@gmail.com",
-                "Inserisci e-mail"),
+            child: _textFormField(
+                Icons.email, "E-mail", email, "Inserisci e-mail"),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: const Text(
-              "Dottori associati",
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              "Dttori associati",
               style: TextStyle(fontSize: 15),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: persons1.map((personone){
-                return Container(
-                  child: Card(
-                    child:ListTile(
-                      title: Text(personone.name),
-                      subtitle: Text(personone.phone),
-                      trailing: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.blue
+            child: Container(
+              height: 130,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: lista_dottori.map((data) {
+                    return Card(
+                      child: ListTile(
+                        title: Text(data["cognome"]! + ' ' + data["nome"]!),
+                        trailing: ElevatedButton(
+                          style: ElevatedButton.styleFrom(primary: Colors.blue),
+                          child: const Icon(Icons.delete),
+                          onPressed: () {
+                            //delete action for this button
+                            lista_dottori.removeWhere((element) {
+                              if (element["cod_fiscale"] ==
+                                  data["cod_fiscale"]) {
+                                RimuoviAssociazione(element['cod_fiscale'], 2);
+                              }
+                              return element["cod_fiscale"] ==
+                                  data["cod_fiscale"];
+                            }); //go through the loop and match content to delete from list
+                            setState(() {
+                              updateProfileData();
+                              //refresh UI after deleting element from list
+                            });
+                          },
                         ),
-                        child: Icon(Icons.delete),
-                        onPressed: (){
-                          //delete action for this button
-                          persons1.removeWhere((element){
-                            return element.id == personone.id;
-                          }); //go through the loop and match content to delete from list
-                          setState(() {
-                            //refresh UI after deleting element from list
-                          });
-                        },
                       ),
-                    ),
-                  ),
-
-                );
-              }).toList(),
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child:ElevatedButton(
+            child: ElevatedButton(
               onPressed: () {
-                //TODO
+                _navigateAndDisplaySelection(context, 2);
               },
               child: const Text('Aggiungi dottore'),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: const Text(
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
               "Familiari associati",
               style: TextStyle(fontSize: 15),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: persons2.map((persontwo){
-                return Container(
-                  child: Card(
-                    child:ListTile(
-                      title: Text(persontwo.name),
-                      subtitle: Text(persontwo.phone),
-                      trailing: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.blue
+            child: Container(
+              height: 60,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: lista_familiari.map((data) {
+                    return Card(
+                      child: ListTile(
+                        title: Text(data["cognome"]! + ' ' + data["nome"]!),
+                        trailing: ElevatedButton(
+                          style: ElevatedButton.styleFrom(primary: Colors.blue),
+                          child: const Icon(Icons.delete),
+                          onPressed: () {
+                            //delete action for this button
+                            lista_familiari.removeWhere((element) {
+                              if (element["cod_fiscale"] ==
+                                  data["cod_fiscale"]) {
+                                RimuoviAssociazione(element['cod_fiscale'], 4);
+                              }
+                              return element["cod_fiscale"] ==
+                                  data["cod_fiscale"];
+                            }); //go through the loop and match content to delete from list
+                            setState(() {
+                              //refresh UI after deleting element from list
+                            });
+                          },
                         ),
-                        child: Icon(Icons.delete),
-                        onPressed: (){
-                          //delete action for this button
-                          persons2.removeWhere((element){
-                            return element.id == persontwo.id;
-                          }); //go through the loop and match content to delete from list
-                          setState(() {
-                            //refresh UI after deleting element from list
-                          });
-                        },
                       ),
-                    ),
-                  ),
-
-                );
-              }).toList(),
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child:ElevatedButton(
+            child: ElevatedButton(
               onPressed: () {
-                //TODO
+                _navigateAndDisplaySelection(context, 4);
               },
               child: const Text('Aggiungi familiare'),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: const Text(
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
               "Tipologia Chat",
               style: TextStyle(fontSize: 15),
             ),
@@ -236,9 +480,9 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text(
-          "Mario Rossi",
-          style: TextStyle(fontSize: 50),
+        Text(
+          nome + " " + cognome,
+          style: const TextStyle(fontSize: 30),
         ),
         _form(),
       ],
@@ -246,7 +490,8 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   }
 }
 
-class Person{ //modal class for Person object
+class Person {
+  //modal class for Person object
   String id, name, phone;
   Person({required this.id, required this.name, required this.phone});
 }

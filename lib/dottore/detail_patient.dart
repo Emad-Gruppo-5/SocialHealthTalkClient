@@ -145,18 +145,12 @@ class MyDetailPatient extends State<DetailPatient> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: _iconButton(
-              context,
-              Icons.arrow_back,
-              'Indietro',
-              MainDottore(
-                  nome: nome,
-                  cognome: cognome,
-                  email: email,
-                  num_cellulare: num_cellulare,
-                  specializzazione: specializzazione,
-                  cod_fiscale: cod_fiscale,
-                  token: token)),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_sharp),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: const Center(
             child: Text("Profilo"),
           ),

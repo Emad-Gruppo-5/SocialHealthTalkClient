@@ -63,13 +63,15 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
 
   @override
   Widget build(BuildContext context) {
-    // var datiprofilo = getprofiledata();
+    var profilo;
+    List<dynamic> familiari = [];
+    List<dynamic> dottori = [];
 
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: new IconButton(
-            icon: Icon(Icons.arrow_back_ios_sharp),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_sharp),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -78,19 +80,28 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
             child: Text("Profilo"),
           ),
           actions: [
-            new IconButton(
+            IconButton(
               icon: Icon(Icons.edit),
               iconSize: 40,
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProfiloPazienteModifica(),
+                    builder: (context) => ProfiloPazienteModifica(
+                      nome: profilo["nome"],
+                      cognome: profilo["cognome"],
+                      cod_fiscale: profilo["cod_fiscale"],
+                      email: profilo["email"],
+                      num_cellulare: profilo["num_cellulare"],
+                      tipologia_chat: profilo["tipologia_chat"],
+                      lista_dottori: dottori,
+                      lista_familiari: familiari,
+                    ),
                   ),
                 );
               },
             ),
-            new IconButton(
+            IconButton(
               icon: Icon(Icons.delete_forever),
               iconSize: 40,
               onPressed: () {
@@ -132,15 +143,17 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                                 );
                               }).catchError((error) {
                                 print("Failed to delete patient: $error");
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text(
-                                        "Errore nella rimozione del paziente")));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            "Errore nella rimozione del paziente")));
                               });
                             } else {
                               print("Errore lato Server: " + value.body);
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: Text(
-                                      "Errore nella rimozione del paziente")));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          "Errore nella rimozione del paziente")));
                             }
                           });
                         },
@@ -151,7 +164,8 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                           Navigator.pop(context, 'No');
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Paziente non rimosso")));
+                              const SnackBar(
+                                  content: Text("Paziente non rimosso")));
                         },
                         child: const Text('No'),
                       ),
@@ -176,12 +190,10 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                 print(snapshot.data);
 
                 Map<String, dynamic> data = Map.from(snapshot.data!);
-                var profilo =
-                    json.decode(json.encode(data["paziente"]).toString());
-                List<dynamic> familiari =
+                profilo = json.decode(json.encode(data["paziente"]).toString());
+                familiari =
                     json.decode(json.encode(data["familiari"]).toString());
-                List<dynamic> dottori =
-                    json.decode(json.encode(data["dottori"]).toString());
+                dottori = json.decode(json.encode(data["dottori"]).toString());
 
                 print("DOTTORI\n" + dottori.toString());
                 print("FAMILIARI\n" + familiari.toString());
@@ -190,7 +202,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                     children: [
                       Text(
                         profilo["nome"] + " " + profilo["cognome"],
-                        style: TextStyle(fontSize: 30),
+                        style: const TextStyle(fontSize: 30),
                       ),
                       _card(profilo["cod_fiscale"], Icons.person),
                       _card(profilo["num_cellulare"].toString(),
@@ -228,7 +240,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                 );
                 // return Center(child: Text("NON FUNZIONA"));
               } else {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
             },
           ),
