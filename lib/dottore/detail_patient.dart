@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:test_emad/dottore/new_question.dart';
+import 'package:test_emad/dottore/questions_history.dart';
 import 'package:test_emad/main.dart';
 import 'main_dottore.dart';
 import 'patient_list_item.dart';
@@ -28,7 +29,7 @@ class DetailPatient extends StatefulWidget {
     required this.email,
     required this.num_cellulare,
     required this.specializzazione,
-    required this.paz_cod_fiscale, 
+    required this.paz_cod_fiscale,
   });
 
   @override
@@ -160,76 +161,117 @@ class MyDetailPatient extends State<DetailPatient> {
             child: Text("Profilo"),
           ),
           actions: [
-            _iconButton(
-                context,
-                Icons.logout,
-                'Logout',
-                LoginPage()),
+            _iconButton(context, Icons.logout, 'Logout', LoginPage()),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              CupertinoPageRoute(
-                  fullscreenDialog: true,
-                  builder: (context) => NewQuestion(
-                      paz_cod_fiscale: paz_cod_fiscale,
-                      nome: nome,
-                      cognome: cognome,
-                      email: email,
-                      num_cellulare: num_cellulare,
-                      specializzazione: specializzazione,
-                      cod_fiscale: cod_fiscale,
-                      token: token)),
-            );
-          },
-          backgroundColor: Colors.green,
-          child: const Icon(Icons.add),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                      fullscreenDialog: true,
+                      builder: (context) => NewQuestion(
+                          paz_cod_fiscale: paz_cod_fiscale,
+                          nome: nome,
+                          cognome: cognome,
+                          email: email,
+                          num_cellulare: num_cellulare,
+                          specializzazione: specializzazione,
+                          cod_fiscale: cod_fiscale,
+                          token: token)),
+                );
+              },
+              backgroundColor: Colors.green,
+              child: const Icon(Icons.add),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                      fullscreenDialog: true,
+                      builder: (context) => const QuestionsHistory()),
+                );
+              },
+              backgroundColor: Colors.green,
+              child: const Icon(Icons.history),
+            ),
+          ],
         ),
         body: SingleChildScrollView(
           child: Column(
-          children: [
-            FutureBuilder(
-              future: getprofiledata(),
-              builder: (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-                if (snapshot.hasData) {
-                  Map<String, dynamic> data = Map.from(snapshot.data!);
-                  var profilo =
-                      json.decode(json.encode(data["paziente"]).toString());
-                  print(profilo);
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Text(
-                          profilo["nome"] + ' ' + profilo["cognome"],
-                          style: const TextStyle(fontSize: 40),
-                        ),
-                        _card(profilo["cod_fiscale"] == null ? "null" : profilo["cod_fiscale"], Icons.person),
-                        _card(profilo["num_cellulare"] == null ? "null" : profilo["num_cellulare"],
-                            Icons.smartphone),
-                        _card(profilo["email"] == null ? "null" : profilo["email"], Icons.email),
-                        _card2(profilo["eta"] == null ? "null" : profilo["eta"], 'Età:'),
-                        _card2(profilo["sesso"] == null ? "null" : profilo["sesso"], 'Sesso:'),
-                        _card2(profilo["titolo_studio"] == null ? "null" : profilo["titolo_studio"], 'Titolo di studio:'),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: _textFormField(Icons.notes, "Note paziente",
-                              profilo["note"] == null ? "null" : profilo["note"], ""),
-                        ),
-                      ],
-                    ),
-                  );
-                  // return Center(child: Text("NON FUNZIONA"));
-                } else {
-                  return Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
-          ],
+            children: [
+              FutureBuilder(
+                future: getprofiledata(),
+                builder:
+                    (context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                  if (snapshot.hasData) {
+                    Map<String, dynamic> data = Map.from(snapshot.data!);
+                    var profilo =
+                        json.decode(json.encode(data["paziente"]).toString());
+                    print(profilo);
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Text(
+                            profilo["nome"] + ' ' + profilo["cognome"],
+                            style: const TextStyle(fontSize: 40),
+                          ),
+                          _card(
+                              profilo["cod_fiscale"] == null
+                                  ? "null"
+                                  : profilo["cod_fiscale"],
+                              Icons.person),
+                          _card(
+                              profilo["num_cellulare"] == null
+                                  ? "null"
+                                  : profilo["num_cellulare"],
+                              Icons.smartphone),
+                          _card(
+                              profilo["email"] == null
+                                  ? "null"
+                                  : profilo["email"],
+                              Icons.email),
+                          _card2(
+                              profilo["eta"] == null ? "null" : profilo["eta"],
+                              'Età:'),
+                          _card2(
+                              profilo["sesso"] == null
+                                  ? "null"
+                                  : profilo["sesso"],
+                              'Sesso:'),
+                          _card2(
+                              profilo["titolo_studio"] == null
+                                  ? "null"
+                                  : profilo["titolo_studio"],
+                              'Titolo di studio:'),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: _textFormField(
+                                Icons.notes,
+                                "Note paziente",
+                                profilo["note"] == null
+                                    ? "null"
+                                    : profilo["note"],
+                                ""),
+                          ),
+                        ],
+                      ),
+                    );
+                    // return Center(child: Text("NON FUNZIONA"));
+                  } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
-
