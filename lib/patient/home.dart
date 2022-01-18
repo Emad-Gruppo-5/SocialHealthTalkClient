@@ -508,15 +508,15 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       File file = File(path2);
       file.openRead();
       List<int> fileBytes = await file.readAsBytes();
-      String base64String = base64Encode(fileBytes);
-      final fileString = 'data:audio/mp3;base64,$base64String';
+      final String base64String = base64Encode(fileBytes);
+
       if (kIsWeb) {
         uri = Uri.parse('http://127.0.0.1:5000/aggiungi_domanda');
       } else
         uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
       Map<String, String> message = {
-        "audio_risposta": fileString,
+        "audio_risposta": base64String,
         "data_risposta": DateTime.now().toString(),
         "cod_fiscale_paziente": cod_fiscale,
         "data_domanda": fireData["data_domanda"],
