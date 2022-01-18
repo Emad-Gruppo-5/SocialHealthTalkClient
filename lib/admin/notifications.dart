@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:audioplayer/audioplayer.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -76,39 +78,35 @@ class Notifications extends StatelessWidget {
   }
 }
 
-Future<void> sendEmail(List<Map<String,String>> addresses) async {
+Future<void> sendEmail(List<Map<String, String>> addresses) async {
   var uri = Uri.parse('http://127.0.0.1:5000/alert');
   print(uri);
 
   print(addresses);
   await http.post(uri,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: json.encode(addresses));
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+      body: json.encode(addresses));
 }
 
 Future<String> getActors(String cod_fiscale) async {
-    
-    List<Map<String, dynamic>> mainDataList = [];
-    var uri = Uri.parse('http://127.0.0.1:5000/attori_associati');
-    print(uri);
+  List<Map<String, dynamic>> mainDataList = [];
+  var uri = Uri.parse('http://127.0.0.1:5000/attori_associati');
+  print(uri);
 
-    Map<String, dynamic> message = {
-      "role": 1,
-      "cod_fiscale": cod_fiscale
-    };
-    var body = json.encode(message);
-    print("\nBODY:: " + body);
-    var data = await http.post(uri,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: body);
-    print('Response status: ${data.statusCode}');
-    print('Response body: ' + data.body);
-    return data.body;
-  }
+  Map<String, dynamic> message = {"role": 1, "cod_fiscale": cod_fiscale};
+  var body = json.encode(message);
+  print("\nBODY:: " + body);
+  var data = await http.post(uri,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+      body: body);
+  print('Response status: ${data.statusCode}');
+  print('Response body: ' + data.body);
+  return data.body;
+}
 
 class MyNotifications extends StatelessWidget {
   List<Map<String, dynamic>> actors = [];
@@ -126,28 +124,33 @@ class MyNotifications extends StatelessWidget {
                   children: actors.map((data) {
                     return CheckboxListTile(
                       value: data["value"],
-                              onChanged: (value) => setState(() {
-                                data["value"] = value;
-                              }),
-                              title: Text(data["categoria"] + ": " + data["nome"] + " " + data["cognome"]),
+                      onChanged: (value) => setState(() {
+                        data["value"] = value;
+                      }),
+                      title: Text(data["categoria"] +
+                          ": " +
+                          data["nome"] +
+                          " " +
+                          data["cognome"]),
                     );
                   }).toList(),
                 ),
               ),
               actions: [
-                
                 TextButton(
                     onPressed: () => {
-                    actors.clear(),
-                    Navigator.pop(context),
-                    },
+                          actors.clear(),
+                          Navigator.pop(context),
+                        },
                     child: const Text("Non inviare")),
                 TextButton(
                     onPressed: () {
-                      List<Map<String,String>> addresses = [];
+                      List<Map<String, String>> addresses = [];
 
-                      for(int i =0; i<actors.length;i++) if(actors[i]["value"]) addresses.add({ "email": actors[i]["email"]});
-                      
+                      for (int i = 0; i < actors.length; i++)
+                        if (actors[i]["value"])
+                          addresses.add({"email": actors[i]["email"]});
+
                       print(addresses);
                       // RACCOLTA EMAIL e poi INVIO EMAILS
                       sendEmail(addresses).then((val) {
@@ -157,7 +160,6 @@ class MyNotifications extends StatelessWidget {
                                 content: Text('Email/SMS inviati')));
                         actors.clear();
                       });
-                      
                     },
                     child: const Text("Invia")),
               ],
@@ -255,37 +257,48 @@ class MyNotifications extends StatelessWidget {
                                 }),
                             color: Colors.red),
                         onTap: () => {
-
-                          getActors(data['cod_fiscale']).then((value) { 
-      
-                            for (int i = 0; i < json.decode(value)["dottori"].length; i++) {
+                          getActors(data['cod_fiscale']).then((value) {
+                            for (int i = 0;
+                                i < json.decode(value)["dottori"].length;
+                                i++) {
                               actors.add({
-                                'cognome': json.decode(value)["dottori"][i]['cognome'],
-                                'nome': json.decode(value)["dottori"][i]['nome'],
-                                'cod_fiscale': json.decode(value)["dottori"][i]['cod_fiscale'],
-                                'email': json.decode(value)["dottori"][i]['email'],
-                                'num_cellulare': json.decode(value)["dottori"][i]['num_cellulare'],
+                                'cognome': json.decode(value)["dottori"][i]
+                                    ['cognome'],
+                                'nome': json.decode(value)["dottori"][i]
+                                    ['nome'],
+                                'cod_fiscale': json.decode(value)["dottori"][i]
+                                    ['cod_fiscale'],
+                                'email': json.decode(value)["dottori"][i]
+                                    ['email'],
+                                'num_cellulare': json.decode(value)["dottori"]
+                                    [i]['num_cellulare'],
                                 'value': false,
                                 'categoria': 'D'
                               });
                             }
 
-                            for (int i = 0; i < json.decode(value)["familiari"].length; i++) {
+                            for (int i = 0;
+                                i < json.decode(value)["familiari"].length;
+                                i++) {
                               actors.add({
-                                'cognome': json.decode(value)["familiari"][i]['cognome'],
-                                'nome': json.decode(value)["familiari"][i]['nome'],
-                                'cod_fiscale': json.decode(value)["familiari"][i]['cod_fiscale'],
-                                'email': json.decode(value)["familiari"][i]['email'],
-                                'num_cellulare': json.decode(value)["familiari"][i]['num_cellulare'],
+                                'cognome': json.decode(value)["familiari"][i]
+                                    ['cognome'],
+                                'nome': json.decode(value)["familiari"][i]
+                                    ['nome'],
+                                'cod_fiscale': json.decode(value)["familiari"]
+                                    [i]['cod_fiscale'],
+                                'email': json.decode(value)["familiari"][i]
+                                    ['email'],
+                                'num_cellulare': json.decode(value)["familiari"]
+                                    [i]['num_cellulare'],
                                 'value': false,
                                 'categoria': 'F'
                               });
                             }
                             _showAlertDialog(context);
-                            
                           })
-                          },
-                          onLongPress: () => _notificationsReference
+                        },
+                        onLongPress: () => _notificationsReference
                             .doc(document.id)
                             .update({'letto': !data['letto']})
                             .then((value) => print("Notification Updated"))
@@ -438,8 +451,17 @@ class MyNotifications extends StatelessWidget {
         });
   }
 
+  Future<void> downloadURLExample() async {
+    String downloadURL = await firebase_storage.FirebaseStorage.instance
+        .ref('download.png')
+        .getDownloadURL();
+
+    Image.network(downloadURL);
+  }
+
   @override
   Widget build(BuildContext context) {
+    downloadURLExample();
     return Column(
       children: <Widget>[
         ExpansionTile(

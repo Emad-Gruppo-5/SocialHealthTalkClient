@@ -105,7 +105,7 @@ class _Profile extends State<Profile> {
         tooltip: tooltip,
         onPressed: () {
           timer.cancel();
-          DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+          DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
           ultimo_accesso = dateFormat.format(DateTime.now());
           FirebaseFirestore.instance
               .collection('patients')
@@ -211,7 +211,7 @@ class _Profile extends State<Profile> {
 
   void handleTimeout() {
     print("TIMEOUT\nCod_fiscale: " + cod_fiscale);
-    DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
     ultimo_accesso = dateFormat.format(DateTime.now());
     FirebaseFirestore.instance
         .collection('patients')

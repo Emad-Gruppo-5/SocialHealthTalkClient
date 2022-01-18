@@ -231,7 +231,7 @@ class _ModifyProfile extends State<ModifyProfile> {
 
   void handleTimeout() {
     print("TIMEOUT\nCod_fiscale: " + cod_fiscale);
-    DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
     ultimo_accesso = dateFormat.format(DateTime.now());
     FirebaseFirestore.instance
         .collection('patients')

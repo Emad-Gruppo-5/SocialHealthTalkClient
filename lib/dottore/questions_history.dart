@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:audiofileplayer/audiofileplayer.dart';
 
 class QuestionsHistory extends StatefulWidget {
   
@@ -32,7 +34,15 @@ class _QuestionsHistory extends State<QuestionsHistory> {
   }
 
   CollectionReference _opened_questions = FirebaseFirestore.instance.collection('questions_to_answer');
-  
+  bool _isRecording = false;
+
+  _icon() {
+    if (_isRecording == false) {
+      return const Icon(Icons.play_circle, color: Colors.blue);
+    } else {
+      return const Icon(Icons.stop_circle, color: Colors.blue);
+    }
+  }
 
 
   Future<List<Map<String, dynamic>>> getListaDomande(String dateFormat) async {
@@ -76,7 +86,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
   }
 
 
-  Widget getSubtitle(bool flag, ){
+  Widget getSubtitle(bool flag){
     Row row;
     if(flag){
       row = new Row(
@@ -231,7 +241,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       Visibility(
-                                        child: const Icon(Icons.remove_red_eye_outlined ,
+                                        child: const Icon(Icons.circle ,
                                             color: Colors.blue),
                                         visible: data['letto'],
                                       ),
@@ -262,7 +272,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                   future: getListaDomande(_data_domande.text),
                   builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot){
                     
-                    if (!snapshot.data!.isEmpty) {
+                    if ( snapshot.hasData && !snapshot.data!.isEmpty) {
                       
                       List<Map<String, dynamic>> lista = List.from(snapshot.data!);
                       
@@ -277,8 +287,41 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                     children: <Widget>[
                                       ListTile(
                                         title: Text(data['testo_domanda'] ),
-                                        subtitle: (json.encode(data["audio"]).compareTo("null")==0 && json.encode(data["testo_risposta"]).compareTo("null")!=0) ? getSubtitle(false)  : getSubtitle(true),
-                                        // QUI BISOGNA CAPIRE COME RIPRODURRE L'AUDIO DELLA RISPOSTA
+                                        subtitle: json.encode(data["audio_risposta"]).compareTo("null")==0 ? getSubtitle(false)  : getSubtitle(true),
+                                        onTap: () => showDialog<void>(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return SimpleDialog(
+                                                    title: Text(data['testo_domanda'] ),
+                                                    children: <Widget>[
+                                                      Center(
+                                                          child:  json.encode(data["audio_risposta"]).compareTo("null")==0 ? 
+                                                                                Text(data["testo_risposta"]) : 
+                                                                                IconButton(
+                                                                                    onPressed: () {
+                                                                                      var bd = base64Decode(data["audio_risposta"]);
+                                                                                      Audio audio = Audio.loadFromByteData(ByteData.sublistView(bd));
+                                                                                      // if (_isRecording == false) {
+                                                                                      //   setState(() {
+                                                                                      //     _isRecording = true;
+                                                                                      //   });
+                                                                                        audio.play();
+                                                                                      // } else {
+                                                                                      //   setState(() {
+                                                                                      //     _isRecording = false;
+                                                                                      //   });
+                                                                                      //   audio.resume();
+                                                                                      // }
+                                                                                    },
+                                                                                    icon: _icon(),
+                                                                                  ),
+                                                          
+                                                      )
+                                                      
+                                                    ],
+                                                  );
+                                                }
+                                              ),
                                       ),
                                     ],
                                   ),
