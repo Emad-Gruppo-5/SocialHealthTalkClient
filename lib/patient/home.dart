@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:record/record.dart';
 import '../main.dart';
 import 'profile.dart';
@@ -15,6 +16,7 @@ import 'package:just_audio/just_audio.dart' as ap;
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
+import 'package:audiofileplayer/audiofileplayer.dart';
 
 /// This is the main application widget.
 class Patient_Home extends StatelessWidget {
@@ -258,7 +260,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                                   Navigator.pop(
                                                       context, 'Cancel');
                                                 }
-                                                startOrStop();
                                               },
                                               icon: _icon(),
                                             ),
@@ -266,7 +267,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                               onPressed: () {
                                                 if (_isRecording == false) {
                                                   print(_textFieldController);
-                                                  sendText(data, risposta, document);
+                                                  sendRispostaToDatabase(data, document, false);
                                                   Navigator.pop(
                                                       context, 'Cancel');
                                                 } else {
@@ -349,10 +350,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   }
 
   bool _isRecording = false;
-  bool _isPaused = false;
-  int _recordDuration = 0;
   final _audioRecorder = Record();
-  Amplitude? _amplitude;
   var _textFieldController;
   String risposta = " ";
 
@@ -386,9 +384,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           );
           bool isRecording = await _audioRecorder.isRecording();
 
-          setState(() {
-            _isRecording = isRecording;
-          });
         } else {
           Directory? appDocDir = await getExternalStorageDirectory();
           String? appDocPath = appDocDir?.path;
@@ -419,9 +414,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   _stop(Map data, DocumentSnapshot<Object?> document) async {
     final path = await _audioRecorder.stop();
-    setState(() {
-      _isRecording = false;
-    });
     ap.AudioSource? audioSource;
     audioSource = ap.AudioSource.uri(Uri.parse(path!));
     print(path);
@@ -432,7 +424,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     // Find the ScaffoldMessenger in the widget tree
     // and use it to show a SnackBar.
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    return sendFile(data, document);
+    return sendRispostaToDatabase(data, document, true);
   }
 
   _icon() {
@@ -443,86 +435,37 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     }
   }
 
-  Stopwatch watch = Stopwatch();
-
-  bool startStop = true;
-
-  String elapsedTime = '';
-
-  updateTime(Timer timer) {
-    if (watch.isRunning) {
-      setState(() {
-        print("startstop Inside=$startStop");
-        elapsedTime = transformMilliSeconds(watch.elapsedMilliseconds);
-      });
-    }
-  }
-
-  startOrStop() {
-    if (startStop) {
-      startWatch();
-    } else {
-      stopWatch();
-    }
-  }
-
-  startWatch() {
-    setState(() {
-      startStop = false;
-      watch.start();
-      Timer timer = Timer.periodic(Duration(milliseconds: 100), updateTime);
-    });
-  }
-
-  stopWatch() {
-    setState(() {
-      startStop = true;
-      watch.stop();
-      setTime();
-    });
-  }
-
-  setTime() {
-    var timeSoFar = watch.elapsedMilliseconds;
-    setState(() {
-      elapsedTime = transformMilliSeconds(timeSoFar);
-    });
-  }
-
-  transformMilliSeconds(int milliseconds) {
-    int hundreds = (milliseconds / 10).truncate();
-    int seconds = (hundreds / 100).truncate();
-    int minutes = (seconds / 60).truncate();
-    int hours = (minutes / 60).truncate();
-
-    String hoursStr = (hours % 60).toString().padLeft(2, '0');
-    String minutesStr = (minutes % 60).toString().padLeft(2, '0');
-    String secondsStr = (seconds % 60).toString().padLeft(2, '0');
-
-    return "$hoursStr:$minutesStr:$secondsStr";
-  }
-
-  sendFile(Map fireData, DocumentSnapshot<Object?> document) async {
+  sendRispostaToDatabase(Map fireData, DocumentSnapshot<Object?> document, bool isAudio) async {
     try {
-      var uri;
-      File file = File(path2);
-      file.openRead();
-      List<int> fileBytes = await file.readAsBytes();
-      final String base64String = base64Encode(fileBytes);
+      String base64String;
+      if(isAudio) {
+        File file = File(path2);
+        file.openRead();
+        List<int> fileBytes = await file.readAsBytes();
+        base64String = base64Encode(fileBytes);
+        risposta = "null";
+      } else {
+        base64String = "null";
+      }
 
+      var uri;
       if (kIsWeb) {
         uri = Uri.parse('http://127.0.0.1:5000/aggiungi_domanda');
       } else
         uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
+      DateFormat data_risposta_format = DateFormat("yyyy-MM-dd HH:mm");
+      DateFormat data_query_format = DateFormat("yyyy-MM-dd");
+
       Map<String, String> message = {
         "audio_risposta": base64String,
-        "data_risposta": DateTime.now().toString(),
+        "data_risposta": data_risposta_format.format(DateTime.now()),
         "cod_fiscale_paziente": cod_fiscale,
         "data_domanda": fireData["data_domanda"],
         "testo_domanda": fireData["testo_domanda"],
         "cod_fiscale_dottore": fireData["cod_fiscale_dottore"],
-        "testo_risposta": " ",
+        "testo_risposta": risposta,
+        "data_query": data_query_format.format(DateTime.now())
       };
       var body = json.encode(message);
       print("\nBODY:: " + body);
@@ -549,49 +492,5 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     }
   }
 
-  sendText(Map fireData, String value, DocumentSnapshot<Object?> document) async {
-    var uri;
-    if (kIsWeb) {
-      uri = Uri.parse('http://127.0.0.1:5000/aggiungi_domanda');
-    } else
-      uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
-    int role = 1;
-
-    Map<String, dynamic> message = {
-      "testo_risposta": value,
-      "data_risposta": DateTime.now().toString(),
-      "cod_fiscale_paziente": cod_fiscale,
-      "data_domanda": fireData["data_domanda"],
-      "testo_domanda": fireData["testo_domanda"],
-      "cod_fiscale_dottore": fireData["cod_fiscale_dottore"],
-      "audio_risposta": " "
-    };
-    var body = json.encode(message);
-    var data;
-    print("\nBODY:: " + body);
-
-    data = await http.post(uri,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: body);
-
-    if (data.statusCode == 200) {
-      final snackBar = SnackBar(
-        content: const Text('Domanda inserita con successo'),
-      );
-      // Find the ScaffoldMessenger in the widget tree
-      // and use it to show a SnackBar.
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      document.reference.delete();
-    } else {
-      print("ERRORE LATO POSTGRESQL: err: ");
-      const snackBar = const SnackBar(
-        content: Text('Domanda non inserita'),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-    return data.statusCode;
-  }
 }

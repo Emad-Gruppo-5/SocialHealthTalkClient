@@ -230,7 +230,7 @@ class NewQuestion extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    DateFormat dateFormat = DateFormat("yyyy/MM/dd HH:mm");
+                    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
                     print(_repeat);
                     print(_data_domanda_DA.text);
                     print(_data_domanda_A.text);
