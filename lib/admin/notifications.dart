@@ -453,7 +453,7 @@ class MyNotifications extends StatelessWidget {
 
   Future<void> downloadURLExample() async {
     String downloadURL = await firebase_storage.FirebaseStorage.instance
-        .ref('download.jpg')
+        .ref('download.png')
         .getDownloadURL();
 
     Image.network(downloadURL);
