@@ -148,7 +148,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   }
 
   Future<String> modificaUtente() async {
-    var uri = Uri.parse('http://192.168.0.102:5000/modifica_utente');
+    var uri = Uri.parse('http://192.168.1.55:5000/modifica_utente');
 
     print(uri);
 

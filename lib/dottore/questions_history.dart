@@ -53,7 +53,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
 
   Future<List<Map<String, dynamic>>> getListaDomande(String dateFormat) async {
     List<Map<String, dynamic>> _closed_questions = [];
-    var uri = Uri.parse('http://192.168.0.102:5000/lista_domande');
+    var uri = Uri.parse('http://192.168.1.55:5000/lista_domande');
 
     print(uri);
 

@@ -285,6 +285,7 @@ class NewQuestionState extends State<NewQuestion> {
 
                     // Validate returns true if the form is valid, or false otherwise.
                     if (_formKey.currentState!.validate()) {
+                      DateFormat data_query_format = DateFormat("yyyy-MM-dd");
                       CollectionReference questions =
                       FirebaseFirestore.instance.collection('questions');
                       questions.add({

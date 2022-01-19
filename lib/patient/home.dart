@@ -463,7 +463,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           print(downloadUrl);
           var uri;
           // if (kIsWeb) {
-            uri = Uri.parse('http://192.168.0.102:5000/aggiungi_domanda');
+            uri = Uri.parse('http://192.168.1.55:5000/aggiungi_domanda');
           // } else
           //   uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
@@ -506,7 +506,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       } else {
         var uri;
         // if (kIsWeb) {
-          uri = Uri.parse('http://192.168.0.102:5000/aggiungi_domanda');
+          uri = Uri.parse('http://192.168.1.55:5000/aggiungi_domanda');
         // } else
         //   uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 

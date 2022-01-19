@@ -67,7 +67,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   int chat_mode = 0;
 
   Future<void> creaPazienteServer() async {
-    var uri = Uri.parse('http://192.168.0.102:5000/crea_utente');
+    var uri = Uri.parse('http://192.168.1.55:5000/crea_utente');
     print(uri);
     CollectionReference patients =
         FirebaseFirestore.instance.collection('patients');

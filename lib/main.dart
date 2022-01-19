@@ -11,7 +11,9 @@ import 'package:test_emad/admin/adminHome.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // if( Firebase.apps.length == 0){
   await Firebase.initializeApp(
+    
     // Replace with actual values
     options: FirebaseOptions(
       apiKey: "AIzaSyBIuXrd5qAH-i8J0NlZYGE0nZPvxL5VXJs",
@@ -21,6 +23,8 @@ Future<void> main() async {
       projectId: "app-challenge-sht",
     ),
   );
+  // }
+  // else Firebase.app();
   runApp(MyApp());
 }
 
@@ -45,7 +49,7 @@ class LoginPage extends StatelessWidget {
 
   Future<String> login(cod_fiscale, password) async {
     final digest = Crypt.sha256(password).toString();
-    var uri = Uri.parse('http://192.168.0.102:5000/login');
+    var uri = Uri.parse('http://192.168.1.55:5000/login');
     
     print(uri);
 

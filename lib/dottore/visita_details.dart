@@ -58,7 +58,7 @@ class _CreateVisita2State extends State<CreateVisita2> {
 
   Future<String> getPatient() async {
     mainDataList.clear();
-    var uri = Uri.parse('http://192.168.0.102:5000/attori_associati');
+    var uri = Uri.parse('http://192.168.1.55:5000/attori_associati');
 
     print(uri);
 
@@ -109,7 +109,7 @@ class _CreateVisita2State extends State<CreateVisita2> {
   }
 
   Future<String> creaVisitaServer() async {
-    var uri = Uri.parse('http://192.168.0.102:5000/dottore/crea_visita');
+    var uri = Uri.parse('http://192.168.1.55:5000/dottore/crea_visita');
     print(uri);
 
     print(cod_fiscale + "ukff");

@@ -34,7 +34,7 @@ class List_page extends StatelessWidget {
 
     var body = json.encode(message);
 
-    var uri = Uri.parse('http://192.168.0.102:5000/attori_associati');
+    var uri = Uri.parse('http://192.168.1.55:5000/attori_associati');
       
 
     var attori_associati = await http.post(uri,
