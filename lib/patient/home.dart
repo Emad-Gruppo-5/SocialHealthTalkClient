@@ -269,6 +269,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                                 if (_isRecording == false) {
                                                   print(_textFieldController);
                                                   sendRispostaToDatabase(data, document, isAudio);
+                                                  isAudio = false;
                                                   Navigator.pop(
                                                       context, 'Cancel');
                                                 } else {
