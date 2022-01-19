@@ -14,11 +14,11 @@ Future<void> main() async {
   await Firebase.initializeApp(
     // Replace with actual values
     options: FirebaseOptions(
-      apiKey: "AIzaSyAIqKriphksQVYJ4okGp_RGecy8kZCALcA",
-      appId: "1:208691712490:android:d4eaafadf9ba1e990b2293",
+      apiKey: "AIzaSyBIuXrd5qAH-i8J0NlZYGE0nZPvxL5VXJs",
+      appId: "1:538201922332:android:43e7210d4ce4a6a7e9f8d9",
       messagingSenderId:
-          "208691712490-35elfljftgqj1v9gi9c3otgab8s7lfae.apps.googleusercontent.com",
-      projectId: "firestore-example-7e888",
+          "538201922332-b9n2vl6lggp4hiaulkn3f7j5gvbdij6k.apps.googleusercontent.com",
+      projectId: "app-challenge-sht",
     ),
   );
   runApp(MyApp());
@@ -45,7 +45,7 @@ class LoginPage extends StatelessWidget {
 
   Future<String> login(cod_fiscale, password) async {
     final digest = Crypt.sha256(password).toString();
-    var uri = Uri.parse('http://100.75.184.95:5000/login');
+    var uri = Uri.parse('http://192.168.0.102:5000/login');
     
     print(uri);
 

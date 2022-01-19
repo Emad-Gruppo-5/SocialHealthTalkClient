@@ -462,10 +462,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           downloadUrl = await ref.getDownloadURL();
           print(downloadUrl);
           var uri;
-          if (kIsWeb) {
-            uri = Uri.parse('http://127.0.0.1:5000/aggiungi_domanda');
-          } else
-            uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
+          // if (kIsWeb) {
+            uri = Uri.parse('http://192.168.0.102:5000/aggiungi_domanda');
+          // } else
+          //   uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
           DateFormat data_risposta_format = DateFormat("yyyy-MM-dd HH:mm");
           DateFormat data_query_format = DateFormat("yyyy-MM-dd");
@@ -505,10 +505,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
       } else {
         var uri;
-        if (kIsWeb) {
-          uri = Uri.parse('http://127.0.0.1:5000/aggiungi_domanda');
-        } else
-          uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
+        // if (kIsWeb) {
+          uri = Uri.parse('http://192.168.0.102:5000/aggiungi_domanda');
+        // } else
+        //   uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
         DateFormat data_risposta_format = DateFormat("yyyy-MM-dd HH:mm");
         DateFormat data_query_format = DateFormat("yyyy-MM-dd");

@@ -11,7 +11,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// This is the main application widget.
-class NewQuestion extends StatelessWidget {
+class NewQuestion extends StatefulWidget {
   final String paz_cod_fiscale;
   final String token;
   final String cod_fiscale;
@@ -30,11 +30,42 @@ class NewQuestion extends StatelessWidget {
     required this.num_cellulare,
     required this.specializzazione,
   });
-  TextEditingController _testo_domanda = TextEditingController();
+  @override
+  NewQuestionState createState() => NewQuestionState();
+}
+
+class NewQuestionState extends State<NewQuestion> {
+
+  late String paz_cod_fiscale;
+  late String token;
+  late String cod_fiscale;
+  late String nome;
+  late String cognome;
+  late String email;
+  late String num_cellulare;
+  late String specializzazione;
+
+  @override
+  void initState() {
+    print("initState");
+    cod_fiscale = widget.cod_fiscale;
+    token = widget.token;
+    nome = widget.nome;
+    cognome = widget.cognome;
+    email = widget.email;
+    num_cellulare = widget.num_cellulare;
+    specializzazione = widget.specializzazione;
+    paz_cod_fiscale = widget.paz_cod_fiscale;
+    super.initState();
+  }
+
+  String _testo_domanda = " ";
   TextEditingController _data_domanda_DA = TextEditingController();
   TextEditingController _data_domanda_A = TextEditingController();
   TextEditingController _ora_domanda = TextEditingController();
-  // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<bool> isChecked = [false, true, false];
   String dropdownValue = 'Una volta';
   bool _repeat = false;
@@ -69,20 +100,30 @@ class NewQuestion extends StatelessWidget {
   }
 
   Widget _form() {
-    final _formKey = GlobalKey<FormState>();
 
     return Form(
-      key: _formKey,
-      child: Column(
+        key: _formKey,
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _textFormField(
-                  Icons.help_center_rounded,
-                  "Inserisci domanda",
-                  "Ricordati di inserire la domanda",
-                  _testo_domanda),
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.help_center_rounded),
+                    labelText: "Inserisci domanda",
+                  ),
+                  // The validator receives the text that the user has entered.
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Ricordati di inserire la domanda";
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    _testo_domanda = value;
+                  },
+                )
             ),
             Visibility(
                 visible: !_repeat,
@@ -214,12 +255,12 @@ class NewQuestion extends StatelessWidget {
               title: const Text('Ripeti'),
               value: _repeat,
               onChanged: (bool value) {
-                
+                setState(() {
                   _repeat = value;
                   _data_domanda_DA.clear();
                   _data_domanda_A.clear();
                   _ora_domanda.clear();
-                
+                });
               },
               secondary: const Icon(Icons.repeat),
               contentPadding: const EdgeInsets.symmetric(horizontal: 100),
@@ -240,12 +281,12 @@ class NewQuestion extends StatelessWidget {
                       print("DIFFERENZA: " + dif.toString() );
 
                     }
-                    
-                    
+
+
                     // Validate returns true if the form is valid, or false otherwise.
                     if (_formKey.currentState!.validate()) {
                       CollectionReference questions =
-                          FirebaseFirestore.instance.collection('questions');
+                      FirebaseFirestore.instance.collection('questions');
                       questions.add({
                         'cod_fiscale_dottore': cod_fiscale,
                         'cod_fiscale_paziente': paz_cod_fiscale,
@@ -254,23 +295,23 @@ class NewQuestion extends StatelessWidget {
                         'letto': false,
                         'data_domanda': _repeat == true ? _data_domanda_DA.text + " " + _ora_domanda.text : _data_domanda_DA.text,
                         'ripeti': _repeat == true ? dif : 0,
-                        'testo_domanda': _testo_domanda.text
+                        'testo_domanda': _testo_domanda
                       });
-                      // ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-                      //     .showSnackBar(const SnackBar(
-                      //         content: Text("Domanda inviata con successo")));
+                      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                          .showSnackBar(const SnackBar(
+                          content: Text("Domanda inviata con successo")));
                     }
                   },
-                  child: const Text('Salva'),
+                  child: const Text('Invia'),
                 ),
               ),
             ),
           ],
-        ),
+        )
     );
   }
 
-  Widget _textFormField(IconData icon, String labelText, String validator,
+  StatefulWidget _textFormField(IconData icon, String labelText, String validator,
       TextEditingController _con) {
     return TextFormField(
       controller: _con,
@@ -294,7 +335,7 @@ class NewQuestion extends StatelessWidget {
       localizationsDelegates: [GlobalMaterialLocalizations.delegate],
       supportedLocales: [const Locale('it')],
       home: Scaffold(
-        // key: _scaffoldKey,
+        key: _scaffoldKey,
         appBar: AppBar(
           leading: _iconButton(
               context,

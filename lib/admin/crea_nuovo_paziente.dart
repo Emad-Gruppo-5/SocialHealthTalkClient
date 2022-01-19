@@ -61,13 +61,13 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   TextEditingController _cont4 = TextEditingController();
   TextEditingController _cont5 = TextEditingController();
   TextEditingController _cont6 = TextEditingController();
-  String sesso = '';
+  String sesso = 'M';
   //TextEditingController _cont7 = TextEditingController();
   TextEditingController _cont8 = TextEditingController();
   int chat_mode = 0;
 
   Future<void> creaPazienteServer() async {
-    var uri = Uri.parse('http://100.75.184.95:5000/crea_utente');
+    var uri = Uri.parse('http://192.168.0.102:5000/crea_utente');
     print(uri);
     CollectionReference patients =
         FirebaseFirestore.instance.collection('patients');

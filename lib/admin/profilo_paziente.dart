@@ -34,7 +34,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
 
   Future<Map<String, dynamic>> getprofiledata() async {
     print("Inizio funzione");
-    var uri = Uri.parse('http://100.75.184.95:5000/dati_profilo');
+    var uri = Uri.parse('http://192.168.0.102:5000/dati_profilo');
     print(uri);
     var message = {"role": 1, "cod_fiscale": cod_fiscale};
 
@@ -46,7 +46,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
         },
         body: body);
 
-    uri = Uri.parse('http://100.75.184.95:5000/attori_associati');
+    uri = Uri.parse('http://192.168.0.102:5000/attori_associati');
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{
@@ -118,7 +118,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                           CollectionReference patients =
                               FirebaseFirestore.instance.collection('patients');
                           var uri =
-                              Uri.parse('http://100.75.184.95:5000/elimina_utente');
+                              Uri.parse('http://192.168.0.102:5000/elimina_utente');
                           print(uri);
                           var message = {"role": 1, "cod_fiscale": cod_fiscale};
 
@@ -209,7 +209,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                           Icons.smartphone),
                       _card(profilo["email"], Icons.email),
                       _card2(profilo["eta"], 'Età:'),
-                      _card2(profilo["sesso"], "sesso:"),
+                      _card2(profilo["sesso"] == null ? "null" : profilo["sesso"], "sesso:"),
                       _card2(profilo["titolo_studio"], "Titolo di studio:"),
                       const Text("\nTipologia chat"),
                       _checkboxListTile("Solo testo",

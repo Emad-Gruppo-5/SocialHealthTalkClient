@@ -63,7 +63,7 @@ class MyDetailPatient extends State<DetailPatient> {
 
   Future<Map<String, dynamic>> getprofiledata() async {
     print("Inizio funzione");
-    var uri = Uri.parse('http://100.75.184.95:5000/dati_profilo');
+    var uri = Uri.parse('http://192.168.0.102:5000/dati_profilo');
     print(uri);
     var message = {"role": 1, "cod_fiscale": paz_cod_fiscale};
 

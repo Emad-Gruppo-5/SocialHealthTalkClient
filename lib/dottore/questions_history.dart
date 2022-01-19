@@ -7,8 +7,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:audiofileplayer/audiofileplayer.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:audioplayer/audioplayer.dart';
+
+
 class QuestionsHistory extends StatefulWidget {
   
   final String cod_fiscale_paziente;
@@ -35,6 +38,9 @@ class _QuestionsHistory extends State<QuestionsHistory> {
 
   CollectionReference _opened_questions = FirebaseFirestore.instance.collection('questions_to_answer');
   bool _isRecording = false;
+  FirebaseStorage storage = FirebaseStorage.instance;
+  
+  AudioPlayer audioPlayer = AudioPlayer();
 
   _icon() {
     if (_isRecording == false) {
@@ -47,7 +53,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
 
   Future<List<Map<String, dynamic>>> getListaDomande(String dateFormat) async {
     List<Map<String, dynamic>> _closed_questions = [];
-    var uri = Uri.parse('http://100.75.184.95:5000/lista_domande');
+    var uri = Uri.parse('http://192.168.0.102:5000/lista_domande');
 
     print(uri);
 
@@ -292,6 +298,8 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                         onTap: () => showDialog<void>(
                                                 context: context,
                                                 builder: (BuildContext context) {
+                                                   
+                                                  
                                                   return SimpleDialog(
                                                     title: Text(data['testo_domanda'] ),
                                                     children: <Widget>[
@@ -300,19 +308,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                                                                 Text(data["testo_risposta"]) : 
                                                                                 IconButton(
                                                                                     onPressed: () {
-                                                                                      var bd = base64Decode(data["audio_risposta"]);
-                                                                                      Audio audio = Audio.loadFromByteData(ByteData.sublistView(bd));
-                                                                                      // if (_isRecording == false) {
-                                                                                      //   setState(() {
-                                                                                      //     _isRecording = true;
-                                                                                      //   });
-                                                                                        audio.play();
-                                                                                      // } else {
-                                                                                      //   setState(() {
-                                                                                      //     _isRecording = false;
-                                                                                      //   });
-                                                                                      //   audio.resume();
-                                                                                      // }
+                                                                                      audioPlayer.play(data["audio_risposta"]);
                                                                                     },
                                                                                     icon: _icon(),
                                                                                   ),
