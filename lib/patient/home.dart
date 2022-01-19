@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:record/record.dart';
 import '../main.dart';
@@ -237,6 +238,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                         return AlertDialog(
                                           title: Text(data['testo_domanda']),
                                           content: TextField(
+                                            enabled: !isAudio,
                                             onChanged: (value) {
                                               risposta = value;
                                             },
@@ -255,6 +257,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                                 } else {
                                                   setState(() {
                                                     _isRecording = false;
+                                                    isAudio = true;
                                                   });
                                                   _stop(data, document);
                                                 }
@@ -265,7 +268,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                               onPressed: () {
                                                 if (_isRecording == false) {
                                                   print(_textFieldController);
-                                                  sendRispostaToDatabase(data, document, false);
+                                                  sendRispostaToDatabase(data, document, isAudio);
+                                                  isAudio = false;
                                                   Navigator.pop(
                                                       context, 'Cancel');
                                                 } else {
@@ -279,7 +283,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                                       .showSnackBar(snackBar);
                                                 }
                                               },
-                                              child: const Text('Invio'),
+                                              child: _text(),
                                             ),
                                           ],
                                         );
@@ -351,6 +355,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   final _audioRecorder = Record();
   var _textFieldController;
   String risposta = " ";
+  bool isAudio = false;
 
   @override
   void initState() {
@@ -386,7 +391,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           Directory? appDocDir = await getExternalStorageDirectory();
           String? appDocPath = appDocDir?.path;
           await _audioRecorder.start(
-            path: '$appDocPath/myFile.mp3',
+            path: '$appDocPath/myFile.m4a',
             encoder: AudioEncoder.AAC, // by default
             bitRate: 128000,
           );
@@ -422,7 +427,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     // Find the ScaffoldMessenger in the widget tree
     // and use it to show a SnackBar.
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    return sendRispostaToDatabase(data, document, true);
   }
 
   _icon() {
@@ -433,56 +437,112 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     }
   }
 
+  _text() {
+    if (isAudio == false) {
+      return const Text("Invio testo");
+    } else {
+      return const Text("Invia registrazione");
+    }
+  }
+
   sendRispostaToDatabase(Map fireData, DocumentSnapshot<Object?> document, bool isAudio) async {
     try {
       String base64String;
+      String downloadUrl;
       if(isAudio) {
         File file = File(path2);
         file.openRead();
         List<int> fileBytes = await file.readAsBytes();
         base64String = base64Encode(fileBytes);
         risposta = "null";
+        FirebaseStorage storage = FirebaseStorage.instance;
+        Reference ref = storage.ref().child("audiopaziente" + DateTime.now().toString());
+        UploadTask uploadTask = ref.putFile(file);
+        uploadTask.whenComplete(() async {
+          downloadUrl = await ref.getDownloadURL();
+          print(downloadUrl);
+          var uri;
+          if (kIsWeb) {
+            uri = Uri.parse('http://127.0.0.1:5000/aggiungi_domanda');
+          } else
+            uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
+
+          DateFormat data_risposta_format = DateFormat("yyyy-MM-dd HH:mm");
+          DateFormat data_query_format = DateFormat("yyyy-MM-dd");
+
+          Map<String, String> message = {
+            "audio_risposta": downloadUrl,
+            "data_risposta": data_risposta_format.format(DateTime.now()),
+            "cod_fiscale_paziente": cod_fiscale,
+            "data_domanda": fireData["data_domanda"],
+            "testo_domanda": fireData["testo_domanda"],
+            "cod_fiscale_dottore": fireData["cod_fiscale_dottore"],
+            "testo_risposta": risposta,
+            "data_query": data_query_format.format(DateTime.now())
+          };
+          var body = json.encode(message);
+          print("\nBODY:: " + body);
+          var data = await http.post(uri,
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8'
+              },
+              body: body);
+          print('Response status: ${data.statusCode}');
+          print('Response body: ' + data.body);
+          if (data.statusCode != 200) {
+            print("ERRORE LATO POSTGRESQL: err: ");
+            const snackBar = const SnackBar(
+              content: Text('Risposta non inserita'),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            document.reference.delete();
+          }
+          return data.statusCode;
+
+        }).catchError((onError) {
+          print(onError);
+        });
+
       } else {
-        base64String = "null";
+        var uri;
+        if (kIsWeb) {
+          uri = Uri.parse('http://127.0.0.1:5000/aggiungi_domanda');
+        } else
+          uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
+
+        DateFormat data_risposta_format = DateFormat("yyyy-MM-dd HH:mm");
+        DateFormat data_query_format = DateFormat("yyyy-MM-dd");
+
+        Map<String, String> message = {
+          "audio_risposta": "null",
+          "data_risposta": data_risposta_format.format(DateTime.now()),
+          "cod_fiscale_paziente": cod_fiscale,
+          "data_domanda": fireData["data_domanda"],
+          "testo_domanda": fireData["testo_domanda"],
+          "cod_fiscale_dottore": fireData["cod_fiscale_dottore"],
+          "testo_risposta": risposta,
+          "data_query": data_query_format.format(DateTime.now())
+        };
+        var body = json.encode(message);
+        print("\nBODY:: " + body);
+        var data = await http.post(uri,
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8'
+            },
+            body: body);
+        print('Response status: ${data.statusCode}');
+        print('Response body: ' + data.body);
+        if (data.statusCode != 200) {
+          print("ERRORE LATO POSTGRESQL: err: ");
+          const snackBar = const SnackBar(
+            content: Text('Risposta non inserita'),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          document.reference.delete();
+        }
+        return data.statusCode;
       }
 
-      var uri;
-      if (kIsWeb) {
-        uri = Uri.parse('http://100.75.184.95:5000/aggiungi_domanda');
-      } else
-        uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
-
-      DateFormat data_risposta_format = DateFormat("yyyy-MM-dd HH:mm");
-      DateFormat data_query_format = DateFormat("yyyy-MM-dd");
-
-      Map<String, String> message = {
-        "audio_risposta": base64String,
-        "data_risposta": data_risposta_format.format(DateTime.now()),
-        "cod_fiscale_paziente": cod_fiscale,
-        "data_domanda": fireData["data_domanda"],
-        "testo_domanda": fireData["testo_domanda"],
-        "cod_fiscale_dottore": fireData["cod_fiscale_dottore"],
-        "testo_risposta": risposta,
-        "data_query": data_query_format.format(DateTime.now())
-      };
-      var body = json.encode(message);
-      print("\nBODY:: " + body);
-      var data = await http.post(uri,
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8'
-          },
-          body: body);
-      print('Response status: ${data.statusCode}');
-      print('Response body: ' + data.body);
-      if (data.statusCode != 200) {
-        print("ERRORE LATO POSTGRESQL: err: ");
-        const snackBar = const SnackBar(
-          content: Text('Risposta non inserita'),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        document.reference.delete();
-      }
-      return data.statusCode;
     } catch (e) {
       print(e.toString());
 
