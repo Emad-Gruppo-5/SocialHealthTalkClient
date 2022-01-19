@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 class List_page extends StatelessWidget {
   final String token;
   final String cod_fiscale;
@@ -34,7 +34,8 @@ class List_page extends StatelessWidget {
 
     var body = json.encode(message);
 
-    var uri = Uri.parse('http://127.0.0.1:5000/attori_associati');
+    var uri = Uri.parse('http://100.75.184.95:5000/attori_associati');
+      
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{

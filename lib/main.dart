@@ -45,7 +45,8 @@ class LoginPage extends StatelessWidget {
 
   Future<String> login(cod_fiscale, password) async {
     final digest = Crypt.sha256(password).toString();
-    var uri = Uri.parse('http://127.0.0.1:5000/login');
+    var uri = Uri.parse('http://100.75.184.95:5000/login');
+    
     print(uri);
 
     print("\nECCOMI IN getUser. COD_FISCALE: " +

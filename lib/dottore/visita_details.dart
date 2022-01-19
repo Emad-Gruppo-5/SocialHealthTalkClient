@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -58,7 +58,8 @@ class _CreateVisita2State extends State<CreateVisita2> {
 
   Future<String> getPatient() async {
     mainDataList.clear();
-    var uri = Uri.parse('http://127.0.0.1:5000/admin/attori_associati');
+    var uri = Uri.parse('http://100.75.184.95:5000/attori_associati');
+
     print(uri);
 
     
@@ -108,7 +109,7 @@ class _CreateVisita2State extends State<CreateVisita2> {
   }
 
   Future<String> creaVisitaServer() async {
-    var uri = Uri.parse('http://127.0.0.1:5000/dottore/crea_visita');
+    var uri = Uri.parse('http://100.75.184.95:5000/dottore/crea_visita');
     print(uri);
 
     print(cod_fiscale + "ukff");

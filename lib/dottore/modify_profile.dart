@@ -1,7 +1,7 @@
 // ignore_for_file: unnecessary_const
 
 import 'dart:convert';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:test_emad/main.dart';
 import 'main_dottore.dart';
@@ -148,7 +148,8 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   }
 
   Future<String> modificaUtente() async {
-    var uri = Uri.parse('http://127.0.0.1:5000/modifica_utente');
+    var uri = Uri.parse('http://100.75.184.95:5000/modifica_utente');
+
     print(uri);
 
     print(cod_fiscale + "ukff");

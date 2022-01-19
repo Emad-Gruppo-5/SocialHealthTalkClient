@@ -9,7 +9,7 @@ import 'package:test_emad/main.dart';
 import 'main_dottore.dart';
 import 'patient_list_item.dart';
 import 'new_question.dart';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 /// This is the main application widget.
 class DetailPatient extends StatefulWidget {
   final String token;
@@ -63,7 +63,7 @@ class MyDetailPatient extends State<DetailPatient> {
 
   Future<Map<String, dynamic>> getprofiledata() async {
     print("Inizio funzione");
-    var uri = Uri.parse('http://127.0.0.1:5000/dati_profilo');
+    var uri = Uri.parse('http://100.75.184.95:5000/dati_profilo');
     print(uri);
     var message = {"role": 1, "cod_fiscale": paz_cod_fiscale};
 

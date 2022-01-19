@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:audiofileplayer/audiofileplayer.dart';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 class QuestionsHistory extends StatefulWidget {
   
   final String cod_fiscale_paziente;
@@ -47,7 +47,8 @@ class _QuestionsHistory extends State<QuestionsHistory> {
 
   Future<List<Map<String, dynamic>>> getListaDomande(String dateFormat) async {
     List<Map<String, dynamic>> _closed_questions = [];
-    var uri = Uri.parse('http://127.0.0.1:5000/lista_domande');
+    var uri = Uri.parse('http://100.75.184.95:5000/lista_domande');
+
     print(uri);
 
     Map<String, dynamic> message = {

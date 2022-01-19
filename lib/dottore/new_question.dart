@@ -34,7 +34,7 @@ class NewQuestion extends StatelessWidget {
   TextEditingController _data_domanda_DA = TextEditingController();
   TextEditingController _data_domanda_A = TextEditingController();
   TextEditingController _ora_domanda = TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<bool> isChecked = [false, true, false];
   String dropdownValue = 'Una volta';
   bool _repeat = false;
@@ -73,8 +73,7 @@ class NewQuestion extends StatelessWidget {
 
     return Form(
       key: _formKey,
-      child: StatefulBuilder(builder: (context, setState) {
-        return Column(
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
@@ -215,12 +214,12 @@ class NewQuestion extends StatelessWidget {
               title: const Text('Ripeti'),
               value: _repeat,
               onChanged: (bool value) {
-                setState(() {
+                
                   _repeat = value;
                   _data_domanda_DA.clear();
                   _data_domanda_A.clear();
                   _ora_domanda.clear();
-                });
+                
               },
               secondary: const Icon(Icons.repeat),
               contentPadding: const EdgeInsets.symmetric(horizontal: 100),
@@ -257,9 +256,9 @@ class NewQuestion extends StatelessWidget {
                         'ripeti': _repeat == true ? dif : 0,
                         'testo_domanda': _testo_domanda.text
                       });
-                      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-                          .showSnackBar(const SnackBar(
-                              content: Text("Domanda inviata con successo")));
+                      // ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                      //     .showSnackBar(const SnackBar(
+                      //         content: Text("Domanda inviata con successo")));
                     }
                   },
                   child: const Text('Salva'),
@@ -267,8 +266,7 @@ class NewQuestion extends StatelessWidget {
               ),
             ),
           ],
-        );
-      }),
+        ),
     );
   }
 
@@ -296,7 +294,7 @@ class NewQuestion extends StatelessWidget {
       localizationsDelegates: [GlobalMaterialLocalizations.delegate],
       supportedLocales: [const Locale('it')],
       home: Scaffold(
-        key: _scaffoldKey,
+        // key: _scaffoldKey,
         appBar: AppBar(
           leading: _iconButton(
               context,

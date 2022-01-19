@@ -257,8 +257,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                                     _isRecording = false;
                                                   });
                                                   _stop(data, document);
-                                                  Navigator.pop(
-                                                      context, 'Cancel');
                                                 }
                                               },
                                               icon: _icon(),
@@ -450,7 +448,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
       var uri;
       if (kIsWeb) {
-        uri = Uri.parse('http://127.0.0.1:5000/aggiungi_domanda');
+        uri = Uri.parse('http://100.75.184.95:5000/aggiungi_domanda');
       } else
         uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
