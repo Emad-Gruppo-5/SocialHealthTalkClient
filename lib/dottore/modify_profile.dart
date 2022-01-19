@@ -59,6 +59,38 @@ class ModifyProfile extends StatelessWidget {
     return iconButton;
   }
 
+  Widget _iconButton2(BuildContext context, IconData icon, String tooltip,
+      StatefulWidget statelessWidget) {
+    IconButton iconButton;
+
+    if (tooltip != "Logout") {
+      iconButton = IconButton(
+        icon: Icon(icon),
+        tooltip: tooltip,
+        onPressed: () {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LoginPage(),
+              ));
+        },
+      );
+    } else {
+      iconButton = IconButton(
+        icon: Icon(icon),
+        tooltip: tooltip,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (co) => statelessWidget),
+          );
+        },
+      );
+    }
+
+    return iconButton;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -78,7 +110,7 @@ class ModifyProfile extends StatelessWidget {
                   token: token)),
           title: const Text("Modifica dati"),
           actions: [
-            _iconButton(
+            _iconButton2(
                 context,
                 Icons.logout,
                 'Logout',

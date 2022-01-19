@@ -9,11 +9,13 @@ import 'package:test_emad/dottore/main_dottore.dart';
 import 'package:test_emad/patient/home.dart';
 import 'package:test_emad/admin/adminHome.dart';
 
+import 'costanti.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // if( Firebase.apps.length == 0){
   await Firebase.initializeApp(
-    
+
     // Replace with actual values
     options: FirebaseOptions(
       apiKey: "AIzaSyBIuXrd5qAH-i8J0NlZYGE0nZPvxL5VXJs",
@@ -43,13 +45,19 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+
+  @override
+  State<LoginPage> createState() => LoginPageState();
+}
+
+class LoginPageState extends State<LoginPage> {
   TextEditingController _cod_fiscaleC = TextEditingController();
   TextEditingController _passwordC = TextEditingController();
 
   Future<String> login(cod_fiscale, password) async {
     final digest = Crypt.sha256(password).toString();
-    var uri = Uri.parse('http://192.168.1.55:5000/login');
+    var uri = Uri.parse('http://' + urlServer + ':5000/login');
     
     print(uri);
 
@@ -190,7 +198,7 @@ class LoginPage extends StatelessWidget {
                                       switch (role) {
                                         case 1: //PAZIENTE
                                           int tipologia_chat = json.decode(data)['tipologia_chat'];
-                                          Navigator.push(
+                                          Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) => Patient_Home(

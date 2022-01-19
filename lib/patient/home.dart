@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:record/record.dart';
+import '../costanti.dart';
 import '../main.dart';
 import 'profile.dart';
 import 'dart:developer';
@@ -139,7 +140,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       iconSize: 40,
       onPressed: () {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => MyApp()));
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
       },
     );
   }
@@ -451,9 +454,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       String downloadUrl;
       if(isAudio) {
         File file = File(path2);
-        file.openRead();
-        List<int> fileBytes = await file.readAsBytes();
-        base64String = base64Encode(fileBytes);
         risposta = "null";
         FirebaseStorage storage = FirebaseStorage.instance;
         Reference ref = storage.ref().child("audiopaziente" + DateTime.now().toString());
@@ -463,7 +463,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           print(downloadUrl);
           var uri;
           // if (kIsWeb) {
-            uri = Uri.parse('http://192.168.1.55:5000/aggiungi_domanda');
+            uri = Uri.parse('http://' + urlServer + ':5000/aggiungi_domanda');
           // } else
           //   uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
@@ -506,7 +506,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       } else {
         var uri;
         // if (kIsWeb) {
-          uri = Uri.parse('http://192.168.1.55:5000/aggiungi_domanda');
+          uri = Uri.parse('http://' + urlServer + ':5000/aggiungi_domanda');
         // } else
         //   uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 

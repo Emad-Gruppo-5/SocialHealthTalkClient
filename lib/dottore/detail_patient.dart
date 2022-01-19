@@ -81,13 +81,13 @@ class MyDetailPatient extends State<DetailPatient> {
   }
 
   Widget _iconButton(BuildContext context, IconData icon, String tooltip,
-      StatelessWidget statelessWidget) {
+      var statelessWidget) {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
       iconSize: 40,
       onPressed: () {
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => statelessWidget),
         );
