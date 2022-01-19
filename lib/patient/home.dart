@@ -238,6 +238,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                         return AlertDialog(
                                           title: Text(data['testo_domanda']),
                                           content: TextField(
+                                            enabled: !isAudio,
                                             onChanged: (value) {
                                               risposta = value;
                                             },
@@ -256,10 +257,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                                 } else {
                                                   setState(() {
                                                     _isRecording = false;
+                                                    isAudio = true;
                                                   });
                                                   _stop(data, document);
-                                                  Navigator.pop(
-                                                      context, 'Cancel');
                                                 }
                                               },
                                               icon: _icon(),
@@ -268,7 +268,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                               onPressed: () {
                                                 if (_isRecording == false) {
                                                   print(_textFieldController);
-                                                  sendRispostaToDatabase(data, document, false);
+                                                  sendRispostaToDatabase(data, document, isAudio);
                                                   Navigator.pop(
                                                       context, 'Cancel');
                                                 } else {
@@ -282,7 +282,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                                       .showSnackBar(snackBar);
                                                 }
                                               },
-                                              child: const Text('Invio'),
+                                              child: _text(),
                                             ),
                                           ],
                                         );
@@ -354,6 +354,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   final _audioRecorder = Record();
   var _textFieldController;
   String risposta = " ";
+  bool isAudio = false;
 
   @override
   void initState() {
@@ -425,7 +426,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     // Find the ScaffoldMessenger in the widget tree
     // and use it to show a SnackBar.
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    return sendRispostaToDatabase(data, document, true);
   }
 
   _icon() {
@@ -433,6 +433,14 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       return const Icon(Icons.mic_none_sharp, color: Colors.blue);
     } else {
       return const Icon(Icons.stop, color: Colors.blue);
+    }
+  }
+
+  _text() {
+    if (isAudio == false) {
+      return const Text("Invio testo");
+    } else {
+      return const Text("Invia registrazione");
     }
   }
 
