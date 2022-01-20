@@ -15,7 +15,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // if( Firebase.apps.length == 0){
   await Firebase.initializeApp(
-
     // Replace with actual values
     options: FirebaseOptions(
       apiKey: "AIzaSyBIuXrd5qAH-i8J0NlZYGE0nZPvxL5VXJs",
@@ -46,7 +45,6 @@ class MyApp extends StatelessWidget {
 }
 
 class LoginPage extends StatefulWidget {
-
   @override
   State<LoginPage> createState() => LoginPageState();
 }
@@ -54,11 +52,12 @@ class LoginPage extends StatefulWidget {
 class LoginPageState extends State<LoginPage> {
   TextEditingController _cod_fiscaleC = TextEditingController();
   TextEditingController _passwordC = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   Future<String> login(cod_fiscale, password) async {
     final digest = Crypt.sha256(password).toString();
     var uri = Uri.parse('http://' + urlServer + ':5000/login');
-    
+
     print(uri);
 
     print("\nECCOMI IN getUser. COD_FISCALE: " +
@@ -83,12 +82,10 @@ class LoginPageState extends State<LoginPage> {
     return data.body;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: double.infinity,
         decoration: BoxDecoration(
             gradient: LinearGradient(begin: Alignment.topCenter, colors: [
           Colors.lightBlue.shade200,
@@ -98,17 +95,19 @@ class LoginPageState extends State<LoginPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(
-              height: 40,
-            ),
             Padding(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(5),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   // Text("Login", style: TextStyle(color: Colors.white, fontSize: 40),),
                   // SizedBox(height: 10,)
-                  Center(child: Image.asset('assets/images/SHT.png'))
+                  Center(
+                      child: Image.asset(
+                    'assets/images/SHT.png',
+                    fit: BoxFit.scaleDown,
+                    width: 960,
+                  ))
                 ],
               ),
             ),
@@ -121,94 +120,119 @@ class LoginPageState extends State<LoginPage> {
                         topLeft: Radius.circular(60),
                         topRight: Radius.circular(60))),
                 child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.all(30),
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 30,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Color.fromRGBO(109, 193, 255, .3),
-                                    blurRadius: 20,
-                                    offset: Offset(0, 10))
-                              ]),
-                          child: Column(
-                            children: <Widget>[
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    border: Border(
-                                        bottom: BorderSide(
-                                            color: Colors.grey.shade200))),
-                                child: TextField(
-                                  controller: _cod_fiscaleC,
-                                  decoration: InputDecoration(
-                                      hintText: "Codice fiscale",
-                                      hintStyle: TextStyle(color: Colors.grey),
-                                      border: InputBorder.none),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    border: Border(
-                                        bottom: BorderSide(
-                                            color: Colors.grey.shade200))),
-                                child: TextField(
-                                  controller: _passwordC,
-                                  obscureText: true,
-                                  decoration: InputDecoration(
-                                      hintText: "Password",
-                                      hintStyle: TextStyle(color: Colors.grey),
-                                      border: InputBorder.none),
-                                ),
-                              ),
-                            ],
+                  child: Form(
+                    key: _formKey,
+                    child: Padding(
+                      padding: EdgeInsets.all(30),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          SizedBox(
+                            height: 30,
                           ),
-                        ),
-                        SizedBox(
-                          height: 40,
-                        ),
-                        Container(
-                            height: 50,
-                            margin: EdgeInsets.symmetric(horizontal: 50),
+                          Container(
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(90),
-                                color: Colors.lightBlue.shade700),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                var cod_fiscale = _cod_fiscaleC.text;
-                                var password = _passwordC.text;
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Color.fromRGBO(109, 193, 255, .3),
+                                      blurRadius: 20,
+                                      offset: Offset(0, 10))
+                                ]),
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              color: Colors.grey.shade200))),
+                                  child: TextFormField(
+                                    controller: _cod_fiscaleC,
+                                    decoration: InputDecoration(
+                                        hintText: "Codice fiscale",
+                                        hintStyle:
+                                            TextStyle(color: Colors.grey),
+                                        border: InputBorder.none),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Inserire il codice fiscale";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      border: Border(
+                                          bottom: BorderSide(
+                                              color: Colors.grey.shade200))),
+                                  child: TextFormField(
+                                    controller: _passwordC,
+                                    obscureText: true,
+                                    decoration: InputDecoration(
+                                        hintText: "Password",
+                                        hintStyle:
+                                            TextStyle(color: Colors.grey),
+                                        border: InputBorder.none),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Inserire la password";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 40,
+                          ),
+                          Container(
+                              height: 50,
+                              margin: EdgeInsets.symmetric(horizontal: 50),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(90),
+                                  color: Colors.lightBlue.shade700),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    var cod_fiscale = _cod_fiscaleC.text;
+                                    var password = _passwordC.text;
 
-                                login(cod_fiscale, password).then((data) {
+                                    login(cod_fiscale, password).then((data) {
                                       int role = json.decode(data)['role'];
                                       String token = json.decode(data)['token'];
                                       String nome = json.decode(data)['nome'];
-                                      String cognome = json.decode(data)['cognome'];
+                                      String cognome =
+                                          json.decode(data)['cognome'];
                                       String email = json.decode(data)['email'];
-                                      String num_cellulare =
-                                          json.decode(data)['num_cellulare'].toString();
-                                      
+                                      String num_cellulare = json
+                                          .decode(data)['num_cellulare']
+                                          .toString();
+
                                       switch (role) {
                                         case 1: //PAZIENTE
-                                          int tipologia_chat = json.decode(data)['tipologia_chat'];
+                                          int tipologia_chat = json
+                                              .decode(data)['tipologia_chat'];
                                           Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => Patient_Home(
-                                                    cod_fiscale: cod_fiscale,
-                                                    nome: nome,
-                                                    cognome: cognome,
-                                                    email: email,
-                                                    num_cellulare: num_cellulare,
-                                                    tipologia_chat: tipologia_chat,
-                                                    token: token)),
+                                                builder: (context) =>
+                                                    Patient_Home(
+                                                        cod_fiscale:
+                                                            cod_fiscale,
+                                                        nome: nome,
+                                                        cognome: cognome,
+                                                        email: email,
+                                                        num_cellulare:
+                                                            num_cellulare,
+                                                        tipologia_chat:
+                                                            tipologia_chat,
+                                                        token: token)),
                                           );
                                           break;
                                         case 2: //DOTTORE
@@ -219,19 +243,24 @@ class LoginPageState extends State<LoginPage> {
                                                     builder: (context) =>
                                                         AdminHome()));
                                           } else {
-                                            String specializzazione = json.decode(data)['specializzazione'];
+                                            String specializzazione =
+                                                json.decode(
+                                                    data)['specializzazione'];
                                             Navigator.pushReplacement(
-                                                context, 
+                                                context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
                                                         MainDottore(
-                                                          token: token, 
-                                                          cod_fiscale: cod_fiscale,
-                                                          nome: nome,
-                                                          cognome: cognome,
-                                                          email: email,
-                                                          num_cellulare: num_cellulare,
-                                                          specializzazione: specializzazione )));
+                                                            token: token,
+                                                            cod_fiscale:
+                                                                cod_fiscale,
+                                                            nome: nome,
+                                                            cognome: cognome,
+                                                            email: email,
+                                                            num_cellulare:
+                                                                num_cellulare,
+                                                            specializzazione:
+                                                                specializzazione)));
                                           }
 
                                           break;
@@ -247,48 +276,52 @@ class LoginPageState extends State<LoginPage> {
                                           break;
                                         default:
                                       }
-                                })
-                                .catchError((error) => {
-                                  ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(content: Text('Utente non esistente'))),
+                                    }).catchError((error) => {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(
+                                                      'Utente non esistente'))),
                                           print(error)
-                                });
-                              },
-                              child: Center(
-                                  child: Text(
-                                "Accedi",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
+                                        });
+                                  }
+                                },
+                                child: Center(
+                                    child: Text(
+                                  "Accedi",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                                style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(90)),
+                                    primary: Colors.lightBlue.shade900),
                               )),
-                              style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(90)),
-                                  primary: Colors.lightBlue.shade900),
-                            )),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        const Divider(
+                          SizedBox(
                             height: 20,
-                            thickness: 1,
-                            indent: 10,
-                            endIndent: 30),
-                        // SizedBox(height: 20, ),
-                        // Text("Non sei ancora registrato? ", style: TextStyle(color: Colors.black87), ),
-                        // SizedBox(height: 20, ),
-                        // Container(
-                        //     height: 50,
-                        //     margin: EdgeInsets.symmetric(horizontal: 50),
-                        //     decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(50),
-                        //         color: Colors.lightBlue.shade900
-                        //     ),
-                        //     child: Center(
-                        //         child: Text("Registrati", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), ),
-                        //     )
-                        // )
-                      ],
+                          ),
+                          const Divider(
+                              height: 20,
+                              thickness: 1,
+                              indent: 10,
+                              endIndent: 30),
+                          // SizedBox(height: 20, ),
+                          // Text("Non sei ancora registrato? ", style: TextStyle(color: Colors.black87), ),
+                          // SizedBox(height: 20, ),
+                          // Container(
+                          //     height: 50,
+                          //     margin: EdgeInsets.symmetric(horizontal: 50),
+                          //     decoration: BoxDecoration(
+                          //         borderRadius: BorderRadius.circular(50),
+                          //         color: Colors.lightBlue.shade900
+                          //     ),
+                          //     child: Center(
+                          //         child: Text("Registrati", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), ),
+                          //     )
+                          // )
+                        ],
+                      ),
                     ),
                   ),
                 ),
