@@ -19,6 +19,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:audiofileplayer/audiofileplayer.dart';
+import 'package:flash/flash.dart';
 
 /// This is the main application widget.
 class Patient_Home extends StatelessWidget {
@@ -270,26 +271,19 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                             TextButton(
                                               onPressed: () {
                                                 if (_isRecording == false) {
-                                                  print(_textFieldController);
-                                                  sendRispostaToDatabase(data, document, isAudio);
+                                                  if (risposta != " " ||
+                                                      isAudio) {
+                                                    sendRispostaToDatabase(data,
+                                                        document, isAudio);
+                                                    Navigator.pop(context);
+                                                  } else {
+                                                    _showBasicsFlash(
+                                                        "É necessario registare o scrivere qualcosa prima di inviare una risposta");
+                                                  }
                                                   isAudio = false;
-                                                  const snackBar = SnackBar(
-                                                    content: Text(
-                                                        'Risposta inviata con successo'),
-                                                  );
-                                                  // Find the ScaffoldMessenger in the widget tree
-                                                  // and use it to show a SnackBar.
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(snackBar);
                                                 } else {
-                                                  const snackBar = SnackBar(
-                                                    content: Text(
-                                                        'Impossibile inviare testo mentre si sta registrando'),
-                                                  );
-                                                  // Find the ScaffoldMessenger in the widget tree
-                                                  // and use it to show a SnackBar.
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(snackBar);
+                                                  _showBasicsFlash(
+                                                      'Impossibile inviare messaggi mentre si sta registrando');
                                                 }
                                               },
                                               child: _text(),
@@ -395,7 +389,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             bitRate: 128000,
           );
           bool isRecording = await _audioRecorder.isRecording();
-
         } else {
           Directory? appDocDir = await getExternalStorageDirectory();
           String? appDocPath = appDocDir?.path;
@@ -410,12 +403,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             _isRecording = isRecording;
           });
         }
-        final snackBar = SnackBar(
-          content: const Text('Registrazione iniziata'),
-        );
-        // Find the ScaffoldMessenger in the widget tree
-        // and use it to show a SnackBar.
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        _showBasicsFlash("Registazione iniziata");
       }
     } catch (e) {
       print(e);
@@ -430,12 +418,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     audioSource = ap.AudioSource.uri(Uri.parse(path!));
     print(path);
     path2 = path;
-    final snackBar = SnackBar(
-      content: const Text('Registrazione inviata con successo'),
-    );
-    // Find the ScaffoldMessenger in the widget tree
-    // and use it to show a SnackBar.
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    _showBasicsFlash("Registrazione salvata con successo");
   }
 
   _icon() {
@@ -454,22 +437,24 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     }
   }
 
-  sendRispostaToDatabase(Map fireData, DocumentSnapshot<Object?> document, bool isAudio) async {
+  sendRispostaToDatabase(
+      Map fireData, DocumentSnapshot<Object?> document, bool isAudio) async {
     try {
       String base64String;
       String downloadUrl;
-      if(isAudio) {
+      if (isAudio) {
         File file = File(path2);
         risposta = "null";
         FirebaseStorage storage = FirebaseStorage.instance;
-        Reference ref = storage.ref().child("audiopaziente" + DateTime.now().toString());
+        Reference ref =
+            storage.ref().child("audiopaziente" + DateTime.now().toString());
         UploadTask uploadTask = ref.putFile(file);
         uploadTask.whenComplete(() async {
           downloadUrl = await ref.getDownloadURL();
           print(downloadUrl);
           var uri;
           // if (kIsWeb) {
-            uri = Uri.parse('http://' + urlServer + ':5000/aggiungi_domanda');
+          uri = Uri.parse('http://' + urlServer + ':5000/aggiungi_domanda');
           // } else
           //   uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
@@ -497,22 +482,19 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           print('Response body: ' + data.body);
           if (data.statusCode != 200) {
             print("ERRORE LATO POSTGRESQL: err: ");
-            const snackBar = const SnackBar(
-              content: Text('Risposta non inserita'),
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            _showBasicsFlash("Risposta non inserita");
+          } else {
+            _showBasicsFlash('Risposta inviata con successo');
             document.reference.delete();
           }
           return data.statusCode;
-
         }).catchError((onError) {
           print(onError);
         });
-
       } else {
         var uri;
         // if (kIsWeb) {
-          uri = Uri.parse('http://' + urlServer + ':5000/aggiungi_domanda');
+        uri = Uri.parse('http://' + urlServer + ':5000/aggiungi_domanda');
         // } else
         //   uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
@@ -540,15 +522,13 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         print('Response body: ' + data.body);
         if (data.statusCode != 200) {
           print("ERRORE LATO POSTGRESQL: err: ");
-          const snackBar = const SnackBar(
-            content: Text('Risposta non inserita'),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          _showBasicsFlash("Risposta non inserita");
+        } else {
+          _showBasicsFlash('Risposta inviata con successo');
           document.reference.delete();
         }
         return data.statusCode;
       }
-
     } catch (e) {
       print(e.toString());
 
@@ -556,5 +536,30 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     }
   }
 
-
+  void _showBasicsFlash(String text) {
+    Duration duration = const Duration(seconds: 7);
+    showFlash(
+      context: context,
+      duration: duration,
+      builder: (context, controller) {
+        var flashStyle = FlashBehavior.floating;
+        return Flash(
+          controller: controller,
+          behavior: flashStyle,
+          position: FlashPosition.bottom,
+          boxShadows: kElevationToShadow[4],
+          backgroundColor: Colors.black87,
+          horizontalDismissDirection: HorizontalDismissDirection.horizontal,
+          child: FlashBar(
+            content: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
