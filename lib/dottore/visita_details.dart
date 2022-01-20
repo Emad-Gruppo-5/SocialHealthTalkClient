@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:test_emad/costanti.dart';
 
 class TimePickerVisita extends StatelessWidget {
   final String date;
@@ -58,7 +58,7 @@ class _CreateVisita2State extends State<CreateVisita2> {
 
   Future<String> getPatient() async {
     mainDataList.clear();
-    var uri = Uri.parse('http://192.168.1.55:5000/attori_associati');
+    var uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
 
     print(uri);
 
@@ -109,7 +109,7 @@ class _CreateVisita2State extends State<CreateVisita2> {
   }
 
   Future<String> creaVisitaServer() async {
-    var uri = Uri.parse('http://192.168.1.55:5000/dottore/crea_visita');
+    var uri = Uri.parse('http://' + urlServer + ':5000/dottore/crea_visita');
     print(uri);
 
     print(cod_fiscale + "ukff");

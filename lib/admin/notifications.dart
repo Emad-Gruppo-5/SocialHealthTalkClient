@@ -3,7 +3,7 @@ import 'package:audioplayer/audioplayer.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:test_emad/costanti.dart';
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class Notifications extends StatelessWidget {
@@ -78,7 +78,7 @@ class Notifications extends StatelessWidget {
 }
 
 Future<void> sendEmail(List<Map<String, String>> addresses) async {
-  var uri = Uri.parse('http://192.168.1.55:5000/alert');
+  var uri = Uri.parse('http://' + urlServer + ':5000/alert');
   print(uri);
 
   print(addresses);
@@ -91,7 +91,7 @@ Future<void> sendEmail(List<Map<String, String>> addresses) async {
 
 Future<String> getActors(String cod_fiscale) async {
   List<Map<String, dynamic>> mainDataList = [];
-  var uri = Uri.parse('http://192.168.1.55:5000/attori_associati');
+  var uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
   print(uri);
 
   Map<String, dynamic> message = {"role": 1, "cod_fiscale": cod_fiscale};

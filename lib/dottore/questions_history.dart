@@ -9,7 +9,7 @@ import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:audioplayer/audioplayer.dart';
-
+import 'package:test_emad/costanti.dart';
 
 class QuestionsHistory extends StatefulWidget {
   
@@ -52,7 +52,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
 
   Future<List<Map<String, dynamic>>> getListaDomande(String dateFormat) async {
     List<Map<String, dynamic>> _closed_questions = [];
-    var uri = Uri.parse('http://192.168.1.55:5000/lista_domande');
+    var uri = Uri.parse('http://' + urlServer + ':5000/lista_domande');
 
     print(uri);
 
@@ -95,7 +95,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
 
   Future<void> eliminaDomanda(var id_domanda) async {
 
-    var uri = Uri.parse('http://192.168.1.55:5000/elimina_domanda');
+    var uri = Uri.parse('http://' + urlServer + ':5000/elimina_domanda');
 
     print(uri);
 

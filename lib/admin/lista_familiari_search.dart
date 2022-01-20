@@ -5,7 +5,7 @@ import 'package:test_emad/admin/crea_nuovo_familiare.dart';
 import 'package:test_emad/admin/profilo_dottore.dart';
 import 'package:test_emad/admin/profilo_familiari.dart';
 import 'package:test_emad/admin/profilo_paziente_modifica.dart';
-
+import 'package:test_emad/costanti.dart';
 import 'profilo_paziente.dart';
 
 class ListaFamiliariSearch extends StatelessWidget {
@@ -50,7 +50,7 @@ class ListSearchState extends State<ListSearch> {
 
   Future<String> getActors() async {
     mainDataList.clear();
-    var uri = Uri.parse('http://192.168.1.55:5000/lista_attori');
+    var uri = Uri.parse('http://' + urlServer + ':5000/lista_attori');
     print(uri);
 
     int role = 4;

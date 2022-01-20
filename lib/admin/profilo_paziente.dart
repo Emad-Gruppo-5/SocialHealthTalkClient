@@ -2,12 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:test_emad/admin/adminHome.dart';
 import 'package:test_emad/admin/lista_pazienti.dart';
 import 'package:test_emad/admin/profilo_paziente_modifica.dart';
 import 'package:test_emad/familiare.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:test_emad/costanti.dart';
 /// This is the main application widget.
 class ProfiloPaziente extends StatefulWidget {
   final String cod_fiscale;
@@ -21,7 +22,8 @@ class ProfiloPaziente extends StatefulWidget {
 // This is the stateless widget that the main application instantiates.
 class _ProfiloPaziente extends State<ProfiloPaziente> {
   late String cod_fiscale;
-
+  CollectionReference patients =
+                              FirebaseFirestore.instance.collection('patients');
   //late Future<Map<String, dynamic>> datiprofilo;
 
   @override
@@ -34,7 +36,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
 
   Future<Map<String, dynamic>> getprofiledata() async {
     print("Inizio funzione");
-    var uri = Uri.parse('http://192.168.1.55:5000/dati_profilo');
+    var uri = Uri.parse('http://' + urlServer + ':5000/dati_profilo');
     print(uri);
     var message = {"role": 1, "cod_fiscale": cod_fiscale};
 
@@ -46,7 +48,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
         },
         body: body);
 
-    uri = Uri.parse('http://192.168.1.55:5000/attori_associati');
+    uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{
@@ -60,6 +62,26 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
 
     return resp;
   }
+
+  Future<int> eliminaUtente() async {
+      
+      
+      var uri =
+          Uri.parse('http://' + urlServer + ':5000/elimina_utente');
+      print(uri);
+      var message = {"role": 1, "cod_fiscale": cod_fiscale};
+
+      var body = json.encode(message);
+
+      var data = await http.post(uri,
+              headers: <String, String>{
+                'Content-Type':
+                    'application/json; charset=UTF-8'
+              },
+              body: body);
+      return data.statusCode;
+    }
+
 
   @override
   Widget build(BuildContext context) {
@@ -113,32 +135,16 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                     actions: <Widget>[
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context, 'Si');
 
-                          CollectionReference patients =
-                              FirebaseFirestore.instance.collection('patients');
-                          var uri =
-                              Uri.parse('http://192.168.1.55:5000/elimina_utente');
-                          print(uri);
-                          var message = {"role": 1, "cod_fiscale": cod_fiscale};
-
-                          var body = json.encode(message);
-
-                          http
-                              .post(uri,
-                                  headers: <String, String>{
-                                    'Content-Type':
-                                        'application/json; charset=UTF-8'
-                                  },
-                                  body: body)
-                              .then((value) {
-                            if (value.statusCode == 200) {
+                          
+                            eliminaUtente().then((value) {
+                            if (value == 200) {
                               patients.doc(cod_fiscale).delete().then((value) {
                                 print("Patient Deleted");
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ListaPazienti(),
+                                    builder: (context) => AdminHome(),
                                   ),
                                 );
                               }).catchError((error) {
@@ -149,12 +155,17 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                                             "Errore nella rimozione del paziente")));
                               });
                             } else {
-                              print("Errore lato Server: " + value.body);
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text(
                                           "Errore nella rimozione del paziente")));
                             }
+                          })
+                          .catchError((err) => {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          "Errore nella rimozione del paziente"))),
                           });
                         },
                         child: const Text('Si'),

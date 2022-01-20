@@ -7,7 +7,7 @@ import 'package:test_emad/admin/profilo_volontari.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'profilo_paziente.dart';
-
+import 'package:test_emad/costanti.dart';
 class ListaVolontari extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -49,7 +49,7 @@ class ListSearchState extends State<ListSearch> {
 
   Future<String> getActors() async {
     mainDataList.clear();
-    var uri = Uri.parse('http://192.168.1.55:5000/lista_attori');
+    var uri = Uri.parse('http://' + urlServer + ':5000/lista_attori');
     print(uri);
 
     int role = 3;

@@ -8,6 +8,7 @@ import 'package:crypt/crypt.dart';
 import 'package:test_emad/dottore/main_dottore.dart';
 import 'package:test_emad/patient/home.dart';
 import 'package:test_emad/admin/adminHome.dart';
+import 'package:test_emad/recupera_password.dart';
 
 import 'costanti.dart';
 
@@ -274,20 +275,37 @@ class LoginPageState extends State<LoginPage> {
                             thickness: 1,
                             indent: 10,
                             endIndent: 30),
-                        // SizedBox(height: 20, ),
+                        SizedBox(height: 20, ),
                         // Text("Non sei ancora registrato? ", style: TextStyle(color: Colors.black87), ),
                         // SizedBox(height: 20, ),
-                        // Container(
-                        //     height: 50,
-                        //     margin: EdgeInsets.symmetric(horizontal: 50),
-                        //     decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(50),
-                        //         color: Colors.lightBlue.shade900
-                        //     ),
-                        //     child: Center(
-                        //         child: Text("Registrati", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), ),
-                        //     )
-                        // )
+                        Container(
+                            height: 50,
+                            margin: EdgeInsets.symmetric(horizontal: 50),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Colors.lightBlue.shade600
+                                
+                            ),
+                            child: ElevatedButton(
+                              onPressed: () {
+                               Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => RecuperaPassword()),
+                              );
+                              },
+                              child: Center(
+                                  child: Text(
+                                "Recupera Password",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              )),
+                              style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(90)),
+                                  primary: Colors.lightBlue.shade700),
+                            )
+                        )
                       ],
                     ),
                   ),

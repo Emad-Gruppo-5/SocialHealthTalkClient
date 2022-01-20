@@ -1,1 +1,1 @@
-var urlServer = '10.0.2.2';
+var urlServer = '192.168.1.55';

@@ -1,5 +1,5 @@
 // ignore_for_file: unnecessary_const
-
+import 'package:test_emad/costanti.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -67,7 +67,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   int chat_mode = 0;
 
   Future<void> creaPazienteServer() async {
-    var uri = Uri.parse('http://192.168.1.55:5000/crea_utente');
+    var uri = Uri.parse('http://' + urlServer + ':5000/crea_utente');
     print(uri);
     CollectionReference patients =
         FirebaseFirestore.instance.collection('patients');
@@ -243,7 +243,12 @@ class _MyModifyProfile extends State<MyModifyProfile> {
                 onPressed: () {
                   // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate() && chat_mode >= 0) {
-                    creaPazienteServer();
+                    creaPazienteServer().then((value) => {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => ListaPazienti()),
+                      ),
+                    });
                   } else {
                     final snackBar = SnackBar(
                       content: const Text('Seleziona tipologia di chat'),

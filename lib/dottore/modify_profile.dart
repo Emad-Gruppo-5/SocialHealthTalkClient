@@ -7,7 +7,7 @@ import 'package:test_emad/main.dart';
 import 'main_dottore.dart';
 import 'profile.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:test_emad/costanti.dart';
 /// This is the main application widget.
 class ModifyProfile extends StatelessWidget {
   final String token;
@@ -180,7 +180,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   }
 
   Future<String> modificaUtente() async {
-    var uri = Uri.parse('http://192.168.1.55:5000/modifica_utente');
+    var uri = Uri.parse('http://' + urlServer + ':5000/modifica_utente');
 
     print(uri);
 
