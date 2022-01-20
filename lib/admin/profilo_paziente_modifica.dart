@@ -33,14 +33,13 @@ class ProfiloPazienteModifica extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_sharp),
+            icon: Icon(Icons.arrow_back_ios),
+            tooltip: "Indietro",
             onPressed: () {
               Navigator.pop(context);
             },
           ),
-          title: const Center(
-            child: Text("Modifica dati"),
-          ),
+          title: Text("Modifica dati"),
         ),
         body: SingleChildScrollView(
             child: MyModifyProfile(

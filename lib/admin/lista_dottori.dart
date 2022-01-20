@@ -17,9 +17,12 @@ class ListaDottori extends StatelessWidget {
           actions: [
             IconButton(
               icon: Icon(Icons.add),
+              tooltip: "Aggiungi",
               onPressed: () {
-                MaterialPageRoute(
-                  builder: (context) => CreaNuovoDottore(),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CreaNuovoDottore()),
                 );
               },
             ),

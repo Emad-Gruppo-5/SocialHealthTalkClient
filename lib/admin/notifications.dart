@@ -9,21 +9,18 @@ final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 class Notifications extends StatelessWidget {
   const Notifications({Key? key}) : super(key: key);
 
-  static const String _title = 'Notifiche';
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: _title,
       home: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back_ios),
             onPressed: () => Navigator.pop(context),
             tooltip: "Indietro",
           ),
-          title: const Text(_title),
+          title: const Text("Notifications"),
           actions: [
             IconButton(
               icon: const Icon(Icons.clear_all),
@@ -449,8 +446,6 @@ class MyNotifications extends StatelessWidget {
           }
         });
   }
-
-  
 
   @override
   Widget build(BuildContext context) {

@@ -18,6 +18,7 @@ class ListaPazienti extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.add),
+              tooltip: "Aggiungi",
               onPressed: () {
                 Navigator.push(
                     context,

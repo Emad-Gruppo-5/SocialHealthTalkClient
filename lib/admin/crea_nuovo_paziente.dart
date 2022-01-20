@@ -23,7 +23,7 @@ class CreaPaziente extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_sharp),
+            icon: Icon(Icons.arrow_back_ios),
             onPressed: () {
               Navigator.pop(context);
               //   Navigator.pushReplacement(
@@ -33,9 +33,7 @@ class CreaPaziente extends StatelessWidget {
               //         ));
             },
           ),
-          title: const Center(
-            child: Text("Modifica dati"),
-          ),
+          title: Text("Crea nuovo paziente"),
         ),
         body: const SingleChildScrollView(child: MyModifyProfile()),
       ),
@@ -283,14 +281,6 @@ class _MyModifyProfile extends State<MyModifyProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text(
-          "Crea Paziente",
-          style: TextStyle(fontSize: 50),
-        ),
-        _form(),
-      ],
-    );
+    return _form();
   }
 }

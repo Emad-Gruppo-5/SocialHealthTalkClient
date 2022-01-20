@@ -27,36 +27,14 @@ class ModifyProfile extends StatelessWidget {
     required this.specializzazione,
   });
 
-  Widget _iconButton(BuildContext context, IconData icon, String tooltip,
-      StatelessWidget statelessWidget) {
-    IconButton iconButton;
-
-    if (tooltip != "Logout") {
-      iconButton = IconButton(
-        icon: Icon(icon),
-        tooltip: tooltip,
-        onPressed: () {
-            Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MyApp(),
-                      ));
-        },
-      );
-    } else {
-      iconButton = IconButton(
-        icon: Icon(icon),
-        tooltip: tooltip,
-        onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (co) => statelessWidget),
-          );
-        },
-      );
-    }
-
-    return iconButton;
+  Widget _iconButton(BuildContext context, IconData icon, String tooltip) {
+    return IconButton(
+      icon: Icon(icon),
+      tooltip: tooltip,
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
   }
 
   Widget _iconButton2(BuildContext context, IconData icon, String tooltip,
@@ -96,25 +74,10 @@ class ModifyProfile extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: _iconButton(
-              context,
-              Icons.arrow_back,
-              'Indietro',
-              Profile(
-                  nome: nome,
-                  cognome: cognome,
-                  email: email,
-                  num_cellulare: num_cellulare,
-                  specializzazione: specializzazione,
-                  cod_fiscale: cod_fiscale,
-                  token: token)),
+          leading: _iconButton(context, Icons.arrow_back_ios, 'Indietro'),
           title: const Text("Modifica dati"),
           actions: [
-            _iconButton2(
-                context,
-                Icons.logout,
-                'Logout',
-                LoginPage()),
+            _iconButton2(context, Icons.logout, 'Logout', LoginPage()),
           ],
         ),
         body: Center(

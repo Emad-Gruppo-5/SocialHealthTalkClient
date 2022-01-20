@@ -20,9 +20,12 @@ class ListaFamiliari extends StatelessWidget {
               actions: [
                 IconButton(
                   icon: Icon(Icons.add),
+                  tooltip: "Aggiungi",
                   onPressed: () {
-                    MaterialPageRoute(
-                      builder: (context) => CreaNuovoFamiliare(),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CreaNuovoFamiliare()),
                     );
                   },
                 ),
