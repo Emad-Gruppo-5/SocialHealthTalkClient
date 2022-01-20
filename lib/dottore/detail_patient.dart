@@ -122,22 +122,21 @@ class MyDetailPatient extends State<DetailPatient> {
     );
   }
 
-  Widget _textFormField(
-      IconData icon, String labelText, String initialValue, String validator) {
-    return TextFormField(
-      decoration: InputDecoration(
-        icon: Icon(icon),
-        labelText: labelText,
-      ),
-      initialValue: initialValue,
-      // The validator receives the text that the user has entered.
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return validator;
-        }
-        return null;
-      },
-    );
+  Widget _textFormField(String initialValue) {
+    if (initialValue == "") {
+      return TextFormField(
+        maxLines: null,
+        decoration: const InputDecoration(
+            icon: Icon(Icons.note), hintText: "Note", labelText: "Note"),
+      );
+    } else {
+      return TextFormField(
+        initialValue: initialValue,
+        maxLines: null,
+        decoration: const InputDecoration(
+            icon: Icon(Icons.note), hintText: "Note", labelText: "Note"),
+      );
+    }
   }
 
   @override
@@ -249,13 +248,11 @@ class MyDetailPatient extends State<DetailPatient> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: _textFormField(
-                                Icons.notes,
-                                "Note paziente",
-                                profilo["note"] == null
-                                    ? "null"
-                                    : profilo["note"],
-                                ""),
+                                profilo["note"] == null ? "" : profilo["note"]),
                           ),
+                          ElevatedButton(
+                              onPressed: () {},
+                              child: const Text("Salva note")),
                         ],
                       ),
                     );
