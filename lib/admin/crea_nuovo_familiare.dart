@@ -8,21 +8,18 @@ void main() => runApp(const CreaNuovoFamiliare());
 class CreaNuovoFamiliare extends StatelessWidget {
   const CreaNuovoFamiliare({Key? key}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           leading: new IconButton(
-            icon: Icon(Icons.arrow_back_ios_sharp),
-            onPressed: (){
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () {
               Navigator.pop(context);
             },
           ),
-          title: const Center(
-            child: Text("Crea nuovo familiare"),
-          ),
+          title: Text("Crea nuovo familiare"),
         ),
         body: const SingleChildScrollView(child: CreateProfile()),
       ),
@@ -40,15 +37,12 @@ class CreateProfile extends StatefulWidget {
 
 // This is the stateless widget that the main application instantiates.
 class _MyModifyProfile extends State<CreateProfile> {
-
   @override
   void initState() {
-
     super.initState();
   }
 
-  Widget _textFormField(
-      IconData icon, String labelText, String validator) {
+  Widget _textFormField(IconData icon, String labelText, String validator) {
     return TextFormField(
       decoration: InputDecoration(
         icon: Icon(icon),
@@ -73,13 +67,13 @@ class _MyModifyProfile extends State<CreateProfile> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(Icons.person_rounded, "Nome",
-                "Inserisci Nome"),
+            child:
+                _textFormField(Icons.person_rounded, "Nome", "Inserisci Nome"),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(Icons.person_rounded, "Cognome",
-                "Inserisci Cognome"),
+            child: _textFormField(
+                Icons.person_rounded, "Cognome", "Inserisci Cognome"),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -93,8 +87,7 @@ class _MyModifyProfile extends State<CreateProfile> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(Icons.email, "E-mail",
-                "Inserisci e-mail"),
+            child: _textFormField(Icons.email, "E-mail", "Inserisci e-mail"),
           ),
           Center(
             child: Padding(
@@ -117,10 +110,6 @@ class _MyModifyProfile extends State<CreateProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _form(),
-      ],
-    );
+    return _form();
   }
 }

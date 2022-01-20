@@ -10,6 +10,7 @@ import 'main_dottore.dart';
 import 'patient_list_item.dart';
 import 'new_question.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+
 /// This is the main application widget.
 class DetailPatient extends StatefulWidget {
   final String token;
@@ -85,7 +86,6 @@ class MyDetailPatient extends State<DetailPatient> {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         Navigator.pushReplacement(
           context,
@@ -146,14 +146,13 @@ class MyDetailPatient extends State<DetailPatient> {
       home: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_sharp),
+            icon: Icon(Icons.arrow_back_ios),
+            tooltip: "Indietro",
             onPressed: () {
               Navigator.pop(context);
             },
           ),
-          title: const Center(
-            child: Text("Profilo"),
-          ),
+          title: Text("Profilo"),
           actions: [
             _iconButton(context, Icons.logout, 'Logout', LoginPage()),
           ],
@@ -190,7 +189,9 @@ class MyDetailPatient extends State<DetailPatient> {
                 Navigator.of(context).push(
                   CupertinoPageRoute(
                       fullscreenDialog: true,
-                      builder: (context) => QuestionsHistory(cod_fiscale_paziente: paz_cod_fiscale, cod_fiscale_dottore: cod_fiscale )),
+                      builder: (context) => QuestionsHistory(
+                          cod_fiscale_paziente: paz_cod_fiscale,
+                          cod_fiscale_dottore: cod_fiscale)),
                 );
               },
               backgroundColor: Colors.green,

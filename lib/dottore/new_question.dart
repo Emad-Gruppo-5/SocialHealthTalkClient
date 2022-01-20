@@ -79,7 +79,6 @@ class NewQuestionState extends State<NewQuestion> {
       iconButton = IconButton(
         icon: Icon(icon),
         tooltip: tooltip,
-        iconSize: 40,
         onPressed: () {
           Navigator.pop(context);
         },
@@ -88,7 +87,6 @@ class NewQuestionState extends State<NewQuestion> {
       iconButton = IconButton(
         icon: Icon(icon),
         tooltip: tooltip,
-        iconSize: 40,
         onPressed: () {
           Navigator.pushReplacement(
             context,
@@ -108,7 +106,6 @@ class NewQuestionState extends State<NewQuestion> {
     iconButton = IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         Navigator.push(
           context,
@@ -361,7 +358,7 @@ class NewQuestionState extends State<NewQuestion> {
         appBar: AppBar(
           leading: _iconButton(
               context,
-              Icons.arrow_back_ios_sharp,
+              Icons.arrow_back_ios,
               'Indietro',
               Profile(
                   nome: nome,
@@ -371,9 +368,7 @@ class NewQuestionState extends State<NewQuestion> {
                   specializzazione: specializzazione,
                   cod_fiscale: cod_fiscale,
                   token: token)),
-          title: const Center(
-            child: Text("Modifica dati"),
-          ),
+          title: Text("Modifica dati"),
           actions: [
             _iconButton2(context, Icons.logout, 'Logout', LoginPage()),
           ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_emad/dottore/profile.dart';
 import 'package:test_emad/dottore/patient_list_page.dart';
-import 'package:test_emad/dottore/visita.dart';
 
 /// This is the main application widget.
 class MainDottore extends StatelessWidget {
@@ -97,7 +96,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           specializzazione: specializzazione,
           cod_fiscale: cod_fiscale,
           token: token),
-      createVisita(cod_fiscale: cod_fiscale, token: token),
       Profile(
           nome: nome,
           cognome: cognome,
@@ -127,10 +125,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_outlined),
-            label: 'Pianifica Visita',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),

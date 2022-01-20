@@ -3,7 +3,6 @@ import 'package:test_emad/admin/mainAdmin.dart';
 import 'package:test_emad/admin/lista_pazienti.dart';
 import 'package:test_emad/admin/lista_dottori.dart';
 import 'package:test_emad/admin/lista_familiari.dart';
-import 'package:test_emad/admin/lista_volontari.dart';
 
 class AdminHome extends StatefulWidget {
   @override
@@ -23,8 +22,7 @@ class _AdminHome extends State<AdminHome> {
     MainAdmin(),
     ListaPazienti(),
     ListaDottori(),
-    ListaFamiliari(),
-    ListaVolontari()
+    ListaFamiliari()
   ];
 
   @override
@@ -50,10 +48,6 @@ class _AdminHome extends State<AdminHome> {
           BottomNavigationBarItem(
             icon: Icon(Icons.wc_outlined),
             label: 'Familiari',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attribution_outlined),
-            label: "Volontari",
           ),
         ],
         currentIndex: _selectedIndex,

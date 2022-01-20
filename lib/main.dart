@@ -15,7 +15,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // if( Firebase.apps.length == 0){
   await Firebase.initializeApp(
-
     // Replace with actual values
     options: FirebaseOptions(
       apiKey: "AIzaSyBIuXrd5qAH-i8J0NlZYGE0nZPvxL5VXJs",
@@ -46,7 +45,6 @@ class MyApp extends StatelessWidget {
 }
 
 class LoginPage extends StatefulWidget {
-
   @override
   State<LoginPage> createState() => LoginPageState();
 }
@@ -57,8 +55,8 @@ class LoginPageState extends State<LoginPage> {
 
   Future<String> login(cod_fiscale, password) async {
     final digest = Crypt.sha256(password).toString();
-    var uri = Uri.parse('http://' + urlServer + ':5000/login');
-    
+    var uri = Uri.parse('http://127.0.0.1:5000/login');
+
     print(uri);
 
     print("\nECCOMI IN getUser. COD_FISCALE: " +
@@ -82,7 +80,6 @@ class LoginPageState extends State<LoginPage> {
 
     return data.body;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -187,72 +184,79 @@ class LoginPageState extends State<LoginPage> {
                                 var password = _passwordC.text;
 
                                 login(cod_fiscale, password).then((data) {
-                                      int role = json.decode(data)['role'];
-                                      String token = json.decode(data)['token'];
-                                      String nome = json.decode(data)['nome'];
-                                      String cognome = json.decode(data)['cognome'];
-                                      String email = json.decode(data)['email'];
-                                      String num_cellulare =
-                                          json.decode(data)['num_cellulare'].toString();
-                                      
-                                      switch (role) {
-                                        case 1: //PAZIENTE
-                                          int tipologia_chat = json.decode(data)['tipologia_chat'];
-                                          Navigator.pushReplacement(
+                                  int role = json.decode(data)['role'];
+                                  String token = json.decode(data)['token'];
+                                  String nome = json.decode(data)['nome'];
+                                  String cognome = json.decode(data)['cognome'];
+                                  String email = json.decode(data)['email'];
+                                  String num_cellulare = json
+                                      .decode(data)['num_cellulare']
+                                      .toString();
+
+                                  switch (role) {
+                                    case 1: //PAZIENTE
+                                      int tipologia_chat =
+                                          json.decode(data)['tipologia_chat'];
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Patient_Home(
+                                                cod_fiscale: cod_fiscale,
+                                                nome: nome,
+                                                cognome: cognome,
+                                                email: email,
+                                                num_cellulare: num_cellulare,
+                                                tipologia_chat: tipologia_chat,
+                                                token: token)),
+                                      );
+                                      break;
+                                    case 2: //DOTTORE
+                                      if (cod_fiscale == 'admin') {
+                                        Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => Patient_Home(
-                                                    cod_fiscale: cod_fiscale,
-                                                    nome: nome,
-                                                    cognome: cognome,
-                                                    email: email,
-                                                    num_cellulare: num_cellulare,
-                                                    tipologia_chat: tipologia_chat,
-                                                    token: token)),
-                                          );
-                                          break;
-                                        case 2: //DOTTORE
-                                          if (cod_fiscale == 'admin') {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        AdminHome()));
-                                          } else {
-                                            String specializzazione = json.decode(data)['specializzazione'];
-                                            Navigator.pushReplacement(
-                                                context, 
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        MainDottore(
-                                                          token: token, 
-                                                          cod_fiscale: cod_fiscale,
-                                                          nome: nome,
-                                                          cognome: cognome,
-                                                          email: email,
-                                                          num_cellulare: num_cellulare,
-                                                          specializzazione: specializzazione )));
-                                          }
-
-                                          break;
-                                        case 3: //VOLONTARIO
-                                          // Navigator.push(context,
-                                          //        MaterialPageRoute(
-                                          //           builder: (context) => Familiare(token: token)));
-                                          break;
-                                        case 4: //FAMILIARE
-                                          // Navigator.push(context,
-                                          //        MaterialPageRoute(
-                                          //           builder: (context) => Familiare(token: token)));
-                                          break;
-                                        default:
+                                                builder: (context) =>
+                                                    AdminHome()));
+                                      } else {
+                                        String specializzazione = json
+                                            .decode(data)['specializzazione'];
+                                        Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    MainDottore(
+                                                        token: token,
+                                                        cod_fiscale:
+                                                            cod_fiscale,
+                                                        nome: nome,
+                                                        cognome: cognome,
+                                                        email: email,
+                                                        num_cellulare:
+                                                            num_cellulare,
+                                                        specializzazione:
+                                                            specializzazione)));
                                       }
-                                })
-                                .catchError((error) => {
-                                  ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(content: Text('Utente non esistente'))),
-                                          print(error)
-                                });
+
+                                      break;
+                                    case 3: //VOLONTARIO
+                                      // Navigator.push(context,
+                                      //        MaterialPageRoute(
+                                      //           builder: (context) => Familiare(token: token)));
+                                      break;
+                                    case 4: //FAMILIARE
+                                      // Navigator.push(context,
+                                      //        MaterialPageRoute(
+                                      //           builder: (context) => Familiare(token: token)));
+                                      break;
+                                    default:
+                                  }
+                                }).catchError((error) => {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  'Utente non esistente'))),
+                                      print(error)
+                                    });
                               },
                               child: Center(
                                   child: Text(

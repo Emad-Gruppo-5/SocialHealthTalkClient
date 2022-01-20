@@ -14,8 +14,9 @@ class ProfiloFamiliareModifica extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           leading: new IconButton(
-            icon: Icon(Icons.arrow_back_ios_sharp),
-            onPressed: (){
+            icon: Icon(Icons.arrow_back_ios),
+            tooltip: "Indietro",
+            onPressed: () {
               Navigator.pop(context);
             },
           ),
@@ -45,9 +46,9 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   @override
   void initState() {
     //adding item to list, you can add using json from network
-    persons1.add(Person(id:"1", name:"Paziente 1", phone:"1111111111"));
-    persons1.add(Person(id:"2", name:"Paziente 2", phone:"22222222222"));
-    persons1.add(Person(id:"3", name:"Paziente 3", phone:"33333333333"));
+    persons1.add(Person(id: "1", name: "Paziente 1", phone: "1111111111"));
+    persons1.add(Person(id: "2", name: "Paziente 2", phone: "22222222222"));
+    persons1.add(Person(id: "3", name: "Paziente 3", phone: "33333333333"));
 
     super.initState();
   }
@@ -88,31 +89,30 @@ class _MyModifyProfile extends State<MyModifyProfile> {
             child: _textFormField(Icons.email, "E-mail", "mariorossi@gmail.com",
                 "Inserisci e-mail"),
           ),
-
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: const Text(
-              "Pazienti associati",
-              style: TextStyle(fontSize: 15),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: const Text(
+                "Pazienti associati",
+                style: TextStyle(fontSize: 15),
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              children: persons1.map((personone){
+              children: persons1.map((personone) {
                 return Container(
                   child: Card(
-                    child:ListTile(
+                    child: ListTile(
                       title: Text(personone.name),
                       subtitle: Text(personone.phone),
                       trailing: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.blue
-                        ),
+                        style: ElevatedButton.styleFrom(primary: Colors.blue),
                         child: Icon(Icons.delete),
-                        onPressed: (){
+                        onPressed: () {
                           //delete action for this button
-                          persons1.removeWhere((element){
+                          persons1.removeWhere((element) {
                             return element.id == personone.id;
                           }); //go through the loop and match content to delete from list
                           setState(() {
@@ -122,18 +122,19 @@ class _MyModifyProfile extends State<MyModifyProfile> {
                       ),
                     ),
                   ),
-
                 );
               }).toList(),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child:ElevatedButton(
-              onPressed: () {
-                //TODO
-              },
-              child: const Text('Aggiungi paziente'),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  //TODO
+                },
+                child: const Text('Aggiungi paziente'),
+              ),
             ),
           ),
           Center(
@@ -174,7 +175,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
       children: [
         const Text(
           "Mario Rossi",
-          style: TextStyle(fontSize: 50),
+          style: TextStyle(fontSize: 30),
         ),
         _form(),
       ],
@@ -182,7 +183,8 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   }
 }
 
-class Person{ //modal class for Person object
+class Person {
+  //modal class for Person object
   String id, name, phone;
   Person({required this.id, required this.name, required this.phone});
 }

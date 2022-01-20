@@ -43,7 +43,7 @@ class Profile extends StatelessWidget {
         icon: Icon(icon),
         tooltip: tooltip,
         onPressed: () {
-          Navigator.pushReplacement(
+          Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => statefulWidget),
           );
@@ -60,7 +60,6 @@ class Profile extends StatelessWidget {
     iconButton = IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         Navigator.push(
           context,
