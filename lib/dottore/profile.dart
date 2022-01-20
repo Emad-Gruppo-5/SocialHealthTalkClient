@@ -15,6 +15,7 @@ class Profile extends StatelessWidget {
   final String email;
   final String num_cellulare;
   final String specializzazione;
+
   Profile({
     required this.cod_fiscale,
     required this.token,
@@ -26,7 +27,7 @@ class Profile extends StatelessWidget {
   });
 
   Widget _iconButton(BuildContext context, IconData icon, String tooltip,
-      StatelessWidget statelessWidget) {
+      StatelessWidget statefulWidget) {
     IconButton iconButton;
 
     if (tooltip != "Modifica") {
@@ -44,11 +45,29 @@ class Profile extends StatelessWidget {
         onPressed: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => statelessWidget),
+            MaterialPageRoute(builder: (context) => statefulWidget),
           );
         },
       );
     }
+
+    return iconButton;
+  }
+
+  Widget _iconButton2(BuildContext context, IconData icon, String tooltip,
+      StatefulWidget statefulWidget) {
+    IconButton iconButton;
+    iconButton = IconButton(
+      icon: Icon(icon),
+      tooltip: tooltip,
+      iconSize: 40,
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => statefulWidget),
+        );
+      },
+    );
 
     return iconButton;
   }
@@ -72,7 +91,7 @@ class Profile extends StatelessWidget {
                   cod_fiscale: cod_fiscale)),
           title: const Text("Profilo"),
           actions: [
-            _iconButton(context, Icons.logout, 'Logout', LoginPage()),
+            _iconButton2(context, Icons.logout, 'Logout', LoginPage()),
           ],
         ),
         body: Center(

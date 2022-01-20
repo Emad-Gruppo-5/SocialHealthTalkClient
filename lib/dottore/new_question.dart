@@ -20,6 +20,7 @@ class NewQuestion extends StatefulWidget {
   final String email;
   final String num_cellulare;
   final String specializzazione;
+
   NewQuestion({
     required this.paz_cod_fiscale,
     required this.cod_fiscale,
@@ -30,12 +31,12 @@ class NewQuestion extends StatefulWidget {
     required this.num_cellulare,
     required this.specializzazione,
   });
+
   @override
   NewQuestionState createState() => NewQuestionState();
 }
 
 class NewQuestionState extends State<NewQuestion> {
-
   late String paz_cod_fiscale;
   late String token;
   late String cod_fiscale;
@@ -69,6 +70,7 @@ class NewQuestionState extends State<NewQuestion> {
   List<bool> isChecked = [false, true, false];
   String dropdownValue = 'Una volta';
   bool _repeat = false;
+
   Widget _iconButton(BuildContext context, IconData icon, String tooltip,
       StatelessWidget statelessWidget) {
     IconButton iconButton;
@@ -99,8 +101,26 @@ class NewQuestionState extends State<NewQuestion> {
     return iconButton;
   }
 
-  Widget _form() {
+  Widget _iconButton2(BuildContext context, IconData icon, String tooltip,
+      StatefulWidget statelessWidget) {
+    IconButton iconButton;
 
+    iconButton = IconButton(
+      icon: Icon(icon),
+      tooltip: tooltip,
+      iconSize: 40,
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => statelessWidget),
+        );
+      },
+    );
+
+    return iconButton;
+  }
+
+  Widget _form() {
     return Form(
         key: _formKey,
         child: Column(
@@ -123,8 +143,7 @@ class NewQuestionState extends State<NewQuestion> {
                   onChanged: (value) {
                     _testo_domanda = value;
                   },
-                )
-            ),
+                )),
             Visibility(
                 visible: !_repeat,
                 child: Padding(
@@ -276,31 +295,34 @@ class NewQuestionState extends State<NewQuestion> {
                     print(_data_domanda_A.text);
                     print(_ora_domanda);
                     var dif;
-                    if(_repeat == true){
-                      dif = DateTime.parse(_data_domanda_DA.text).difference(DateTime.parse(_data_domanda_A.text)).inDays.abs();
-                      print("DIFFERENZA: " + dif.toString() );
-
+                    if (_repeat == true) {
+                      dif = DateTime.parse(_data_domanda_DA.text)
+                          .difference(DateTime.parse(_data_domanda_A.text))
+                          .inDays
+                          .abs();
+                      print("DIFFERENZA: " + dif.toString());
                     }
-
 
                     // Validate returns true if the form is valid, or false otherwise.
                     if (_formKey.currentState!.validate()) {
                       DateFormat data_query_format = DateFormat("yyyy-MM-dd");
                       CollectionReference questions =
-                      FirebaseFirestore.instance.collection('questions');
+                          FirebaseFirestore.instance.collection('questions');
                       questions.add({
                         'cod_fiscale_dottore': cod_fiscale,
                         'cod_fiscale_paziente': paz_cod_fiscale,
                         'cognome': cognome,
                         'nome': nome,
                         'letto': false,
-                        'data_domanda': _repeat == true ? _data_domanda_DA.text + " " + _ora_domanda.text : _data_domanda_DA.text,
+                        'data_domanda': _repeat == true
+                            ? _data_domanda_DA.text + " " + _ora_domanda.text
+                            : _data_domanda_DA.text,
                         'ripeti': _repeat == true ? dif : 0,
                         'testo_domanda': _testo_domanda
                       });
                       ScaffoldMessenger.of(_scaffoldKey.currentContext!)
                           .showSnackBar(const SnackBar(
-                          content: Text("Domanda inviata con successo")));
+                              content: Text("Domanda inviata con successo")));
                     }
                   },
                   child: const Text('Invia'),
@@ -308,12 +330,11 @@ class NewQuestionState extends State<NewQuestion> {
               ),
             ),
           ],
-        )
-    );
+        ));
   }
 
-  StatefulWidget _textFormField(IconData icon, String labelText, String validator,
-      TextEditingController _con) {
+  StatefulWidget _textFormField(IconData icon, String labelText,
+      String validator, TextEditingController _con) {
     return TextFormField(
       controller: _con,
       decoration: InputDecoration(
@@ -354,7 +375,7 @@ class NewQuestionState extends State<NewQuestion> {
             child: Text("Modifica dati"),
           ),
           actions: [
-            _iconButton(context, Icons.logout, 'Logout', LoginPage()),
+            _iconButton2(context, Icons.logout, 'Logout', LoginPage()),
           ],
         ),
         body: Center(

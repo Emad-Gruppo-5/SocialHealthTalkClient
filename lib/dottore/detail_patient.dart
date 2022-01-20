@@ -81,7 +81,7 @@ class MyDetailPatient extends State<DetailPatient> {
   }
 
   Widget _iconButton(BuildContext context, IconData icon, String tooltip,
-      StatelessWidget statelessWidget) {
+      var statelessWidget) {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,

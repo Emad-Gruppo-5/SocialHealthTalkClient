@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_emad/costanti.dart';
 import 'package:test_emad/main.dart';
 import 'main_dottore.dart';
 import 'patient_list_item.dart';
@@ -34,7 +35,7 @@ class List_page extends StatelessWidget {
 
     var body = json.encode(message);
 
-    var uri = Uri.parse('http://192.168.1.55:5000/attori_associati');
+    var uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
       
 
     var attori_associati = await http.post(uri,
@@ -124,7 +125,7 @@ class List_page extends StatelessWidget {
   }
 
   Widget _iconButton(BuildContext context, IconData icon, String tooltip,
-      StatelessWidget statelessWidget) {
+      StatefulWidget statelessWidget) {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
