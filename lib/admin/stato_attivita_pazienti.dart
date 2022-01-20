@@ -26,7 +26,7 @@ class BodyLayout extends State<StatoAttivitaPazienti> {
         appBar: new AppBar(
           title: const Text('Stato attività pazienti'),
           leading: new IconButton(
-            icon: const Icon(Icons.arrow_back_ios_sharp),
+            icon: const Icon(Icons.arrow_back_ios),
             onPressed: () {
               Navigator.pop(context);
             },

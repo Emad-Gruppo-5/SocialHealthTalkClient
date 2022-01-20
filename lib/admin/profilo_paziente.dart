@@ -34,7 +34,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
 
   Future<Map<String, dynamic>> getprofiledata() async {
     print("Inizio funzione");
-    var uri = Uri.parse('http://192.168.1.55:5000/dati_profilo');
+    var uri = Uri.parse('http://127.0.0.1:5000/dati_profilo');
     print(uri);
     var message = {"role": 1, "cod_fiscale": cod_fiscale};
 
@@ -46,7 +46,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
         },
         body: body);
 
-    uri = Uri.parse('http://192.168.1.55:5000/attori_associati');
+    uri = Uri.parse('http://127.0.0.1:5000/attori_associati');
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{
@@ -71,18 +71,17 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
       home: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_sharp),
+            icon: const Icon(Icons.arrow_back_ios),
+            tooltip: "Indietro",
             onPressed: () {
               Navigator.pop(context);
             },
           ),
-          title: const Center(
-            child: Text("Profilo"),
-          ),
+          title: Text("Profilo"),
           actions: [
             IconButton(
               icon: Icon(Icons.edit),
-              iconSize: 40,
+              tooltip: "Modifica",
               onPressed: () {
                 Navigator.push(
                   context,
@@ -102,8 +101,8 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.delete_forever),
-              iconSize: 40,
+              icon: Icon(Icons.delete),
+              tooltip: "Rimuovvi",
               onPressed: () {
                 showDialog<String>(
                   context: context,
@@ -118,7 +117,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                           CollectionReference patients =
                               FirebaseFirestore.instance.collection('patients');
                           var uri =
-                              Uri.parse('http://192.168.1.55:5000/elimina_utente');
+                              Uri.parse('http://127.0.0.1:5000/elimina_utente');
                           print(uri);
                           var message = {"role": 1, "cod_fiscale": cod_fiscale};
 
@@ -209,7 +208,9 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                           Icons.smartphone),
                       _card(profilo["email"], Icons.email),
                       _card2(profilo["eta"], 'Età:'),
-                      _card2(profilo["sesso"] == null ? "null" : profilo["sesso"], "sesso:"),
+                      _card2(
+                          profilo["sesso"] == null ? "null" : profilo["sesso"],
+                          "sesso:"),
                       _card2(profilo["titolo_studio"], "Titolo di studio:"),
                       const Text("\nTipologia chat"),
                       _checkboxListTile("Solo testo",
