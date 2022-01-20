@@ -75,6 +75,7 @@ class _Profile extends State<Profile> {
     if (tooltip != 'Logout') {
       return IconButton(
         icon: Icon(icon),
+        iconSize: 40,
         tooltip: tooltip,
         onPressed: () {
           timer.cancel();
@@ -102,6 +103,7 @@ class _Profile extends State<Profile> {
     } else {
       return IconButton(
         icon: Icon(icon),
+        iconSize: 40,
         tooltip: tooltip,
         onPressed: () {
           timer.cancel();
@@ -122,6 +124,7 @@ class _Profile extends State<Profile> {
   Widget _iconButtonPop(IconData icon, String tooltip) {
     return IconButton(
       icon: Icon(icon),
+      iconSize: 40,
       tooltip: tooltip,
       onPressed: () {
         timer.cancel();

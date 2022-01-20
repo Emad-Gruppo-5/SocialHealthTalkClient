@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:test_emad/patient/profile.dart';
@@ -143,7 +144,7 @@ class _ModifyProfile extends State<ModifyProfile> {
               _iconButtonPush(context, Icons.logout, 'Logout'),
             ],
           ),
-          body: Center(
+          body: SingleChildScrollView(
             child: Column(
               children: [
                 Text(
@@ -290,18 +291,12 @@ class _ModifyProfile extends State<ModifyProfile> {
                                   + _email.text + ", num_cellulare: " + _num_cell.text 
                                   + ", tipologia_chat: " + _character!.index.toString());
                   flag = true;
-                  ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-                  .showSnackBar(const SnackBar(
-                content: Text("Richiesta di modifica inviata"),
-              ));
+                  _showBasicsFlash(flag, online_duration);
             })
             .catchError((error) {
                 print("Errore nell'aggiunta della notifica: $error");
                 flag = false;
-                ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-                  .showSnackBar(const SnackBar(
-                content: Text("Impossibile inviare la richiesta"),
-              ));
+                _showBasicsFlash(flag, online_duration);
             });
             
           }
@@ -407,28 +402,28 @@ class _ModifyProfile extends State<ModifyProfile> {
     );
   }
 
-  // void _showBasicsFlash(bool flag, Duration duration ) {
-  //   showFlash(
-  //     context: context,
-  //     duration: duration,
-  //     builder: (context, controller) {
-  //       String text = flag ? "Richiesta inviata con successo" : "Errore, richiesta non inviata";
-  //       var flashStyle = FlashBehavior.floating;
-  //       return Flash(
-  //         controller: controller,
-  //         behavior: flashStyle,
-  //         position: FlashPosition.bottom,
-  //         boxShadows: kElevationToShadow[4],
-  //         backgroundColor: Colors.black,
-  //         horizontalDismissDirection: HorizontalDismissDirection.horizontal,
-  //         child: FlashBar(
-  //           content: Text(text, style: TextStyle(
-  //             color: Colors.white,
-  //           ),),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+  void _showBasicsFlash(bool flag, Duration duration ) {
+    showFlash(
+      context: context,
+      duration: duration,
+      builder: (context, controller) {
+        String text = flag ? "Richiesta inviata con successo" : "Errore, richiesta non inviata";
+        var flashStyle = FlashBehavior.floating;
+        return Flash(
+          controller: controller,
+          behavior: flashStyle,
+          position: FlashPosition.bottom,
+          boxShadows: kElevationToShadow[4],
+          backgroundColor: Colors.black87,
+          horizontalDismissDirection: HorizontalDismissDirection.horizontal,
+          child: FlashBar(
+            content: Text(text, style: const TextStyle(
+              color: Colors.white,
+            ),),
+          ),
+        );
+      },
+    );
+  }
 
 }
