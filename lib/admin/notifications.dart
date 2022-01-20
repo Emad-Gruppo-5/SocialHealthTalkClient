@@ -3,7 +3,6 @@ import 'package:audioplayer/audioplayer.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -451,17 +450,10 @@ class MyNotifications extends StatelessWidget {
         });
   }
 
-  Future<void> downloadURLExample() async {
-    String downloadURL = await firebase_storage.FirebaseStorage.instance
-        .ref('download.png')
-        .getDownloadURL();
-
-    Image.network(downloadURL);
-  }
+  
 
   @override
   Widget build(BuildContext context) {
-    downloadURLExample();
     return Column(
       children: <Widget>[
         ExpansionTile(

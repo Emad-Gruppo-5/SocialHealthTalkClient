@@ -88,9 +88,9 @@ class NewQuestionState extends State<NewQuestion> {
         tooltip: tooltip,
         iconSize: 40,
         onPressed: () {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => statelessWidget),
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         },
       );
@@ -340,7 +340,7 @@ class NewQuestionState extends State<NewQuestion> {
         appBar: AppBar(
           leading: _iconButton(
               context,
-              Icons.arrow_back,
+              Icons.arrow_back_ios_sharp,
               'Indietro',
               Profile(
                   nome: nome,

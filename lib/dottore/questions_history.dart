@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:audioplayer/audioplayer.dart';
 
 
@@ -37,9 +36,9 @@ class _QuestionsHistory extends State<QuestionsHistory> {
   }
 
   CollectionReference _opened_questions = FirebaseFirestore.instance.collection('questions_to_answer');
+  CollectionReference _scheduled_questions = FirebaseFirestore.instance.collection('questions');
   bool _isRecording = false;
-  FirebaseStorage storage = FirebaseStorage.instance;
-  
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   AudioPlayer audioPlayer = AudioPlayer();
 
   _icon() {
@@ -81,6 +80,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
           'testo_risposta': json.decode(data.body)[i]['testo_risposta'],
           'audio_risposta': json.decode(data.body)[i]['audio_risposta'],
           'data_risposta': json.decode(data.body)[i]['data_risposta'],
+          'data_domanda': json.decode(data.body)[i]['data_domanda']
           
         });
       }
@@ -93,25 +93,25 @@ class _QuestionsHistory extends State<QuestionsHistory> {
   }
 
 
-  Widget getSubtitle(bool flag){
-    Row row;
-    if(flag){
-      row = new Row(
-        children: [
-          const Icon(Icons.volume_up_outlined, color: Colors.blue),
-          Text(" Risposta audio")
-        ],
-      );
-    }
-    else{
-      row = new Row(
-        children: [
-          const Icon(Icons.keyboard_alt_outlined, color: Colors.blue),
-          Text(" Risposta testuale")
-        ],
-      );
-    }
-    return row;
+  Future<void> eliminaDomanda(var id_domanda) async {
+
+    var uri = Uri.parse('http://192.168.1.55:5000/elimina_domanda');
+
+    print(uri);
+
+    Map<String, dynamic> message = {
+      "id_domanda": id_domanda
+    };
+    var body = json.encode(message);
+    print("\nBODY:: " + body);
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    print('Response status: ${data.statusCode}');
+    print('Response body: ' + data.body);
+
   }
 
 
@@ -142,11 +142,16 @@ class _QuestionsHistory extends State<QuestionsHistory> {
       localizationsDelegates: [GlobalMaterialLocalizations.delegate],
       supportedLocales: [const Locale('it')],
       home: Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_sharp),
             onPressed: () {
               Navigator.pop(context);
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => statelessWidget),
+              // );
             },
           ),
           title: const Text('Storico domande'),
@@ -204,6 +209,105 @@ class _QuestionsHistory extends State<QuestionsHistory> {
               ),
             ),
             ExpansionTile(
+              leading: const Icon(Icons.schedule),
+              title: const Text('Domande in programma'),
+              children: [
+                StreamBuilder<QuerySnapshot>(
+                  stream: _scheduled_questions
+                          .where('cod_fiscale_paziente', isEqualTo: cod_fiscale_paziente)
+                          .where('cod_fiscale_dottore', isEqualTo: cod_fiscale_dottore)
+                          .where('data_domanda', isGreaterThan: _data_domande.text + " 00:00")
+                          .where('data_domanda', isLessThan: _data_domande.text + " 23:59")
+                          .orderBy('data_domanda', descending: true)
+                          .snapshots(),
+                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    
+                    if (snapshot.hasError) {
+                      print(snapshot.error);
+                      return const Text('Something went wrong');
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.data!.docs.isEmpty) {
+                        return const Center(child: Text("Non ci sono domande in programma per il giorno selezionato"));
+                    }
+                    else
+                    return ListView(
+                      shrinkWrap: true,
+                      children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                        Map<String, dynamic> data =
+                        document.data()! as Map<String, dynamic>;
+                        String subtitle = "";
+                        Icon trailing;
+                        print(data.toString());
+
+                        return Center(
+                          child: Card(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                ListTile(
+                                  trailing: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            IconButton(onPressed: () => showDialog<void>(
+                                            context: context,
+                                            barrierDismissible: false, // user must tap button!
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: const Text('ATTENZIONE!'),
+                                                content: SingleChildScrollView(
+                                                  child: ListBody(
+                                                    children: const <Widget>[
+                                                      Text(
+                                                          'Sei sicuro di voler ritirare la domanda?'),
+                                                    ],
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    child: const Text('Si'),
+                                                    onPressed: () {
+
+                                                      _scheduled_questions
+                                                            .doc(document.id)
+                                                            .delete();
+                                                        Navigator.of(context).pop();
+                                                        ScaffoldMessenger.of(
+                                                                _scaffoldKey.currentContext!)
+                                                            .showSnackBar(const SnackBar(
+                                                                content:
+                                                                    Text('Domanda ritirata')));
+                                                    },
+                                                  ),
+                                                  TextButton(
+                                                    child: const Text('No'),
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                       ), icon: Icon(Icons.delete, color: Colors.red))],
+                                        ),
+                                  title: Text(data['testo_domanda']),
+                                  subtitle: Text("Data: " + data["data_domanda"]),
+                                ),
+                                // row,
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                  )
+              ],
+            ),
+            ExpansionTile(
               leading: const Icon(Icons.question_answer),
               title: const Text('Domande aperte'),
               children: [
@@ -250,10 +354,54 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                       Visibility(
                                         child: const Icon(Icons.circle ,
                                             color: Colors.blue),
-                                        visible: data['letto'],
+                                        visible: !data['letto'],
                                       ),
                                     ],
                                   ),
+                                  trailing: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            IconButton(onPressed: () => showDialog<void>(
+                                            context: context,
+                                            barrierDismissible: false, // user must tap button!
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: const Text('ATTENZIONE!'),
+                                                content: SingleChildScrollView(
+                                                  child: ListBody(
+                                                    children: const <Widget>[
+                                                      Text(
+                                                          'Sei sicuro di voler ritirare la domanda?'),
+                                                    ],
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    child: const Text('Si'),
+                                                    onPressed: () {
+
+                                                      _opened_questions
+                                                            .doc(document.id)
+                                                            .delete();
+                                                        Navigator.of(context).pop();
+                                                        ScaffoldMessenger.of(
+                                                                _scaffoldKey.currentContext!)
+                                                            .showSnackBar(const SnackBar(
+                                                                content:
+                                                                    Text('Domanda ritirata')));
+                                                    },
+                                                  ),
+                                                  TextButton(
+                                                    child: const Text('No'),
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                       ), icon: Icon(Icons.delete, color: Colors.red))],
+                                        ),
                                   title: Text(data['testo_domanda']),
                                   subtitle: Text("Data: " + data["data_domanda"]),
                                 ),
@@ -293,8 +441,70 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
                                       ListTile(
+                                        isThreeLine: true,
                                         title: Text(data['testo_domanda'] ),
-                                        subtitle: json.encode(data["audio_risposta"]).compareTo("null")==0 ? getSubtitle(false)  : getSubtitle(true),
+                                        leading: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            json.encode(data["audio_risposta"]).compareTo("null")==0 ? Icon(Icons.keyboard_alt_outlined, color: Colors.blue) : Icon(Icons.volume_up_outlined, color: Colors.blue),
+                                          ],
+                                        ),
+                                        trailing: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            IconButton(onPressed: () => showDialog<void>(
+                                            context: context,
+                                            barrierDismissible: false, // user must tap button!
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: const Text('ATTENZIONE!'),
+                                                content: SingleChildScrollView(
+                                                  child: ListBody(
+                                                    children: const <Widget>[
+                                                      Text(
+                                                          'Sei sicuro di voler eliminare la domanda dal database?'),
+                                                    ],
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    child: const Text('Si'),
+                                                    onPressed: () {
+
+                                                      eliminaDomanda(data["id_domanda"]).then((value) => {
+                                                        
+                                                        ScaffoldMessenger.of(
+                                                              _scaffoldKey.currentContext!)
+                                                          .showSnackBar(const SnackBar(
+                                                              content: Text(
+                                                                  'Domanda rimossa con successo'))),
+                                                      })
+                                                      .catchError((error) => {
+                                                        ScaffoldMessenger.of(context)
+                                                                .showSnackBar(SnackBar(content: Text('Errore nella cancellazione della domanda'))),
+                                                                print(error)
+                                                      });
+                                                      
+                                                      setState(() {
+                                                        Navigator.of(context).pop();
+                                                      });
+                                                    },
+                                                  ),
+                                                  TextButton(
+                                                    child: const Text('No'),
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                       ), icon: Icon(Icons.delete, color: Colors.red))],
+                                        ),
+                                        subtitle: json.encode(data["audio_risposta"]).compareTo("null")==0 ? 
+                                                  Text("Risposta testuale" + "\nData Domanda: " + data["data_domanda"] + "\nData Risposta: " + data["data_risposta"])
+                                                  :
+                                                  Text("Risposta audio" + "\nData Domanda: " + data["data_domanda"] + "\nData Risposta: " + data["data_risposta"]),
                                         onTap: () => showDialog<void>(
                                                 context: context,
                                                 builder: (BuildContext context) {

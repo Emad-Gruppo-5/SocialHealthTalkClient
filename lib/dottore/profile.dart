@@ -42,7 +42,7 @@ class Profile extends StatelessWidget {
         icon: Icon(icon),
         tooltip: tooltip,
         onPressed: () {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => statelessWidget),
           );

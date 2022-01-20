@@ -39,7 +39,7 @@ class ModifyProfile extends StatelessWidget {
             Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LoginPage(),
+                        builder: (context) => MyApp(),
                       ));
         },
       );
@@ -48,7 +48,7 @@ class ModifyProfile extends StatelessWidget {
         icon: Icon(icon),
         tooltip: tooltip,
         onPressed: () {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (co) => statelessWidget),
           );

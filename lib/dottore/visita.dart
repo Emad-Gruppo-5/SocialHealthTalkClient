@@ -53,7 +53,7 @@ class createVisitaState extends State<createVisita> {
               title: const Text("Pianifica visita"),
               actions: [
                 IconButton(
-                    onPressed: () => Navigator.push(
+                    onPressed: () => Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                             builder: (context) => TimePickerVisita(

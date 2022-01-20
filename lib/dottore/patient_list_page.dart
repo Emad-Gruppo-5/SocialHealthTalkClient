@@ -128,7 +128,6 @@ class List_page extends StatelessWidget {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         Navigator.pushReplacement(
           context,

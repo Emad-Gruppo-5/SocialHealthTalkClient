@@ -116,7 +116,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             .doc(cod_fiscale)
             .update({'status': 'online'});
 
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => Profile(
@@ -139,7 +139,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       iconSize: 40,
       onPressed: () {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => MyApp()));
+            context, MaterialPageRoute(builder: (context) => LoginPage()));
       },
     );
   }
@@ -270,8 +270,14 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                                   print(_textFieldController);
                                                   sendRispostaToDatabase(data, document, isAudio);
                                                   isAudio = false;
-                                                  Navigator.pop(
-                                                      context, 'Cancel');
+                                                  const snackBar = SnackBar(
+                                                    content: Text(
+                                                        'Risposta inviata con successo'),
+                                                  );
+                                                  // Find the ScaffoldMessenger in the widget tree
+                                                  // and use it to show a SnackBar.
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(snackBar);
                                                 } else {
                                                   const snackBar = SnackBar(
                                                     content: Text(

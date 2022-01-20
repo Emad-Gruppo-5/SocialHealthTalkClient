@@ -74,7 +74,7 @@ class _ModifyProfile extends State<ModifyProfile> {
   // bool _visible = false;
 
   Widget _iconButtonPush(
-      BuildContext context, IconData icon, String tooltip, MyApp myApp) {
+      BuildContext context, IconData icon, String tooltip) {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
@@ -90,7 +90,7 @@ class _ModifyProfile extends State<ModifyProfile> {
             .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
 
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => MyApp()));
+            context, MaterialPageRoute(builder: (context) => LoginPage()));
       },
     );
   }
@@ -140,7 +140,7 @@ class _ModifyProfile extends State<ModifyProfile> {
               child: Text("Modifica dati"),
             ),
             actions: [
-              _iconButtonPush(context, Icons.logout, 'Logout', MyApp()),
+              _iconButtonPush(context, Icons.logout, 'Logout'),
             ],
           ),
           body: Center(

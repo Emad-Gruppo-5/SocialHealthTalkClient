@@ -85,7 +85,7 @@ class _Profile extends State<Profile> {
               .doc(cod_fiscale)
               .update({'status': 'online'});
 
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (context) => ModifyProfile(
@@ -112,8 +112,8 @@ class _Profile extends State<Profile> {
               .doc(cod_fiscale)
               .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
 
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => MyApp()));
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => LoginPage()));
         },
       );
     }

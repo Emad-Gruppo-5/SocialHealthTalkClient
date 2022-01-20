@@ -190,7 +190,7 @@ class LoginPage extends StatelessWidget {
                                       switch (role) {
                                         case 1: //PAZIENTE
                                           int tipologia_chat = json.decode(data)['tipologia_chat'];
-                                          Navigator.push(
+                                          Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) => Patient_Home(
@@ -205,7 +205,7 @@ class LoginPage extends StatelessWidget {
                                           break;
                                         case 2: //DOTTORE
                                           if (cod_fiscale == 'admin') {
-                                            Navigator.push(
+                                            Navigator.pushReplacement(
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
