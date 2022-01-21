@@ -342,16 +342,16 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   void callback() {
     print("ALERT\nCod_fiscale: " + cod_fiscale);
-    // FirebaseFirestore.instance
-    //     .collection('notifications')
-    //     .add({
-    //           'alert': true,
-    //           'letto': false,
-    //           'cod_fiscale': cod_fiscale,
-    //           'nome': nome,
-    //           'cognome': cognome,
-    //           'ultimo_accesso': ultimo_accesso
-    //     });
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .add({
+              'alert': true,
+              'letto': false,
+              'cod_fiscale': cod_fiscale,
+              'nome': nome,
+              'cognome': cognome,
+              'ultimo_accesso': ultimo_accesso
+        });
   }
 
   bool _isRecording = false;

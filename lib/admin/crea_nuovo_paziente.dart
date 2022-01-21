@@ -244,7 +244,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
                     creaPazienteServer().then((value) => {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => ListaPazienti()),
+                        MaterialPageRoute(builder: (context) => AdminHome()),
                       ),
                     });
                   } else {

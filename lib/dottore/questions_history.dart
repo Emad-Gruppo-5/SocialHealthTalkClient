@@ -9,10 +9,7 @@ import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:audioplayer/audioplayer.dart';
-<<<<<<< HEAD
 import 'package:test_emad/costanti.dart';
-=======
->>>>>>> 0a4fc412e6f843f4c1008e79df221d50c7d4b357
 
 class QuestionsHistory extends StatefulWidget {
   final String cod_fiscale_paziente;
@@ -491,11 +488,8 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
-                                            json
-                                                        .encode(data[
-                                                            "audio_risposta"])
-                                                        .compareTo("null") ==
-                                                    0
+                                            data["audio_risposta"].toString()
+                                                        .compareTo("null") == 0
                                                 ? Icon(
                                                     Icons.keyboard_alt_outlined,
                                                     color: Colors.blue)
@@ -571,11 +565,8 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                                     color: Colors.red))
                                           ],
                                         ),
-                                        subtitle: json
-                                                    .encode(
-                                                        data["audio_risposta"])
-                                                    .compareTo("null") ==
-                                                0
+                                        subtitle: data["audio_risposta"].toString().compareTo("null") == 0
+                                                    
                                             ? Text("Risposta testuale" +
                                                 "\nData Domanda: " +
                                                 data["data_domanda"] +
@@ -594,12 +585,8 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                                     Text(data['testo_domanda']),
                                                 children: <Widget>[
                                                   Center(
-                                                    child: json
-                                                                .encode(data[
-                                                                    "audio_risposta"])
-                                                                .compareTo(
-                                                                    "null") ==
-                                                            0
+                                                    child: data["audio_risposta"].toString()
+                                                                .compareTo("null") == 0
                                                         ? Text(data[
                                                             "testo_risposta"])
                                                         : IconButton(
