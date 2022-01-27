@@ -393,9 +393,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           Directory? appDocDir = await getExternalStorageDirectory();
           String? appDocPath = appDocDir?.path;
           await _audioRecorder.start(
-            path: '$appDocPath/myFile.m4a',
+            path: '$appDocPath/myFile.wav',
             encoder: AudioEncoder.AAC, // by default
-            bitRate: 128000,
+            bitRate: 16000,
           );
           bool isRecording = await _audioRecorder.isRecording();
 
