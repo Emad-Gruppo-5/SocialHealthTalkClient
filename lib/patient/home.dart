@@ -109,7 +109,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         timer.cancel();
         timer_alert.cancel();
@@ -139,7 +138,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         Navigator.pushReplacement(
           context,

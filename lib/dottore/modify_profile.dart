@@ -147,13 +147,12 @@ class _MyModifyProfile extends State<MyModifyProfile> {
 
     print(uri);
 
-    print(cod_fiscale + "ukff");
 
     int role = 2;
     print(senddata);
-    Map<String, String> message = {
+    Map<String, dynamic> message = {
       "cod_fiscale": cod_fiscale,
-      "role": role.toString(),
+      "role": role,
       "num_cellulare": senddata["Numero di cellulare"],
       "email": senddata["E-mail"],
     };

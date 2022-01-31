@@ -75,7 +75,6 @@ class _Profile extends State<Profile> {
     if (tooltip != 'Logout') {
       return IconButton(
         icon: Icon(icon),
-        iconSize: 40,
         tooltip: tooltip,
         onPressed: () {
           timer.cancel();
@@ -103,7 +102,6 @@ class _Profile extends State<Profile> {
     } else {
       return IconButton(
         icon: Icon(icon),
-        iconSize: 40,
         tooltip: tooltip,
         onPressed: () {
           timer.cancel();
@@ -124,7 +122,6 @@ class _Profile extends State<Profile> {
   Widget _iconButtonPop(IconData icon, String tooltip) {
     return IconButton(
       icon: Icon(icon),
-      iconSize: 40,
       tooltip: tooltip,
       onPressed: () {
         timer.cancel();
@@ -155,7 +152,7 @@ class _Profile extends State<Profile> {
       home: GestureDetector(
         child: Scaffold(
           appBar: AppBar(
-            leading: _iconButtonPop(Icons.arrow_back, 'Indietro'),
+            leading: _iconButtonPop(Icons.arrow_back_ios, 'Indietro'),
             title: const Text("Profilo"),
             actions: [
               _iconButtonPush(Icons.edit, 'Modifica'),
@@ -164,10 +161,19 @@ class _Profile extends State<Profile> {
           ),
           body: Column(
             children: [
+              const SizedBox(
+          height: 10,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
               Text(
                 "$nome $cognome",
                 style: TextStyle(fontSize: 30),
               ),
+              const SizedBox(
+          height: 10,
+        ),
               _card("$cod_fiscale", Icons.person),
               _card("$num_cellulare", Icons.smartphone),
               _card("$email", Icons.email),
