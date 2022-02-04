@@ -96,6 +96,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   Duration online_duration = const Duration(seconds: 7);
   Duration alert_duration = const Duration(seconds: 20);
+  Duration question_duration = const Duration(seconds: 30);
   late Timer timer;
   late Timer timer_alert;
   String timerText = "Start";
@@ -109,7 +110,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         timer.cancel();
         timer_alert.cancel();
@@ -139,7 +139,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         Navigator.pushReplacement(
           context,
@@ -202,7 +201,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     String subtitle = "";
                     Icon trailing;
                     print(data.toString());
-
+                    Timer timer_question = Timer(question_duration, (){
+                                                          print("ELIMINATO? " + document.id.toString());
+                                                          document.reference.delete();
+                                                        } );
                     return Center(
                       child: Card(
                         child: Column(
@@ -275,7 +277,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                                   if (risposta != " " ||
                                                       isAudio) {
                                                     sendRispostaToDatabase(data,
-                                                        document, isAudio);
+                                                        document, isAudio, timer_question);
                                                     Navigator.pop(context);
                                                   } else {
                                                     _showBasicsFlash(
@@ -341,18 +343,25 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
 
+  // void questionTimeout() {
+  //   FirebaseFirestore.instance
+  //       .collection('patients')
+  //       .doc(cod_fiscale)
+  //       .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
+  // }
+
   void callback() {
     print("ALERT\nCod_fiscale: " + cod_fiscale);
-    FirebaseFirestore.instance
-        .collection('notifications')
-        .add({
-              'alert': true,
-              'letto': false,
-              'cod_fiscale': cod_fiscale,
-              'nome': nome,
-              'cognome': cognome,
-              'ultimo_accesso': ultimo_accesso
-        });
+    // FirebaseFirestore.instance
+    //     .collection('notifications')
+    //     .add({
+    //           'alert': true,
+    //           'letto': false,
+    //           'cod_fiscale': cod_fiscale,
+    //           'nome': nome,
+    //           'cognome': cognome,
+    //           'ultimo_accesso': ultimo_accesso
+    //     });
   }
 
   bool _isRecording = false;
@@ -439,7 +448,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   }
 
   sendRispostaToDatabase(
-      Map fireData, DocumentSnapshot<Object?> document, bool isAudio) async {
+      Map fireData, DocumentSnapshot<Object?> document, bool isAudio, Timer timer) async {
     try {
       String base64String;
       String downloadUrl;
@@ -490,6 +499,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             print("ERRORE LATO POSTGRESQL: err: ");
             _showBasicsFlash("Risposta non inserita");
           } else {
+            timer.cancel();
             _showBasicsFlash('Risposta inviata con successo');
             document.reference.delete();
           }
@@ -530,6 +540,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           print("ERRORE LATO POSTGRESQL: err: ");
           _showBasicsFlash("Risposta non inserita");
         } else {
+          timer.cancel();
           _showBasicsFlash('Risposta inviata con successo');
           document.reference.delete();
         }

@@ -10,6 +10,7 @@ import 'main_dottore.dart';
 import 'patient_list_item.dart';
 import 'new_question.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:test_emad/costanti.dart';
 
 /// This is the main application widget.
 class DetailPatient extends StatefulWidget {
@@ -47,7 +48,7 @@ class MyDetailPatient extends State<DetailPatient> {
   late String num_cellulare;
   late String specializzazione;
   late String paz_cod_fiscale;
-
+  var myController;
   @override
   void initState() {
     print("initState");
@@ -64,7 +65,7 @@ class MyDetailPatient extends State<DetailPatient> {
 
   Future<Map<String, dynamic>> getprofiledata() async {
     print("Inizio funzione");
-    var uri = Uri.parse('http://100.75.184.95:5000/dati_profilo');
+    var uri = Uri.parse('http://' + urlServer + ':5000/dati_profilo');
     print(uri);
     var message = {"role": 1, "cod_fiscale": paz_cod_fiscale};
 
@@ -78,8 +79,31 @@ class MyDetailPatient extends State<DetailPatient> {
 
     Map<String, dynamic> resp = {'paziente': json.decode(dati_profilo.body)};
     print(resp);
+
+    myController = TextEditingController(text: resp['paziente']['note']);
     return resp;
   }
+
+  Future<void> updateNotes() async {
+    var uri = Uri.parse('http://' + urlServer + ':5000/updateNotes');
+    print(uri);
+ 
+    Map<String, String> message = {
+      "cod_fiscale": paz_cod_fiscale,
+      "note": myController.text
+    };
+    var body = json.encode(message);
+    var data;
+    print("\nBODY:: " + body);
+ 
+    data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+
+  }
+
 
   Widget _iconButton(BuildContext context, IconData icon, String tooltip,
       var statelessWidget) {
@@ -122,22 +146,33 @@ class MyDetailPatient extends State<DetailPatient> {
     );
   }
 
+  
+ 
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+ 
   Widget _textFormField(String initialValue) {
     if (initialValue == "") {
       return TextFormField(
+        controller: myController,
         maxLines: null,
         decoration: const InputDecoration(
             icon: Icon(Icons.note), hintText: "Note", labelText: "Note"),
       );
     } else {
       return TextFormField(
-        initialValue: initialValue,
+        controller: myController,
         maxLines: null,
         decoration: const InputDecoration(
             icon: Icon(Icons.note), hintText: "Note", labelText: "Note"),
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -247,16 +282,33 @@ class MyDetailPatient extends State<DetailPatient> {
                               'Titolo di studio:'),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: _textFormField(
-                                profilo["note"] == null ? "" : profilo["note"]),
+                            child: _textFormField(profilo["note"] == null ? "" : profilo["note"]),
                           ),
                           ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                  updateNotes().then((value) {
+                                      final snackBar = SnackBar(
+                                      content: const Text('Note inserite'),
+                                    );
+
+                                    // Find the ScaffoldMessenger in the widget tree
+                                    // and use it to show a SnackBar.
+                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                  })
+                                  .catchError((err) {
+                                      final snackBar = SnackBar(
+                                      content: const Text('Errore: note non inserite'),
+                                    );
+
+                                    // Find the ScaffoldMessenger in the widget tree
+                                    // and use it to show a SnackBar.
+                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                  });
+                              },
                               child: const Text("Salva note")),
                         ],
                       ),
                     );
-                    // return Center(child: Text("NON FUNZIONA"));
                   } else {
                     return Center(child: CircularProgressIndicator());
                   }

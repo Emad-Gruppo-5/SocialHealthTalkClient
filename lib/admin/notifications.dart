@@ -74,16 +74,16 @@ class Notifications extends StatelessWidget {
   }
 }
 
-Future<void> sendEmail(List<Map<String, String>> addresses) async {
+Future<void> sendAlert(List<String> addresses, String nome, String cognome, String ultimo_accesso) async {
   var uri = Uri.parse('http://' + urlServer + ':5000/alert');
   print(uri);
-
-  print(addresses);
+  Map<String, dynamic> message = {"nome": nome, "cognome": cognome, "ultimo_accesso": ultimo_accesso, "num_cellulare": addresses};
+  var body = json.encode(message);
   await http.post(uri,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8'
       },
-      body: json.encode(addresses));
+      body: body);
 }
 
 Future<String> getActors(String cod_fiscale) async {
@@ -107,7 +107,7 @@ Future<String> getActors(String cod_fiscale) async {
 class MyNotifications extends StatelessWidget {
   List<Map<String, dynamic>> actors = [];
 
-  Future _showAlertDialog(BuildContext context) {
+  Future _showAlertDialog(BuildContext context, String nome, String cognome, String ultimo_accesso) {
     return showDialog<void>(
         context: context,
         barrierDismissible: false,
@@ -124,7 +124,7 @@ class MyNotifications extends StatelessWidget {
                         data["value"] = value;
                       }),
                       title: Text(data["categoria"] +
-                          ": " +
+                          " - " +
                           data["nome"] +
                           " " +
                           data["cognome"]),
@@ -141,19 +141,19 @@ class MyNotifications extends StatelessWidget {
                     child: const Text("Non inviare")),
                 TextButton(
                     onPressed: () {
-                      List<Map<String, String>> addresses = [];
+                      List<String> addresses = [];
 
                       for (int i = 0; i < actors.length; i++)
                         if (actors[i]["value"])
-                          addresses.add({"email": actors[i]["email"]});
+                          addresses.add(actors[i]["num_cellulare"]);
 
                       print(addresses);
                       // RACCOLTA EMAIL e poi INVIO EMAILS
-                      sendEmail(addresses).then((val) {
+                      sendAlert(addresses, nome, cognome, ultimo_accesso).then((val) {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(_scaffoldKey.currentContext!)
                             .showSnackBar(const SnackBar(
-                                content: Text('Email/SMS inviati')));
+                                content: Text('SMS inviati')));
                         actors.clear();
                       });
                     },
@@ -258,16 +258,11 @@ class MyNotifications extends StatelessWidget {
                                 i < json.decode(value)["dottori"].length;
                                 i++) {
                               actors.add({
-                                'cognome': json.decode(value)["dottori"][i]
-                                    ['cognome'],
-                                'nome': json.decode(value)["dottori"][i]
-                                    ['nome'],
-                                'cod_fiscale': json.decode(value)["dottori"][i]
-                                    ['cod_fiscale'],
-                                'email': json.decode(value)["dottori"][i]
-                                    ['email'],
-                                'num_cellulare': json.decode(value)["dottori"]
-                                    [i]['num_cellulare'],
+                                'cognome': json.decode(value)["dottori"][i]['cognome'],
+                                'nome': json.decode(value)["dottori"][i]['nome'],
+                                'cod_fiscale': json.decode(value)["dottori"][i]['cod_fiscale'],
+                                'email': json.decode(value)["dottori"][i]['email'],
+                                'num_cellulare': json.decode(value)["dottori"][i]['num_cellulare'],
                                 'value': false,
                                 'categoria': 'D'
                               });
@@ -291,7 +286,7 @@ class MyNotifications extends StatelessWidget {
                                 'categoria': 'F'
                               });
                             }
-                            _showAlertDialog(context);
+                            _showAlertDialog(context, data["nome"], data["cognome"], data["ultimo_accesso"]);
                           })
                         },
                         onLongPress: () => _notificationsReference

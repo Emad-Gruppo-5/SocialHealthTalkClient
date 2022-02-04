@@ -79,7 +79,6 @@ class _ModifyProfile extends State<ModifyProfile> {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         timer.cancel();
         timer_alert.cancel();
@@ -100,7 +99,6 @@ class _ModifyProfile extends State<ModifyProfile> {
     return IconButton(
       icon: Icon(icon),
       tooltip: tooltip,
-      iconSize: 40,
       onPressed: () {
         timer.cancel();
         timer_alert.cancel();
@@ -136,7 +134,7 @@ class _ModifyProfile extends State<ModifyProfile> {
         child: Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
-            leading: _iconButtonPop(context, Icons.arrow_back, 'Indietro'),
+            leading: _iconButtonPop(context, Icons.arrow_back_ios, 'Indietro'),
             title: const Center(
               child: Text("Modifica dati"),
             ),
@@ -147,10 +145,19 @@ class _ModifyProfile extends State<ModifyProfile> {
           body: SingleChildScrollView(
             child: Column(
               children: [
+                const SizedBox(
+          height: 10,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
                 Text(
                   "$nome $cognome",
                   style: TextStyle(fontSize: 30),
                 ),
+                const SizedBox(
+          height: 10,
+        ),
                 _form(),
                 const Text("\nTipologia chat"),
                   ListTile(

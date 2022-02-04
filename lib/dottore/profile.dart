@@ -166,9 +166,18 @@ class MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(
+          height: 10,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
         Text(
           nome + " " + cognome,
           style: const TextStyle(fontSize: 30),
+        ),
+        const SizedBox(
+          height: 10,
         ),
         _card(cod_fiscale, Icons.person),
         _card(num_cellulare, Icons.smartphone),
