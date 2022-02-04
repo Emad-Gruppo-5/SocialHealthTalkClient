@@ -304,7 +304,7 @@ class NewQuestionState extends State<NewQuestion> {
                     if (_formKey.currentState!.validate()) {
                       DateFormat data_query_format = DateFormat("yyyy-MM-dd");
                       CollectionReference questions =
-                          FirebaseFirestore.instance.collection('questions');
+                          FirebaseFirestore.instance.collection('questions_to_answer');
                       questions.add({
                         'cod_fiscale_dottore': cod_fiscale,
                         'cod_fiscale_paziente': paz_cod_fiscale,
