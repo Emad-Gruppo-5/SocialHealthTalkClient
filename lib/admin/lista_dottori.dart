@@ -132,7 +132,7 @@ class ListSearchState extends State<ListSearch> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ProfiloDottore(),
+                              builder: (context) => ProfiloDot(data["cod_fiscale"]!),
                             ),
                           ),
                         });

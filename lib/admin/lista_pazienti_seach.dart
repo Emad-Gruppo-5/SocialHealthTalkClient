@@ -1,37 +1,34 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
-import 'package:test_emad/admin/crea_nuovo_familiare.dart';
-import 'package:test_emad/admin/profilo_dottore.dart';
-import 'package:test_emad/admin/profilo_familiari.dart';
-import 'package:test_emad/admin/profilo_paziente_modifica.dart';
 import 'package:test_emad/costanti.dart';
+import 'package:flutter/material.dart';
+import 'package:test_emad/admin/crea_nuovo_dottore.dart';
+import 'package:test_emad/admin/profilo_dottore.dart';
+import 'package:test_emad/admin/profilo_paziente_modifica.dart';
+import 'package:http/http.dart' as http;
 import 'profilo_paziente.dart';
 
-class ListaFamiliari extends StatelessWidget {
+class listaPazientiSeach extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: Text('Lista Familiari'),
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.add),
-                  tooltip: "Aggiungi",
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CreaNuovoFamiliare()),
-                    );
-                  },
-                ),
-              ],
+    return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_sharp),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Text('Associa un Paziente'),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.arrow_back_ios_sharp),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
-            body: Center(child: ListSearch())));
+          ],
+        ),
+        body: Center(child: ListSearch()));
   }
 }
 
@@ -50,12 +47,12 @@ class ListSearchState extends State<ListSearch> {
 
   static List<Map<String, String>> mainDataList = [];
 
-  Future<String> getActors() async {
+  Future<void> getActors() async {
     mainDataList.clear();
     var uri = Uri.parse('http://' + urlServer + ':5000/lista_attori');
     print(uri);
 
-    int role = 4;
+    int role = 1;
     Map<String, int> message = {
       "role": role,
     };
@@ -71,11 +68,17 @@ class ListSearchState extends State<ListSearch> {
 
     var i = 0;
     while (i < json.decode(data.body).length) {
-      mainDataList.add({
-        'cognome': json.decode(data.body)[i]['cognome'],
-        'nome': json.decode(data.body)[i]['nome'],
-        'cod_fiscale': json.decode(data.body)[i]['cod_fiscale']
-      });
+      if (json
+              .decode(data.body)[i]['cod_fiscale']
+              .toString()
+              .compareTo('admin') !=
+          0) {
+        mainDataList.add({
+          'cognome': json.decode(data.body)[i]['cognome'],
+          'nome': json.decode(data.body)[i]['nome'],
+          'cod_fiscale': json.decode(data.body)[i]['cod_fiscale']
+        });
+      }
       i++;
     }
 
@@ -84,8 +87,6 @@ class ListSearchState extends State<ListSearch> {
     setState(() {
       newDataList = List.from(mainDataList);
     });
-
-    return data.body;
   }
 
   // Copy Main List into New List.
@@ -128,12 +129,7 @@ class ListSearchState extends State<ListSearch> {
                 return ListTile(
                     title: Text(data["cognome"]! + ' ' + data["nome"]!),
                     onTap: () => {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProfiloFamiliare(data["cod_fiscale"]!),
-                            ),
-                          ),
+                          Navigator.pop(context, data['cod_fiscale']),
                         });
               }).toList(),
             ),
