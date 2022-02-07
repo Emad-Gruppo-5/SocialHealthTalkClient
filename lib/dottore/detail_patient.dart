@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:test_emad/dottore/new_question.dart';
 import 'package:test_emad/dottore/questions_history.dart';
+import 'package:test_emad/dottore/voice_tone_analysis.dart';
 import 'package:test_emad/main.dart';
 import 'main_dottore.dart';
 import 'patient_list_item.dart';
@@ -87,7 +88,7 @@ class MyDetailPatient extends State<DetailPatient> {
   Future<void> updateNotes() async {
     var uri = Uri.parse('http://' + urlServer + ':5000/updateNotes');
     print(uri);
- 
+
     Map<String, String> message = {
       "cod_fiscale": paz_cod_fiscale,
       "note": myController.text
@@ -95,15 +96,13 @@ class MyDetailPatient extends State<DetailPatient> {
     var body = json.encode(message);
     var data;
     print("\nBODY:: " + body);
- 
+
     data = await http.post(uri,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
         body: body);
-
   }
-
 
   Widget _iconButton(BuildContext context, IconData icon, String tooltip,
       var statelessWidget) {
@@ -146,15 +145,13 @@ class MyDetailPatient extends State<DetailPatient> {
     );
   }
 
-  
- 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
     myController.dispose();
     super.dispose();
   }
- 
+
   Widget _textFormField(String initialValue) {
     if (initialValue == "") {
       return TextFormField(
@@ -172,7 +169,6 @@ class MyDetailPatient extends State<DetailPatient> {
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -231,6 +227,22 @@ class MyDetailPatient extends State<DetailPatient> {
               backgroundColor: Colors.green,
               child: const Icon(Icons.history),
             ),
+            const SizedBox(
+              height: 10,
+            ),
+            FloatingActionButton(
+              heroTag: "btn3",
+              onPressed: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                      fullscreenDialog: true,
+                      builder: (context) =>
+                          VoiceToneAnalysis(paz_cod_fiscale, cod_fiscale)),
+                );
+              },
+              backgroundColor: Colors.green,
+              child: const Icon(Icons.analytics),
+            ),
           ],
         ),
         body: SingleChildScrollView(
@@ -282,28 +294,31 @@ class MyDetailPatient extends State<DetailPatient> {
                               'Titolo di studio:'),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: _textFormField(profilo["note"] == null ? "" : profilo["note"]),
+                            child: _textFormField(
+                                profilo["note"] == null ? "" : profilo["note"]),
                           ),
                           ElevatedButton(
                               onPressed: () {
-                                  updateNotes().then((value) {
-                                      final snackBar = SnackBar(
-                                      content: const Text('Note inserite'),
-                                    );
+                                updateNotes().then((value) {
+                                  final snackBar = SnackBar(
+                                    content: const Text('Note inserite'),
+                                  );
 
-                                    // Find the ScaffoldMessenger in the widget tree
-                                    // and use it to show a SnackBar.
-                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                  })
-                                  .catchError((err) {
-                                      final snackBar = SnackBar(
-                                      content: const Text('Errore: note non inserite'),
-                                    );
+                                  // Find the ScaffoldMessenger in the widget tree
+                                  // and use it to show a SnackBar.
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
+                                }).catchError((err) {
+                                  final snackBar = SnackBar(
+                                    content:
+                                        const Text('Errore: note non inserite'),
+                                  );
 
-                                    // Find the ScaffoldMessenger in the widget tree
-                                    // and use it to show a SnackBar.
-                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                  });
+                                  // Find the ScaffoldMessenger in the widget tree
+                                  // and use it to show a SnackBar.
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
+                                });
                               },
                               child: const Text("Salva note")),
                         ],
