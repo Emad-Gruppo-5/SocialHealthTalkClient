@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:record/record.dart';
@@ -404,7 +405,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           await _audioRecorder.start(
             path: '$appDocPath/myFile.wav',
             encoder: AudioEncoder.AAC, // by default
-            bitRate: 16000,
+            bitRate: 128000,
           );
           bool isRecording = await _audioRecorder.isRecording();
 
@@ -452,11 +453,19 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       String base64String;
       String downloadUrl;
       if (isAudio) {
+        DateFormat data_risposta_format = DateFormat("yyyy-MM-dd HH:mm");
+        DateFormat data_query_format = DateFormat("yyyy-MM-dd");
+        Random random = new Random();
+        int randomNumber = random.nextInt(10000);
+
+        String namefile = cod_fiscale + data_query_format.format(DateTime.now()).toString() + DateFormat.Hm().format(DateTime.now()).toString() + randomNumber.toString();
+        print(namefile);
+
         File file = File(path2);
         risposta = "null";
         FirebaseStorage storage = FirebaseStorage.instance;
         Reference ref =
-            storage.ref().child("audiopaziente" + DateTime.now().toString());
+            storage.ref().child(namefile);
         UploadTask uploadTask = ref.putFile(file);
         uploadTask.whenComplete(() async {
           downloadUrl = await ref.getDownloadURL();
@@ -467,11 +476,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           // } else
           //   uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 
-          DateFormat data_risposta_format = DateFormat("yyyy-MM-dd HH:mm");
-          DateFormat data_query_format = DateFormat("yyyy-MM-dd");
-
           Map<String, String> message = {
-            "audio_risposta": downloadUrl,
+            "audio_risposta": namefile,
             "data_risposta": data_risposta_format.format(DateTime.now()),
             "cod_fiscale_paziente": cod_fiscale,
             "data_domanda": fireData["data_domanda"],
