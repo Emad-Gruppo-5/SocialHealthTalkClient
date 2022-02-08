@@ -368,7 +368,7 @@ class NewQuestionState extends State<NewQuestion> {
                   specializzazione: specializzazione,
                   cod_fiscale: cod_fiscale,
                   token: token)),
-          title: Text("Modifica dati"),
+          title: Text("Invio nuova domanda"),
           actions: [
             _iconButton2(context, Icons.logout, 'Logout', LoginPage()),
           ],
@@ -376,10 +376,8 @@ class NewQuestionState extends State<NewQuestion> {
         body: Center(
           child: Column(
             children: [
-              const Text(
-                "Nuova domanda",
-                style: TextStyle(fontSize: 30),
-              ),
+              SizedBox(height: 10,),
+              SizedBox(height: 10,),
               _form(),
             ],
           ),

@@ -484,7 +484,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             "testo_domanda": fireData["testo_domanda"],
             "cod_fiscale_dottore": fireData["cod_fiscale_dottore"],
             "testo_risposta": risposta,
-            "data_query": data_query_format.format(DateTime.now())
+            "data_query": data_query_format.format(DateTime.now()),
+            "url_audio": downloadUrl
           };
           var body = json.encode(message);
           print("\nBODY:: " + body);
@@ -525,7 +526,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           "testo_domanda": fireData["testo_domanda"],
           "cod_fiscale_dottore": fireData["cod_fiscale_dottore"],
           "testo_risposta": risposta,
-          "data_query": data_query_format.format(DateTime.now())
+          "data_query": data_query_format.format(DateTime.now()),
+          "url_audio": "null"
         };
         var body = json.encode(message);
         print("\nBODY:: " + body);
@@ -554,7 +556,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   }
 
   void _showBasicsFlash(String text) {
-    Duration duration = const Duration(seconds: 7);
+    Duration duration = const Duration(seconds: 3);
     showFlash(
       context: context,
       duration: duration,

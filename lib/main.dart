@@ -97,12 +97,12 @@ class LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(5),
+              padding: EdgeInsets.all(40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   // Text("Login", style: TextStyle(color: Colors.white, fontSize: 40),),
-                  // SizedBox(height: 10,)
+                  SizedBox(height: 10,),
                   Center(
                       child: Image.asset(
                     'assets/images/SHT.png',
@@ -201,7 +201,7 @@ class LoginPageState extends State<LoginPage> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (_formKey.currentState!.validate()) {
-                                    var cod_fiscale = _cod_fiscaleC.text;
+                                    var cod_fiscale = _cod_fiscaleC.text.toUpperCase();
                                     var password = _passwordC.text;
 
                                     login(cod_fiscale, password).then((data) {
@@ -301,9 +301,13 @@ class LoginPageState extends State<LoginPage> {
                               )),
                           SizedBox(
                             height: 20,),
-                        SizedBox(height: 20, ),
-                        // Text("Non sei ancora registrato? ", style: TextStyle(color: Colors.black87), ),
-                        // SizedBox(height: 20, ),
+                        
+                        const Divider(
+                            height: 20,
+                            thickness: 1,
+                            indent: 10,
+                            endIndent: 30),
+                          SizedBox(height: 20, ),
                         Container(
                             height: 50,
                             margin: EdgeInsets.symmetric(horizontal: 50),

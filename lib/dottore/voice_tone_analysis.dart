@@ -1,10 +1,12 @@
 import 'dart:convert';
-
+import 'package:audioplayer/audioplayer.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
+import 'package:test_emad/costanti.dart';
+import 'package:flash/flash.dart';
 
 class VoiceToneAnalysis extends StatelessWidget {
   const VoiceToneAnalysis(this._codFiscalePaziente, this._codFiscaleDottore,
@@ -31,7 +33,7 @@ class VoiceToneAnalysis extends StatelessWidget {
           actions: [
             IconButton(
                 onPressed: () =>
-                    Navigator.popUntil(context, ModalRoute.withName('/')),
+                    Navigator.popUntil(context, ModalRoute.withName('/login')),
                 icon: const Icon(Icons.logout))
           ],
         ),
@@ -60,12 +62,40 @@ class _MyVoiceToneAnalysis extends State<MyVoiceToneAnalysis> {
 
   DateFormat dateFormat = DateFormat("yyyy-MM-dd");
   late TextEditingController _date;
-
+  AudioPlayer audioPlayer = AudioPlayer();
+  bool _isPlaying = false;
   @override
   void initState() {
     super.initState();
 
     _date = TextEditingController(text: dateFormat.format(DateTime.now()));
+  }
+
+  void _showBasicsFlash(String text) {
+    Duration duration = const Duration(seconds: 7);
+    showFlash(
+      context: context,
+      duration: duration,
+      builder: (context, controller) {
+        var flashStyle = FlashBehavior.floating;
+        return Flash(
+          controller: controller,
+          behavior: flashStyle,
+          position: FlashPosition.bottom,
+          boxShadows: kElevationToShadow[4],
+          backgroundColor: Colors.black87,
+          horizontalDismissDirection: HorizontalDismissDirection.horizontal,
+          child: FlashBar(
+            content: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _textFormField(IconData icon, String labelText, String validator,
@@ -114,7 +144,7 @@ class _MyVoiceToneAnalysis extends State<MyVoiceToneAnalysis> {
 
   Future<List<Map<String, dynamic>>> getAnalisi(String date) async {
     List<Map<String, dynamic>> _analysis = [];
-    var uri = Uri.parse('http://127.0.0.1:5000/getAnalisi');
+    var uri = Uri.parse('http://' + urlServer + ':5000/getAnalisi');
 
     print(uri);
 
@@ -133,13 +163,16 @@ class _MyVoiceToneAnalysis extends State<MyVoiceToneAnalysis> {
     print('Response status: ${data.statusCode}');
     print('Response body: ' + data.body);
 
+  
     if (data.statusCode == 200) {
+
       for (int i = 0; i < json.decode(data.body).length; i++) {
         _analysis.add({
           'testo_domanda': json.decode(data.body)[i]['testo_domanda'],
           'data_domanda': json.decode(data.body)[i]['data_domanda'],
           'data_risposta': json.decode(data.body)[i]['data_risposta'],
-          'humor': json.decode(data.body)[i]['humor']
+          'humor': json.decode(data.body)[i]['humor'] != null ? json.decode(data.body)[i]['humor'] : "Analisi ancora da effettuare",
+          'url_audio': json.decode(data.body)[i]['url_audio'],
         });
       }
     } else {
@@ -149,29 +182,49 @@ class _MyVoiceToneAnalysis extends State<MyVoiceToneAnalysis> {
     return _analysis;
   }
 
+  _icon() {
+    if (_isPlaying == false) {
+      return const Icon(Icons.play_circle, color: Colors.blue);
+    } else {
+      return const Icon(Icons.stop_circle, color: Colors.blue);
+    }
+  }
+
   Widget _expansionTile(
-      String question, String question_date, String answer_date, var humor) {
-    String humorJson = utf8.decode(base64.decode(humor));
-    humorJson = humorJson.replaceAll("'", "\"");
-    print(humorJson);
-    Map<String, dynamic> jsonObject = jsonDecode(humorJson);
+      String question, String question_date, String answer_date, var humor, var audio_risposta) {
+    Map<String, dynamic> jsonObject = {};
+    if(humor != "null"){
+      String humorJson = utf8.decode(base64.decode(humor));
+      humorJson = humorJson.replaceAll("'", "\"");
+      print(humorJson);
+      jsonObject = jsonDecode(humorJson);
+      print(jsonObject);
+    }
     return ExpansionTile(
       title: Text(question),
       subtitle: Text(
           "Data domanda: " + question_date + "\nData risposta: " + answer_date),
       children: <Widget>[
         ListTile(
-          title: const Text("Analisi"),
-          subtitle: Text("arrabbiato: " +
-              jsonObject['angry'].toString() +
-              ", paura: " +
-              jsonObject['fear'].toString() +
-              ", felice: " +
-              jsonObject['happy'].toString() +
-              ", neutral: " +
-              jsonObject['neutral'].toString() +
-              ", triste: " +
-              jsonObject['sad'].toString()),
+          title: IconButton(
+                                                            onPressed: () {
+                                                              _showBasicsFlash("Audio avviato..");
+                                                              audioPlayer.play(audio_risposta);
+                                                            },
+                                                            icon: _icon(),
+                                                          ),
+          subtitle: humor!="null" ? Center( child: Text("Rabbia: " +
+              (jsonObject['angry']*100).toStringAsFixed(0) + "% - " +
+              "Paura: " +
+              (jsonObject['fear']*100).toStringAsFixed(0) + "% - " +
+              "Felice: " +
+              (jsonObject['happy']*100).toStringAsFixed(0) + "% - " +
+              "Neutrale: " +
+              (jsonObject['neutral']*100).toStringAsFixed(0) + "% - " +
+              "Triste: " +
+              (jsonObject['sad']*100).toStringAsFixed(0) + "%"))
+                                  :
+              Center( child: Text("Analisi non ancora effettuata")),
           isThreeLine: true,
         ),
       ],
@@ -210,7 +263,8 @@ class _MyVoiceToneAnalysis extends State<MyVoiceToneAnalysis> {
                         data['testo_domanda'],
                         data['data_domanda'],
                         data['data_risposta'],
-                        data['humor']);
+                        data['humor'].toString().compareTo("Analisi ancora da effettuare") == 0 ? "null" : data['humor'],
+                        data['url_audio']);
                   }).toList(),
                 );
               } else {

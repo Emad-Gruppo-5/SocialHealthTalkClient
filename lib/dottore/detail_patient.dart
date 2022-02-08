@@ -242,7 +242,7 @@ class MyDetailPatient extends State<DetailPatient> {
                 );
               },
               backgroundColor: Colors.green,
-              child: const Icon(Icons.analytics),
+              child: const Icon(Icons.analytics_outlined),
             ),
           ],
         ),
@@ -261,6 +261,12 @@ class MyDetailPatient extends State<DetailPatient> {
                     return SingleChildScrollView(
                       child: Column(
                         children: [
+                          const SizedBox(
+              height: 10,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
                           Text(
                             profilo["nome"] + ' ' + profilo["cognome"],
                             style: const TextStyle(fontSize: 40),

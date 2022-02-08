@@ -10,6 +10,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:audioplayer/audioplayer.dart';
 import 'package:test_emad/costanti.dart';
+import 'package:flash/flash.dart';
 
 class QuestionsHistory extends StatefulWidget {
   final String cod_fiscale_paziente;
@@ -79,7 +80,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
           'id_domanda': json.decode(data.body)[i]['id_domanda'],
           'testo_domanda': json.decode(data.body)[i]['testo_domanda'],
           'testo_risposta': json.decode(data.body)[i]['testo_risposta'],
-          'audio_risposta': json.decode(data.body)[i]['audio_risposta'],
+          'url_audio': json.decode(data.body)[i]['url_audio'],
           'data_risposta': json.decode(data.body)[i]['data_risposta'],
           'data_domanda': json.decode(data.body)[i]['data_domanda']
         });
@@ -89,6 +90,34 @@ class _QuestionsHistory extends State<QuestionsHistory> {
     }
 
     return _closed_questions;
+  }
+
+
+  void _showBasicsFlash(String text) {
+    Duration duration = const Duration(seconds: 7);
+    showFlash(
+      context: context,
+      duration: duration,
+      builder: (context, controller) {
+        var flashStyle = FlashBehavior.floating;
+        return Flash(
+          controller: controller,
+          behavior: flashStyle,
+          position: FlashPosition.bottom,
+          boxShadows: kElevationToShadow[4],
+          backgroundColor: Colors.black87,
+          horizontalDismissDirection: HorizontalDismissDirection.horizontal,
+          child: FlashBar(
+            content: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> eliminaDomanda(var id_domanda) async {
@@ -488,7 +517,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
-                                            data["audio_risposta"].toString()
+                                            data["url_audio"].toString()
                                                         .compareTo("null") == 0
                                                 ? Icon(
                                                     Icons.keyboard_alt_outlined,
@@ -565,7 +594,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                                     color: Colors.red))
                                           ],
                                         ),
-                                        subtitle: data["audio_risposta"].toString().compareTo("null") == 0
+                                        subtitle: data["url_audio"].toString().compareTo("null") == 0
                                                     
                                             ? Text("Risposta testuale" +
                                                 "\nData Domanda: " +
@@ -580,24 +609,41 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                                         onTap: () => showDialog<void>(
                                             context: context,
                                             builder: (BuildContext context) {
-                                              return SimpleDialog(
+                                              return StatefulBuilder(
+                                                builder: (context, setState) {
+                                                  return SimpleDialog(
                                                 title:
                                                     Text(data['testo_domanda']),
                                                 children: <Widget>[
                                                   Center(
-                                                    child: data["audio_risposta"].toString()
+                                                    child: data["url_audio"].toString()
                                                                 .compareTo("null") == 0
                                                         ? Text(data[
                                                             "testo_risposta"])
                                                         : IconButton(
                                                             onPressed: () {
+                                                              if (_isRecording == false) {
+                                                                
+                                                              setState(() {
+                                                                
+                                                                _isRecording = true;
+                                                              });
+                                                               _showBasicsFlash("Audio avviato..");
                                                               audioPlayer.play(data[
-                                                                  "audio_risposta"]);
+                                                                  "url_audio"]).whenComplete(() => setState((){_isRecording = false;}));
+                                                                 
+                                                            } else {
+                                                              setState(() {
+                                                                _isRecording = false;
+                                                              });
+                                                            }
                                                             },
                                                             icon: _icon(),
                                                           ),
                                                   )
                                                 ],
+                                              );
+                                                },
                                               );
                                             }),
                                       ),

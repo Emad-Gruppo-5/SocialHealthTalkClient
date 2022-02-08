@@ -4,7 +4,7 @@
     <!-- Optional, you'll have to check this permission by yourself. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
    <application
-        android:label="test_emad"
+        android:label="SocialHealthTalk"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
