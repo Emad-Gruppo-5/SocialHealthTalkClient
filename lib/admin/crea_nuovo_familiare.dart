@@ -57,7 +57,7 @@ class _MyModifyProfile extends State<CreateProfile> {
   TextEditingController _cont6 = TextEditingController();
 
   Future<void> creaFamiliareServer() async {
-    var uri = Uri.parse('http://' + urlServer + '/crea_utente');
+    var uri = Uri.parse(urlServer + 'crea_utente');
 
     int role = 4;
     print(senddata);

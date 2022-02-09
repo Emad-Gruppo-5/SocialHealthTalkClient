@@ -1,7 +1,10 @@
+import 'package:test_emad/admin/profilo_dottore.dart';
+import 'package:test_emad/admin/profilo_paziente.dart';
 import 'package:test_emad/costanti.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:test_emad/admin/lista_dottori_seach.dart';
+import 'chat_switch.dart';
 import 'lista_familiari_search.dart';
 import 'package:http/http.dart' as http;
 
@@ -78,6 +81,7 @@ class MyModifyProfile extends StatefulWidget {
     required this.lista_familiari,
     required this.lista_dottori,
   });
+
   @override
   State<MyModifyProfile> createState() => _MyModifyProfile();
 }
@@ -92,6 +96,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   late int tipologia_chat;
   late List<dynamic> lista_dottori;
   late List<dynamic> lista_familiari;
+  late int chat_mode;
   Map<String, dynamic> senddata = {};
 
   List<bool> isChecked = [false, true, false];
@@ -106,6 +111,8 @@ class _MyModifyProfile extends State<MyModifyProfile> {
     num_cellulare = widget.num_cellulare;
     lista_dottori = widget.lista_dottori;
     lista_familiari = widget.lista_familiari;
+    chat_mode = widget.tipologia_chat;
+
     //adding item to list, you can add using json from network
 
     super.initState();
@@ -117,7 +124,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   Future<void> getActors(String cod_fiscale) async {
     mainDataList.clear();
     secondDataList.clear();
-    var uri = Uri.parse('http://' + urlServer + '/attori_associati');
+    var uri = Uri.parse(urlServer + 'attori_associati');
     print(uri);
 
     int role = 1;
@@ -164,7 +171,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
 
     var body = json.encode(message);
 
-    var uri = Uri.parse('http://' + urlServer + '/attori_associati');
+    var uri = Uri.parse(urlServer + 'attori_associati');
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{
@@ -184,14 +191,50 @@ class _MyModifyProfile extends State<MyModifyProfile> {
     return resp;
   }
 
+
+  Future<void> updateProfilo() async {
+    var uri = Uri.parse(urlServer + 'modifica_utente');
+
+    Map<String, dynamic> message = {
+      "role": 1.toString(),
+      "cod_fiscale": cod_fiscale,
+      "num_cellulare": senddata["Numero di cellulare"],
+      "email": senddata["E-mail"],
+      "tipologia_chat": chat_mode
+    };
+    var body = json.encode(message);
+    var data;
+    print("\nBODY:: " + body);
+
+    data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+
+    if (data.statusCode == 200) {
+      // creaPazienteServer();
+      final snackBar = SnackBar(
+        content: const Text('Utente aggiornato con successo'),
+      );
+      // Find the ScaffoldMessenger in the widget tree
+      // and use it to show a SnackBar.
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
+      print("ERRORE LATO POSTGRESQL: err: ");
+      const snackBar = const SnackBar(
+        content: Text('Utente non aggiornato'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
   // Copy Main List into New List.
   List<Map<String, String>> newDataList = List.from(mainDataList);
 
   Future<String> AssociaDottore(String dot_cod_fiscale, int role) async {
-    var uri = Uri.parse('http://' + urlServer + '/associa_attore');
+    var uri = Uri.parse(urlServer + 'associa_attore');
     print(uri);
-
-    print(dot_cod_fiscale + "ukff");
 
     print(senddata);
     Map<String, String> message = {
@@ -227,7 +270,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   }
 
   Future<String> RimuoviAssociazione(String dot_cod_fiscale, int role) async {
-    var uri = Uri.parse('http://' + urlServer + '/rimuovi_associazione');
+    var uri = Uri.parse(urlServer + 'rimuovi_associazione');
     print(uri);
 
     print(dot_cod_fiscale + "ukff");
@@ -307,6 +350,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
         if (value == null || value.isEmpty) {
           return validator;
         }
+        senddata[labelText] = value;
         return null;
       },
     );
@@ -314,6 +358,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
 
   Widget _form() {
     final _formKey = GlobalKey<FormState>();
+    String select_chat_mode;
 
     return Form(
       key: _formKey,
@@ -440,9 +485,24 @@ class _MyModifyProfile extends State<MyModifyProfile> {
               style: TextStyle(fontSize: 15),
             ),
           ),
-          _checkboxListTile("Solo testo", 0),
-          _checkboxListTile("Videochiamata", 1),
-          _checkboxListTile("Chiamata vocale", 2),
+          ChatSwitch(
+            onToggle: (Chat chat) {
+              select_chat_mode = chat.toString().split('.').last;
+              switch (select_chat_mode) {
+                case 'testo':
+                  chat_mode = 0;
+                  break;
+                case 'vocale':
+                  chat_mode = 1;
+                  break;
+                case 'video':
+                  chat_mode = 2;
+                  break;
+                default:
+              }
+              print('>>>>>>>>>> mode: ' + chat_mode.toString());
+            },
+          ),
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -450,7 +510,13 @@ class _MyModifyProfile extends State<MyModifyProfile> {
                 onPressed: () {
                   // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate()) {
-                    // If the form is valid
+                    updateProfilo();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfiloPaziente(cod_fiscale),
+                      ),
+                    );
                   }
                 },
                 child: const Text('Salva'),
@@ -492,5 +558,6 @@ class _MyModifyProfile extends State<MyModifyProfile> {
 class Person {
   //modal class for Person object
   String id, name, phone;
+
   Person({required this.id, required this.name, required this.phone});
 }

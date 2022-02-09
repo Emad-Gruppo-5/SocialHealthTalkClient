@@ -50,7 +50,7 @@ class ListSearchState extends State<ListSearch> {
 
   Future<String> getActors() async {
     mainDataList.clear();
-    var uri = Uri.parse('http://' + urlServer + '/lista_attori');
+    var uri = Uri.parse(urlServer + 'lista_attori');
     print(uri);
 
     int role = 4;

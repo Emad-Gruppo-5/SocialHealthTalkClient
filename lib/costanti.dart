@@ -1,1 +1,1 @@
-var urlServer = 'socialhealthtalk.heroku';
+var urlServer = 'https://socialhealthtalk.herokuapp.com/';

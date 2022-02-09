@@ -144,7 +144,7 @@ class _MyVoiceToneAnalysis extends State<MyVoiceToneAnalysis> {
 
   Future<List<Map<String, dynamic>>> getAnalisi(String date) async {
     List<Map<String, dynamic>> _analysis = [];
-    var uri = Uri.parse('http://' + urlServer + ':5000/getAnalisi');
+    var uri = Uri.parse(urlServer + 'getAnalisi');
 
     print(uri);
 

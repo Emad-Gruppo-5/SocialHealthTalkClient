@@ -77,7 +77,7 @@ class Notifications extends StatelessWidget {
 
 Future<void> sendAlert(List<String> addresses, String nome, String cognome,
     String ultimo_accesso) async {
-  var uri = Uri.parse('http://' + urlServer + '/alert');
+  var uri = Uri.parse(urlServer + 'alert');
   print(uri);
   Map<String, dynamic> message = {
     "nome": nome,
@@ -95,7 +95,7 @@ Future<void> sendAlert(List<String> addresses, String nome, String cognome,
 
 Future<String> getActors(String cod_fiscale) async {
   List<Map<String, dynamic>> mainDataList = [];
-  var uri = Uri.parse('http://' + urlServer + '/attori_associati');
+  var uri = Uri.parse(urlServer + 'attori_associati');
   print(uri);
 
   Map<String, dynamic> message = {"role": 1, "cod_fiscale": cod_fiscale};

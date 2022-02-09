@@ -37,7 +37,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
 
   Future<Map<String, dynamic>> getprofiledata() async {
     print("Inizio funzione");
-    var uri = Uri.parse('http://' + urlServer + '/dati_profilo');
+    var uri = Uri.parse(urlServer + 'dati_profilo');
     print(uri);
     var message = {"role": 1, "cod_fiscale": cod_fiscale};
 
@@ -49,7 +49,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
         },
         body: body);
 
-    uri = Uri.parse('http://' + urlServer + '/attori_associati');
+    uri = Uri.parse(urlServer + 'attori_associati');
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{
@@ -65,7 +65,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
   }
 
   Future<int> eliminaUtente() async {
-    var uri = Uri.parse('http://' + urlServer + '/elimina_utente');
+    var uri = Uri.parse(urlServer + 'elimina_utente');
     print(uri);
     var message = {"role": 1, "cod_fiscale": cod_fiscale};
 

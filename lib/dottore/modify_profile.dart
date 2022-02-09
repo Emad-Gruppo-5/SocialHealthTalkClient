@@ -143,7 +143,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   }
 
   Future<String> modificaUtente() async {
-    var uri = Uri.parse('http://' + urlServer + ':5000/modifica_utente');
+    var uri = Uri.parse(urlServer + 'modifica_utente');
 
     print(uri);
 

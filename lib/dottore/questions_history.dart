@@ -505,6 +505,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                           return ListView(
                             shrinkWrap: true,
                             children: lista.map((data) {
+                              print(data);
                               return Center(
                                 child: Card(
                                   child: Column(
@@ -658,6 +659,7 @@ class _QuestionsHistory extends State<QuestionsHistory> {
                               child: Text(
                                   "Non ci sono domande chiuse per il giorno selezionato"));
                         }
+                        return CircularProgressIndicator();
                       })
                 ],
               ),

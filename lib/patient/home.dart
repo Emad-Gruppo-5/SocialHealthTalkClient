@@ -472,7 +472,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           print(downloadUrl);
           var uri;
           // if (kIsWeb) {
-          uri = Uri.parse('http://' + urlServer + ':5000/aggiungi_domanda');
+          uri = Uri.parse(urlServer + 'aggiungi_domanda');
           // } else
           //   uri = Uri.parse('http://10.0.2.2:5000/aggiungi_domanda');
 

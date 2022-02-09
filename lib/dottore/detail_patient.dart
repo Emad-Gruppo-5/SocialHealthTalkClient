@@ -67,7 +67,7 @@ class MyDetailPatient extends State<DetailPatient> {
 
   Future<Map<String, dynamic>> getprofiledata() async {
     print("Inizio funzione");
-    var uri = Uri.parse('http://' + urlServer + ':5000/dati_profilo');
+    var uri = Uri.parse(urlServer + 'dati_profilo');
     print(uri);
     var message = {"role": 1, "cod_fiscale": paz_cod_fiscale};
 
@@ -87,7 +87,7 @@ class MyDetailPatient extends State<DetailPatient> {
   }
 
   Future<void> updateNotes() async {
-    var uri = Uri.parse('http://' + urlServer + ':5000/updateNotes');
+    var uri = Uri.parse(urlServer + 'updateNotes');
     print(uri);
 
     Map<String, String> message = {

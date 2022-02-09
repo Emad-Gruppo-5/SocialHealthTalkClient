@@ -57,7 +57,7 @@ class LoginPageState extends State<LoginPage> {
 
   Future<String> login(cod_fiscale, password) async {
     final digest = Crypt.sha256(password).toString();
-    var uri = Uri.parse('http://' + urlServer + ':5000/login');
+    var uri = Uri.parse(urlServer + 'login');
 
     print(uri);
 
@@ -201,7 +201,7 @@ class LoginPageState extends State<LoginPage> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (_formKey.currentState!.validate()) {
-                                    var cod_fiscale = _cod_fiscaleC.text.toUpperCase();
+                                    var cod_fiscale = _cod_fiscaleC.text;
                                     var password = _passwordC.text;
 
                                     login(cod_fiscale, password).then((data) {
