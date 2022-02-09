@@ -65,7 +65,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   int chat_mode = 0;
 
   Future<void> creaPazienteServer() async {
-    var uri = Uri.parse('http://' + urlServer + ':5000/crea_utente');
+    var uri = Uri.parse('http://' + urlServer + '/crea_utente');
     print(uri);
     CollectionReference patients =
         FirebaseFirestore.instance.collection('patients');
@@ -242,11 +242,12 @@ class _MyModifyProfile extends State<MyModifyProfile> {
                   // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate() && chat_mode >= 0) {
                     creaPazienteServer().then((value) => {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => AdminHome()),
-                      ),
-                    });
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AdminHome()),
+                          ),
+                        });
                   } else {
                     final snackBar = SnackBar(
                       content: const Text('Seleziona tipologia di chat'),

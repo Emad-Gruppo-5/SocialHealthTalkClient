@@ -9,6 +9,7 @@ import 'package:test_emad/familiare.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:test_emad/costanti.dart';
+
 /// This is the main application widget.
 class ProfiloDot extends StatefulWidget {
   final String cod_fiscale;
@@ -23,7 +24,7 @@ class ProfiloDot extends StatefulWidget {
 class _Profilodottore extends State<ProfiloDot> {
   late String cod_fiscale;
   CollectionReference doctors =
-  FirebaseFirestore.instance.collection('doctors');
+      FirebaseFirestore.instance.collection('doctors');
   //late Future<Map<String, dynamic>> datiprofilo;
 
   @override
@@ -36,7 +37,7 @@ class _Profilodottore extends State<ProfiloDot> {
 
   Future<Map<String, dynamic>> getprofiledata() async {
     print("Inizio funzione");
-    var uri = Uri.parse('http://' + urlServer + ':5000/dati_profilo');
+    var uri = Uri.parse('http://' + urlServer + '/dati_profilo');
     print(uri);
     var message = {"role": 2, "cod_fiscale": cod_fiscale};
 
@@ -48,7 +49,7 @@ class _Profilodottore extends State<ProfiloDot> {
         },
         body: body);
 
-    uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
+    uri = Uri.parse('http://' + urlServer + '/attori_associati');
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{
@@ -63,10 +64,7 @@ class _Profilodottore extends State<ProfiloDot> {
   }
 
   Future<int> eliminaUtente() async {
-
-
-    var uri =
-    Uri.parse('http://' + urlServer + ':5000/elimina_utente');
+    var uri = Uri.parse('http://' + urlServer + '/elimina_utente');
     print(uri);
     var message = {"role": 2, "cod_fiscale": cod_fiscale};
 
@@ -74,13 +72,11 @@ class _Profilodottore extends State<ProfiloDot> {
 
     var data = await http.post(uri,
         headers: <String, String>{
-          'Content-Type':
-          'application/json; charset=UTF-8'
+          'Content-Type': 'application/json; charset=UTF-8'
         },
         body: body);
     return data.statusCode;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -131,8 +127,6 @@ class _Profilodottore extends State<ProfiloDot> {
                     actions: <Widget>[
                       TextButton(
                         onPressed: () {
-
-
                           eliminaUtente().then((value) {
                             if (value == 200) {
                               doctors.doc(cod_fiscale).delete().then((value) {
@@ -156,13 +150,12 @@ class _Profilodottore extends State<ProfiloDot> {
                                       content: Text(
                                           "Errore nella rimozione del dottore")));
                             }
-                          })
-                              .catchError((err) => {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        "Errore nella rimozione del dottore"))),
-                          });
+                          }).catchError((err) => {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            "Errore nella rimozione del dottore"))),
+                              });
                         },
                         child: const Text('Si'),
                       ),
@@ -197,10 +190,14 @@ class _Profilodottore extends State<ProfiloDot> {
                 print(snapshot.data);
 
                 Map<String, dynamic> data = Map.from(snapshot.data!);
-                pazienti = json.decode(json.encode(data["pazienti"]).toString());
+                pazienti =
+                    json.decode(json.encode(data["pazienti"]).toString());
                 profilo = json.decode(json.encode(data["dottore"]).toString());
 
-                print("DOTTORI\n" + pazienti.toString()+ profilo.toString() + profilo["nome"]);
+                print("DOTTORI\n" +
+                    pazienti.toString() +
+                    profilo.toString() +
+                    profilo["nome"]);
                 return SingleChildScrollView(
                   child: Column(
                     children: [
@@ -218,7 +215,8 @@ class _Profilodottore extends State<ProfiloDot> {
                         style: TextStyle(fontSize: 20),
                       ),
                       for (int i = 0; i < pazienti.length; i++)
-                        _card(pazienti[i]["cognome"] + " " + pazienti[i]["nome"],
+                        _card(
+                            pazienti[i]["cognome"] + " " + pazienti[i]["nome"],
                             Icons.people_alt),
                     ],
                   ),

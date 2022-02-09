@@ -117,7 +117,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   Future<void> getActors(String cod_fiscale) async {
     mainDataList.clear();
     secondDataList.clear();
-    var uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
+    var uri = Uri.parse('http://' + urlServer + '/attori_associati');
     print(uri);
 
     int role = 1;
@@ -164,7 +164,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
 
     var body = json.encode(message);
 
-    var uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
+    var uri = Uri.parse('http://' + urlServer + '/attori_associati');
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{
@@ -188,7 +188,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   List<Map<String, String>> newDataList = List.from(mainDataList);
 
   Future<String> AssociaDottore(String dot_cod_fiscale, int role) async {
-    var uri = Uri.parse('http://' + urlServer + ':5000/associa_attore');
+    var uri = Uri.parse('http://' + urlServer + '/associa_attore');
     print(uri);
 
     print(dot_cod_fiscale + "ukff");
@@ -227,7 +227,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   }
 
   Future<String> RimuoviAssociazione(String dot_cod_fiscale, int role) async {
-    var uri = Uri.parse('http://' + urlServer + ':5000/rimuovi_associazione');
+    var uri = Uri.parse('http://' + urlServer + '/rimuovi_associazione');
     print(uri);
 
     print(dot_cod_fiscale + "ukff");

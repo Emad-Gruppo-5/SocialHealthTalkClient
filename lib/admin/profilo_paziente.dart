@@ -9,6 +9,7 @@ import 'package:test_emad/familiare.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:test_emad/costanti.dart';
+
 /// This is the main application widget.
 class ProfiloPaziente extends StatefulWidget {
   final String cod_fiscale;
@@ -23,7 +24,7 @@ class ProfiloPaziente extends StatefulWidget {
 class _ProfiloPaziente extends State<ProfiloPaziente> {
   late String cod_fiscale;
   CollectionReference patients =
-                              FirebaseFirestore.instance.collection('patients');
+      FirebaseFirestore.instance.collection('patients');
   //late Future<Map<String, dynamic>> datiprofilo;
 
   @override
@@ -36,7 +37,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
 
   Future<Map<String, dynamic>> getprofiledata() async {
     print("Inizio funzione");
-    var uri = Uri.parse('http://' + urlServer + ':5000/dati_profilo');
+    var uri = Uri.parse('http://' + urlServer + '/dati_profilo');
     print(uri);
     var message = {"role": 1, "cod_fiscale": cod_fiscale};
 
@@ -48,7 +49,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
         },
         body: body);
 
-    uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
+    uri = Uri.parse('http://' + urlServer + '/attori_associati');
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{
@@ -64,24 +65,19 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
   }
 
   Future<int> eliminaUtente() async {
-      
-      
-      var uri =
-          Uri.parse('http://' + urlServer + ':5000/elimina_utente');
-      print(uri);
-      var message = {"role": 1, "cod_fiscale": cod_fiscale};
+    var uri = Uri.parse('http://' + urlServer + '/elimina_utente');
+    print(uri);
+    var message = {"role": 1, "cod_fiscale": cod_fiscale};
 
-      var body = json.encode(message);
+    var body = json.encode(message);
 
-      var data = await http.post(uri,
-              headers: <String, String>{
-                'Content-Type':
-                    'application/json; charset=UTF-8'
-              },
-              body: body);
-      return data.statusCode;
-    }
-
+    var data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+    return data.statusCode;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,9 +130,7 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                     actions: <Widget>[
                       TextButton(
                         onPressed: () {
-
-                          
-                            eliminaUtente().then((value) {
+                          eliminaUtente().then((value) {
                             if (value == 200) {
                               patients.doc(cod_fiscale).delete().then((value) {
                                 print("Patient Deleted");
@@ -159,13 +153,12 @@ class _ProfiloPaziente extends State<ProfiloPaziente> {
                                       content: Text(
                                           "Errore nella rimozione del paziente")));
                             }
-                          })
-                          .catchError((err) => {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text(
-                                          "Errore nella rimozione del paziente"))),
-                          });
+                          }).catchError((err) => {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            "Errore nella rimozione del paziente"))),
+                              });
                         },
                         child: const Text('Si'),
                       ),

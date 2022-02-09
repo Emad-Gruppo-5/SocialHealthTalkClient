@@ -41,13 +41,13 @@ class ProfiloFamiliareModifica extends StatelessWidget {
         ),
         body: SingleChildScrollView(
             child: MyModifyProfile(
-              nome: nome,
-              cognome: cognome,
-              cod_fiscale: cod_fiscale,
-              email: email,
-              num_cellulare: num_cellulare,
-              lista_pazienti: lista_pazienti,
-            )),
+          nome: nome,
+          cognome: cognome,
+          cod_fiscale: cod_fiscale,
+          email: email,
+          num_cellulare: num_cellulare,
+          lista_pazienti: lista_pazienti,
+        )),
       ),
     );
   }
@@ -105,7 +105,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   Future<void> getActors(String cod_fiscale) async {
     mainDataList.clear();
     secondDataList.clear();
-    var uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
+    var uri = Uri.parse('http://' + urlServer + '/attori_associati');
     print(uri);
 
     int role = 1;
@@ -126,9 +126,9 @@ class _MyModifyProfile extends State<MyModifyProfile> {
     var i = 0;
     while (i < json.decode(data.body).length) {
       if (json
-          .decode(data.body)["lista_pazienti"]
-          .toString()
-          .compareTo('lista_pazienti') ==
+              .decode(data.body)["lista_pazienti"]
+              .toString()
+              .compareTo('lista_pazienti') ==
           1) {
         mainDataList.add({
           'cognome': json.decode(data.body)[i]['cognome'],
@@ -152,7 +152,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
 
     var body = json.encode(message);
 
-    var uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
+    var uri = Uri.parse('http://' + urlServer + '/attori_associati');
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{
@@ -173,7 +173,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   List<Map<String, String>> newDataList = List.from(mainDataList);
 
   Future<String> AssociaFamiliare(String pat_cod_fiscale, int role) async {
-    var uri = Uri.parse('http://' + urlServer + ':5000/associa_attore');
+    var uri = Uri.parse('http://' + urlServer + '/associa_attore');
     print(uri);
 
     print(pat_cod_fiscale + "ukff");
@@ -212,7 +212,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   }
 
   Future<String> RimuoviAssociazione(String dot_cod_fiscale, int role) async {
-    var uri = Uri.parse('http://' + urlServer + ':5000/rimuovi_associazione');
+    var uri = Uri.parse('http://' + urlServer + '/rimuovi_associazione');
     print(uri);
 
     print(dot_cod_fiscale + "ukff");
@@ -361,7 +361,6 @@ class _MyModifyProfile extends State<MyModifyProfile> {
               child: const Text('Aggiungi paziente'),
             ),
           ),
-
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),

@@ -49,7 +49,7 @@ class ListSearchState extends State<ListSearch> {
 
   Future<void> getActors() async {
     mainDataList.clear();
-    var uri = Uri.parse('http://' + urlServer + ':5000/lista_attori');
+    var uri = Uri.parse('http://' + urlServer + '/lista_attori');
     print(uri);
 
     int role = 2;
@@ -132,7 +132,8 @@ class ListSearchState extends State<ListSearch> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ProfiloDot(data["cod_fiscale"]!),
+                              builder: (context) =>
+                                  ProfiloDot(data["cod_fiscale"]!),
                             ),
                           ),
                         });
