@@ -1,3 +1,4 @@
+import 'package:test_emad/admin/profilo_familiari.dart';
 import 'package:test_emad/costanti.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -250,6 +251,42 @@ class _MyModifyProfile extends State<MyModifyProfile> {
     return data.body;
   }
 
+  Future<void> updateProfilo() async {
+    var uri = Uri.parse(urlServer + 'modifica_utente');
+
+    Map<String, dynamic> message = {
+      "role": 4.toString(),
+      "cod_fiscale": cod_fiscale,
+      "num_cellulare": senddata["Numero di cellulare"],
+      "email": senddata["E-mail"]
+    };
+    var body = json.encode(message);
+    var data;
+    print("\nBODY:: " + body);
+
+    data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+
+    if (data.statusCode == 200) {
+      // creaPazienteServer();
+      final snackBar = SnackBar(
+        content: const Text('Utente aggiornato con successo'),
+      );
+      // Find the ScaffoldMessenger in the widget tree
+      // and use it to show a SnackBar.
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
+      print("ERRORE LATO POSTGRESQL: err: ");
+      const snackBar = const SnackBar(
+        content: Text('Utente non aggiornato'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
   void _navigateAndDisplaySelection(BuildContext context, int role) async {
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the Selection Screen.
@@ -286,6 +323,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
         if (value == null || value.isEmpty) {
           return validator;
         }
+        senddata[labelText] = value;
         return null;
       },
     );
@@ -368,7 +406,13 @@ class _MyModifyProfile extends State<MyModifyProfile> {
                 onPressed: () {
                   // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate()) {
-                    // If the form is valid
+                    updateProfilo();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfiloFamiliare(cod_fiscale),
+                      ),
+                    );
                   }
                 },
                 child: const Text('Salva'),
