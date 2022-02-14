@@ -286,7 +286,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
       AssociaDottore(result.toString(), role);
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text('$result')));
+        ..showSnackBar(SnackBar(content: Text("Associazione inserita con successo")));
       await updateProfileData();
       setState(() {
         //refresh UI after deleting element from list

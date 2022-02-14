@@ -201,7 +201,7 @@ class LoginPageState extends State<LoginPage> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (_formKey.currentState!.validate()) {
-                                    var cod_fiscale = _cod_fiscaleC.text.toUpperCase();
+                                    var cod_fiscale = _cod_fiscaleC.text;
                                     var password = _passwordC.text;
 
                                     login(cod_fiscale, password).then((data) {

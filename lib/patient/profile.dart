@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:test_emad/patient/home.dart';
 import '../main.dart';
 import 'modify_profile.dart';
+import '../costanti.dart';
 
 /// This is the main application widget.
 class Profile extends StatefulWidget {
@@ -64,8 +65,8 @@ class _Profile extends State<Profile> {
     }
   }
 
-  Duration alert_duration = const Duration(seconds: 20);
-  Duration online_duration = const Duration(seconds: 5);
+  Duration alert_duration = Duration(seconds: alert_dur);
+  Duration online_duration = Duration(seconds: online_dur);
   late Timer timer;
   late Timer timer_alert;
   String timerText = "Start";

@@ -41,11 +41,11 @@ class _ChatSwitch extends State<ChatSwitch> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        _buildButton(Chat.testo, Icons.message, 'Testo '),
+        _buildButton(Chat.testo, Icons.message, ''),
         const SizedBox(width: 12),
-        _buildButton(Chat.vocale, Icons.call, 'Vocale '),
+        _buildButton(Chat.vocale, Icons.call, ''),
         const SizedBox(width: 12),
-        _buildButton(Chat.video, Icons.video_call, 'Video Chiamata '),
+        _buildButton(Chat.video, Icons.video_call, ''),
       ],
     );
   }

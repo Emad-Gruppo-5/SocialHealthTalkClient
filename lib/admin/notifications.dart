@@ -145,7 +145,7 @@ class MyNotifications extends StatelessWidget {
 
                       for (int i = 0; i < actors.length; i++)
                         if (actors[i]["value"])
-                          addresses.add(actors[i]["num_cellulare"]);
+                          addresses.add("+39" + actors[i]["num_cellulare"]);
 
                       print(addresses);
                       // RACCOLTA EMAIL e poi INVIO EMAILS

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:test_emad/patient/profile.dart';
 import '../main.dart';
+import '../costanti.dart';
 
 class ModifyProfile extends StatefulWidget {
   final String nome;
@@ -67,8 +68,8 @@ class _ModifyProfile extends State<ModifyProfile> {
     super.initState();
   }
   
-  Duration alert_duration = const Duration(seconds: 20);
-  Duration online_duration = const Duration(seconds: 7);
+  Duration alert_duration = Duration(seconds: alert_dur);
+  Duration online_duration = Duration(seconds: online_dur);
   late Timer timer;
   late Timer timer_alert;
   String timerText = "Start";

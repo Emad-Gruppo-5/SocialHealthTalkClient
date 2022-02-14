@@ -373,7 +373,8 @@ class NewQuestionState extends State<NewQuestion> {
             _iconButton2(context, Icons.logout, 'Logout', LoginPage()),
           ],
         ),
-        body: Center(
+        body: SingleChildScrollView(
+          child: Center(
           child: Column(
             children: [
               SizedBox(height: 10,),
@@ -381,6 +382,7 @@ class NewQuestionState extends State<NewQuestion> {
               _form(),
             ],
           ),
+        ),
         ),
       ),
     );

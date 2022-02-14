@@ -12,7 +12,7 @@ import 'dart:developer';
 import 'package:intl/intl.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:test_emad/costanti.dart';
 import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart' as ap;
@@ -94,9 +94,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   late String token;
   late String cod_fiscale;
 
-  Duration online_duration = const Duration(seconds: 7);
-  Duration alert_duration = const Duration(seconds: 20);
-  Duration question_duration = const Duration(seconds: 30);
+  Duration online_duration = Duration(seconds: online_dur);
+  Duration alert_duration = Duration(seconds: alert_dur);
+  Duration question_duration = Duration(seconds: question_dur);
   late Timer timer;
   late Timer timer_alert;
   String timerText = "Start";
@@ -343,25 +343,25 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
   }
 
-  // void questionTimeout() {
-  //   FirebaseFirestore.instance
-  //       .collection('patients')
-  //       .doc(cod_fiscale)
-  //       .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
-  // }
+  void questionTimeout() {
+    FirebaseFirestore.instance
+        .collection('patients')
+        .doc(cod_fiscale)
+        .update({'status': 'offline', 'ultimo_accesso': ultimo_accesso});
+  }
 
   void callback() {
     print("ALERT\nCod_fiscale: " + cod_fiscale);
-    // FirebaseFirestore.instance
-    //     .collection('notifications')
-    //     .add({
-    //           'alert': true,
-    //           'letto': false,
-    //           'cod_fiscale': cod_fiscale,
-    //           'nome': nome,
-    //           'cognome': cognome,
-    //           'ultimo_accesso': ultimo_accesso
-    //     });
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .add({
+              'alert': true,
+              'letto': false,
+              'cod_fiscale': cod_fiscale,
+              'nome': nome,
+              'cognome': cognome,
+              'ultimo_accesso': ultimo_accesso
+        });
   }
 
   bool _isRecording = false;
