@@ -47,16 +47,17 @@ class _MyModifyProfile extends State<CreateProfile> {
   void initState() {
     super.initState();
   }
+
   Map<String, dynamic> senddata = {};
-    TextEditingController _cont1 = TextEditingController();
+  TextEditingController _cont1 = TextEditingController();
   TextEditingController _cont2 = TextEditingController();
   TextEditingController _cont3 = TextEditingController();
   TextEditingController _cont4 = TextEditingController();
   TextEditingController _cont5 = TextEditingController();
   TextEditingController _cont6 = TextEditingController();
-  
+
   Future<void> creaDottoreServer() async {
-    var uri = Uri.parse('http://' + urlServer + ':5000/crea_utente');
+    var uri = Uri.parse(urlServer + 'crea_utente');
 
     int role = 2;
     print(senddata);
@@ -81,8 +82,6 @@ class _MyModifyProfile extends State<CreateProfile> {
         body: body);
 
     if (data.statusCode == 200) {
-  
-
       // creaPazienteServer();
       final snackBar = SnackBar(
         content: const Text('Utente inserito con successo'),
@@ -100,7 +99,7 @@ class _MyModifyProfile extends State<CreateProfile> {
   }
 
   Widget _textFormField(IconData icon, String labelText, String validator,
-       TextEditingController _cont) {
+      TextEditingController _cont) {
     return TextFormField(
       controller: _cont,
       decoration: InputDecoration(
@@ -134,8 +133,8 @@ class _MyModifyProfile extends State<CreateProfile> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child:
-                _textFormField(Icons.person_rounded, "Nome", "Inserisci Nome", _cont1),
+            child: _textFormField(
+                Icons.person_rounded, "Nome", "Inserisci Nome", _cont1),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -154,7 +153,8 @@ class _MyModifyProfile extends State<CreateProfile> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _textFormField(Icons.email, "E-mail", "Inserisci e-mail", _cont5),
+            child: _textFormField(
+                Icons.email, "E-mail", "Inserisci e-mail", _cont5),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -170,11 +170,12 @@ class _MyModifyProfile extends State<CreateProfile> {
                   if (_formKey.currentState!.validate()) {
                     // If the form is valid
                     creaDottoreServer().then((value) => {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => AdminHome()),
-                      ),
-                    });
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AdminHome()),
+                          ),
+                        });
                   }
                 },
                 child: const Text('Crea'),

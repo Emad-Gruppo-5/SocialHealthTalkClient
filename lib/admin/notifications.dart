@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:test_emad/costanti.dart';
+
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class Notifications extends StatelessWidget {
@@ -74,10 +75,16 @@ class Notifications extends StatelessWidget {
   }
 }
 
-Future<void> sendAlert(List<String> addresses, String nome, String cognome, String ultimo_accesso) async {
-  var uri = Uri.parse('http://' + urlServer + ':5000/alert');
+Future<void> sendAlert(List<String> addresses, String nome, String cognome,
+    String ultimo_accesso) async {
+  var uri = Uri.parse(urlServer + 'alert');
   print(uri);
-  Map<String, dynamic> message = {"nome": nome, "cognome": cognome, "ultimo_accesso": ultimo_accesso, "num_cellulare": addresses};
+  Map<String, dynamic> message = {
+    "nome": nome,
+    "cognome": cognome,
+    "ultimo_accesso": ultimo_accesso,
+    "num_cellulare": addresses
+  };
   var body = json.encode(message);
   await http.post(uri,
       headers: <String, String>{
@@ -88,7 +95,7 @@ Future<void> sendAlert(List<String> addresses, String nome, String cognome, Stri
 
 Future<String> getActors(String cod_fiscale) async {
   List<Map<String, dynamic>> mainDataList = [];
-  var uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
+  var uri = Uri.parse(urlServer + 'attori_associati');
   print(uri);
 
   Map<String, dynamic> message = {"role": 1, "cod_fiscale": cod_fiscale};
@@ -107,7 +114,8 @@ Future<String> getActors(String cod_fiscale) async {
 class MyNotifications extends StatelessWidget {
   List<Map<String, dynamic>> actors = [];
 
-  Future _showAlertDialog(BuildContext context, String nome, String cognome, String ultimo_accesso) {
+  Future _showAlertDialog(BuildContext context, String nome, String cognome,
+      String ultimo_accesso) {
     return showDialog<void>(
         context: context,
         barrierDismissible: false,
@@ -149,11 +157,12 @@ class MyNotifications extends StatelessWidget {
 
                       print(addresses);
                       // RACCOLTA EMAIL e poi INVIO EMAILS
-                      sendAlert(addresses, nome, cognome, ultimo_accesso).then((val) {
+                      sendAlert(addresses, nome, cognome, ultimo_accesso)
+                          .then((val) {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-                            .showSnackBar(const SnackBar(
-                                content: Text('SMS inviati')));
+                            .showSnackBar(
+                                const SnackBar(content: Text('SMS inviati')));
                         actors.clear();
                       });
                     },
@@ -258,11 +267,16 @@ class MyNotifications extends StatelessWidget {
                                 i < json.decode(value)["dottori"].length;
                                 i++) {
                               actors.add({
-                                'cognome': json.decode(value)["dottori"][i]['cognome'],
-                                'nome': json.decode(value)["dottori"][i]['nome'],
-                                'cod_fiscale': json.decode(value)["dottori"][i]['cod_fiscale'],
-                                'email': json.decode(value)["dottori"][i]['email'],
-                                'num_cellulare': json.decode(value)["dottori"][i]['num_cellulare'],
+                                'cognome': json.decode(value)["dottori"][i]
+                                    ['cognome'],
+                                'nome': json.decode(value)["dottori"][i]
+                                    ['nome'],
+                                'cod_fiscale': json.decode(value)["dottori"][i]
+                                    ['cod_fiscale'],
+                                'email': json.decode(value)["dottori"][i]
+                                    ['email'],
+                                'num_cellulare': json.decode(value)["dottori"]
+                                    [i]['num_cellulare'],
                                 'value': false,
                                 'categoria': 'D'
                               });
@@ -286,7 +300,8 @@ class MyNotifications extends StatelessWidget {
                                 'categoria': 'F'
                               });
                             }
-                            _showAlertDialog(context, data["nome"], data["cognome"], data["ultimo_accesso"]);
+                            _showAlertDialog(context, data["nome"],
+                                data["cognome"], data["ultimo_accesso"]);
                           })
                         },
                         onLongPress: () => _notificationsReference

@@ -25,7 +25,7 @@ class _RecuperaPassword extends State<RecuperaPassword> {
 
   Future<String> recuperaPassword(cod_fiscale) async {
 
-    var uri = Uri.parse('http://' + urlServer + ':5000/recupera_password');
+    var uri = Uri.parse(urlServer + 'recupera_password');
     
     print(uri);
 

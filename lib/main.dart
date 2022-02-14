@@ -57,7 +57,7 @@ class LoginPageState extends State<LoginPage> {
 
   Future<String> login(cod_fiscale, password) async {
     final digest = Crypt.sha256(password).toString();
-    var uri = Uri.parse('http://' + urlServer + ':5000/login');
+    var uri = Uri.parse(urlServer + 'login');
 
     print(uri);
 

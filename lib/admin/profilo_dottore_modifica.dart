@@ -1,3 +1,4 @@
+import 'package:test_emad/admin/profilo_dottore.dart';
 import 'package:test_emad/costanti.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -105,7 +106,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   Future<void> getActors(String cod_fiscale) async {
     mainDataList.clear();
     secondDataList.clear();
-    var uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
+    var uri = Uri.parse(urlServer + 'attori_associati');
     print(uri);
 
     int role = 1;
@@ -153,7 +154,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
     var body = json.encode(message);
     lista_pazienti.clear();
 
-    var uri = Uri.parse('http://' + urlServer + ':5000/attori_associati');
+    var uri = Uri.parse( urlServer + 'attori_associati');
 
     var attori_associati = await http.post(uri,
         headers: <String, String>{
@@ -174,7 +175,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   List<Map<String, String>> newDataList = List.from(mainDataList);
 
   Future<String> AssociaDottore(String dot_cod_fiscale, int role) async {
-    var uri = Uri.parse('http://' + urlServer + ':5000/associa_attore');
+    var uri = Uri.parse(urlServer + 'associa_attore');
     print(uri);
 
     print(dot_cod_fiscale + "ukff");
@@ -213,7 +214,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
   }
 
   Future<String> RimuoviAssociazione(String dot_cod_fiscale, int role) async {
-    var uri = Uri.parse('http://' + urlServer + ':5000/rimuovi_associazione');
+    var uri = Uri.parse(urlServer + 'rimuovi_associazione');
     print(uri);
 
     print(dot_cod_fiscale + "ukff");
@@ -251,6 +252,43 @@ class _MyModifyProfile extends State<MyModifyProfile> {
     return data.body;
   }
 
+
+  Future<void> updateProfilo() async {
+    var uri = Uri.parse(urlServer + 'modifica_utente');
+
+    Map<String, dynamic> message = {
+      "role": 2.toString(),
+      "cod_fiscale": cod_fiscale,
+      "num_cellulare": senddata["Numero di cellulare"],
+      "email": senddata["E-mail"]
+    };
+    var body = json.encode(message);
+    var data;
+    print("\nBODY:: " + body);
+
+    data = await http.post(uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: body);
+
+    if (data.statusCode == 200) {
+      // creaPazienteServer();
+      final snackBar = SnackBar(
+        content: const Text('Utente aggiornato con successo'),
+      );
+      // Find the ScaffoldMessenger in the widget tree
+      // and use it to show a SnackBar.
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
+      print("ERRORE LATO POSTGRESQL: err: ");
+      const snackBar = const SnackBar(
+        content: Text('Utente non aggiornato'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
   void _navigateAndDisplaySelection(BuildContext context, int role) async {
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the Selection Screen.
@@ -268,8 +306,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text('$result')));
       await updateProfileData();
-      setState(() {
-      });
+      setState(() {});
     }
   }
 
@@ -286,6 +323,7 @@ class _MyModifyProfile extends State<MyModifyProfile> {
         if (value == null || value.isEmpty) {
           return validator;
         }
+        senddata[labelText] = value;
         return null;
       },
     );
@@ -369,7 +407,13 @@ class _MyModifyProfile extends State<MyModifyProfile> {
                 onPressed: () {
                   // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate()) {
-                    // If the form is valid
+                    updateProfilo();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfiloDot(cod_fiscale),
+                      ),
+                    );
                   }
                 },
                 child: const Text('Salva'),
